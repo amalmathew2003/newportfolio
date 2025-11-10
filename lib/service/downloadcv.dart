@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart'; // For kIsWeb
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // For web
@@ -16,7 +16,7 @@ Future<void> downloadCV(BuildContext context) async {
 
   try {
     if (kIsWeb) {
-      // Show fake loader
+      // Show loader
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -27,17 +27,17 @@ Future<void> downloadCV(BuildContext context) async {
 
       await Future.delayed(const Duration(seconds: 2)); // fake wait
 
-      // Trigger download
-      final anchor = html.AnchorElement(href: url)
-        ..download = 'AmalMathewCV.pdf'
+      // ✅ Trigger download
+      html.AnchorElement anchorElement = html.AnchorElement(href: url)
+        ..setAttribute("download", "AmalMathewCV.pdf")
         ..click();
 
-      Navigator.pop(context); // Close loader
+      Navigator.pop(context);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('CV download started')));
     } else {
-      // ✅ Mobile/Desktop: show loading animation
+      // ✅ Mobile/Desktop download
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -50,7 +50,6 @@ Future<void> downloadCV(BuildContext context) async {
       );
 
       Directory dir;
-
       if (Platform.isAndroid) {
         dir = Directory('/storage/emulated/0/Download');
       } else if (Platform.isIOS) {
@@ -64,9 +63,7 @@ Future<void> downloadCV(BuildContext context) async {
 
       await dio.download(url, filePath);
 
-      // ✅ Close animation
       Navigator.pop(context);
-
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('CV downloaded to: $filePath')));
@@ -74,8 +71,7 @@ Future<void> downloadCV(BuildContext context) async {
     }
   } catch (e) {
     debugPrint('❌ Error downloading CV: $e');
-    if (Navigator.canPop(context))
-      Navigator.pop(context); // Close loader if open
+    if (Navigator.canPop(context)) Navigator.pop(context);
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text('Error downloading CV: $e')));
