@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:my_portfolio/screen/project_details_screen.dart';
 
 class ProjectsScreen extends StatefulWidget {
   const ProjectsScreen({super.key});
@@ -14,11 +15,34 @@ class ProjectsScreen extends StatefulWidget {
 class _ProjectsScreenState extends State<ProjectsScreen> {
   bool _visible = false;
 
+  void _navigateToDetails(
+    BuildContext context, {
+    required String title,
+    required String category,
+    required String description,
+    required List<String> imageUrls,
+    required String githubUrl,
+    String? videoUrl,
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProjectDetailsScreen(
+          title: title,
+          category: category,
+          description: description,
+          imageUrls: imageUrls,
+          githubUrl: githubUrl,
+          videoUrl: videoUrl,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isMobile = size.width < 600;
-    final isTablet = size.width >= 600 && size.width < 1000;
+    final isMobile = size.width < 900;
 
     return VisibilityDetector(
       key: const Key('Project-section'),
@@ -30,125 +54,132 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         }
       },
       child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(
-          vertical: isMobile ? 60 : 100,
-          horizontal: isMobile ? 20 : 60,
-        ),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF0a0a0a), Color(0xFF1a1a2e), Color(0xFF0a0a0a)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 100),
         child: Column(
           children: [
-            // Section Title
-            _visible
-                ? FadeInUp(
-                    duration: const Duration(milliseconds: 800),
-                    child: Column(
-                      children: [
-                        Text(
-                          'MY PROJECTS',
-                          style: GoogleFonts.poppins(
-                            fontSize: isMobile ? 14 : 16,
-                            fontWeight: FontWeight.w300,
-                            color: const Color(0xFF00d4ff),
-                            letterSpacing: 4,
-                          ),
+            // Header
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 80),
+              child: FadeInUp(
+                duration: const Duration(milliseconds: 1000),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "SELECTED\nWORKS",
+                        style: GoogleFonts.syne(
+                          fontSize: isMobile ? 40 : 80,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: -2,
+                          height: 0.9,
                         ),
-                        const SizedBox(height: 10),
-                        ShaderMask(
-                          shaderCallback: (bounds) => const LinearGradient(
-                            colors: [Colors.white, Color(0xFF764ba2)],
-                          ).createShader(bounds),
-                          child: Text(
-                            'Recent Work',
-                            style: GoogleFonts.poppins(
-                              fontSize: isMobile ? 32 : 48,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Container(
-                          width: 80,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(2),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  )
-                : const SizedBox.shrink(),
+                    if (!isMobile)
+                      Text(
+                        "(2023 - 2024)",
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          color: Colors.white54,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
 
-            SizedBox(height: isMobile ? 40 : 60),
+            const SizedBox(height: 80),
 
-            // Projects Grid
-            Wrap(
-              spacing: isMobile ? 20 : 30,
-              runSpacing: isMobile ? 20 : 30,
-              alignment: WrapAlignment.center,
-              children: [
-                if (_visible)
-                  FadeInUp(
-                    delay: const Duration(milliseconds: 200),
-                    duration: const Duration(milliseconds: 800),
-                    child: ProjectCard(
-                      title: "Facebook UI Clone",
-                      description:
-                          "A Flutter project that replicates Facebook's UI, including stories, feed, and navigation bar.",
-                      imagePath: "assests/images/facebook.png",
-                      githubUrl: 'https://github.com/amalmathew2003/Facebook',
-                      gradientColors: const [
-                        Color(0xFF667eea),
-                        Color(0xFF764ba2),
+            // Projects List
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 80),
+              child: Column(
+                children: [
+                  if (_visible)
+                    _BrutalistProjectCard(
+                      index: "01",
+                      title: "Facebook Clone",
+                      category: "Mobile App • Flutter",
+                      imageUrls: const [
+                        "https://picsum.photos/id/1/800/600",
+                        "https://picsum.photos/id/2/800/600",
+                        "https://picsum.photos/id/3/800/600",
                       ],
-                      isMobile: isMobile,
+                      githubUrl: "https://github.com/amalmathew2003/Facebook",
+                      delay: 200,
+                      onTap: () => _navigateToDetails(
+                        context,
+                        title: "Facebook Clone",
+                        category: "Mobile App • Flutter",
+                        githubUrl: "https://github.com/amalmathew2003/Facebook",
+                        imageUrls: const [
+                          "https://picsum.photos/id/1/800/600",
+                          "https://picsum.photos/id/2/800/600",
+                          "https://picsum.photos/id/3/800/600",
+                        ],
+                        videoUrl:
+                            "https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4",
+                        description:
+                            "A pixel-perfect replication of the Facebook mobile application built with Flutter. This project demonstrates complex UI implementation, state management using Provider to handle posts and interactions, and responsive design principles. It features a home feed, story reels, marketplace UI, and profile screens, closely mimicking the native experience.",
+                      ),
                     ),
-                  ),
-                if (_visible)
-                  FadeInUp(
-                    delay: const Duration(milliseconds: 400),
-                    duration: const Duration(milliseconds: 800),
-                    child: ProjectCard(
-                      title: "OP Booking App",
-                      description:
-                          "Flutter & Firebase-based app where users log in, select district, hospital, and doctor, book available slots.",
-                      imagePath: "assests/images/op.png",
-                      githubUrl: 'https://github.com/amalmathew2003/Hospital',
-                      gradientColors: const [
-                        Color(0xFFf093fb),
-                        Color(0xFFf5576c),
+                  if (_visible)
+                    _BrutalistProjectCard(
+                      index: "02",
+                      title: "OP Booking",
+                      category: "Medical • Firebase",
+                      imageUrls: const [
+                        "https://picsum.photos/id/4/800/600",
+                        "https://picsum.photos/id/5/800/600",
                       ],
-                      isMobile: isMobile,
+                      githubUrl: "https://github.com/amalmathew2003/Hospital",
+                      delay: 400,
+                      onTap: () => _navigateToDetails(
+                        context,
+                        title: "OP Booking",
+                        category: "Medical • Firebase",
+                        githubUrl: "https://github.com/amalmathew2003/Hospital",
+                        imageUrls: const [
+                          "https://picsum.photos/id/4/800/600",
+                          "https://picsum.photos/id/5/800/600",
+                        ],
+                        videoUrl:
+                            "https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4",
+                        description:
+                            "An Outpatient Booking System designed to streamline hospital appointments. Built with Flutter and backed by Firebase, this app allows patients to book slots with doctors real-time. It features user authentication, doctor availability management, live appointment status tracking, and an admin dashboard for hospital staff.",
+                      ),
                     ),
-                  ),
-                if (_visible)
-                  FadeInUp(
-                    delay: const Duration(milliseconds: 600),
-                    duration: const Duration(milliseconds: 800),
-                    child: ProjectCard(
-                      title: "Voice Note App",
-                      description:
-                          "A smart speech-to-text note app that supports multiple Indian languages with Firebase Firestore.",
-                      imagePath: "assests/images/noteapp.png",
-                      githubUrl: 'https://github.com/amalmathew2003/note-app',
-                      gradientColors: const [
-                        Color(0xFF00d4ff),
-                        Color(0xFF00a8cc),
+                  if (_visible)
+                    _BrutalistProjectCard(
+                      index: "03",
+                      title: "Voice Notes",
+                      category: "AI • Productivity",
+                      imageUrls: const [
+                        "https://picsum.photos/id/6/800/600",
+                        "https://picsum.photos/id/7/800/600",
                       ],
-                      isMobile: isMobile,
+                      githubUrl: "https://github.com/amalmathew2003/note-app",
+                      delay: 600,
+                      onTap: () => _navigateToDetails(
+                        context,
+                        title: "Voice Notes",
+                        category: "AI • Productivity",
+                        githubUrl: "https://github.com/amalmathew2003/note-app",
+                        imageUrls: const [
+                          "https://picsum.photos/id/6/800/600",
+                          "https://picsum.photos/id/7/800/600",
+                        ],
+                        videoUrl:
+                            "https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4",
+                        description:
+                            "A smart productivity tool that converts speech to text details. Leveraging local database storage for offline access and efficient note organization. The app focuses on minimalism and speed, allowing users to capture ideas instantly.",
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -157,182 +188,181 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 }
 
-class ProjectCard extends StatefulWidget {
+class _BrutalistProjectCard extends StatefulWidget {
+  final String index;
   final String title;
-  final String description;
-  final String imagePath;
+  final String category;
+  final List<String> imageUrls;
   final String githubUrl;
-  final List<Color> gradientColors;
-  final bool isMobile;
+  final int delay;
+  final VoidCallback onTap;
 
-  const ProjectCard({
-    super.key,
+  const _BrutalistProjectCard({
+    required this.index,
     required this.title,
-    required this.description,
-    required this.imagePath,
+    required this.category,
+    required this.imageUrls,
     required this.githubUrl,
-    required this.gradientColors,
-    required this.isMobile,
+    required this.delay,
+    required this.onTap,
   });
 
   @override
-  State<ProjectCard> createState() => _ProjectCardState();
+  State<_BrutalistProjectCard> createState() => _BrutalistProjectCardState();
 }
 
-class _ProjectCardState extends State<ProjectCard> {
-  bool isHovered = false;
+class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
+  bool _isHovered = false;
 
   Future<void> _launchGitHub() async {
     final Uri url = Uri.parse(widget.githubUrl);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Could not launch ${widget.githubUrl}")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Could not launch ${widget.githubUrl}")),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => isHovered = true),
-      onExit: (_) => setState(() => isHovered = false),
-      cursor: SystemMouseCursors.click,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-        transform: Matrix4.identity()..translate(0.0, isHovered ? -10.0 : 0.0),
-        width: widget.isMobile ? 300 : 320,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            colors: [
-              Colors.white.withOpacity(0.1),
-              Colors.white.withOpacity(0.05),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          border: Border.all(
-            color: isHovered
-                ? widget.gradientColors.first.withOpacity(0.8)
-                : Colors.white.withOpacity(0.1),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: isHovered
-                  ? widget.gradientColors.first.withOpacity(0.4)
-                  : Colors.black.withOpacity(0.3),
-              blurRadius: isHovered ? 30 : 15,
-              spreadRadius: isHovered ? 5 : 0,
-              offset: const Offset(0, 10),
+    return FadeInUp(
+      delay: Duration(milliseconds: widget.delay),
+      duration: const Duration(milliseconds: 1000),
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 40),
+            padding: const EdgeInsets.only(bottom: 40),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Project Image with overlay
-            Stack(
+            child: Column(
               children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(24),
-                  ),
-                  child: Image.asset(
-                    widget.imagePath,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                // Gradient overlay
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(24),
-                      ),
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          widget.gradientColors.last.withOpacity(0.7),
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Index
+                    Text(
+                      widget.index,
+                      style: GoogleFonts.syne(
+                        fontSize: 20,
+                        color: _isHovered
+                            ? const Color(0xFF00FF94)
+                            : Colors.white54,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ),
-              ],
-            ),
+                    const SizedBox(width: 40),
 
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.title,
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    widget.description,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                      color: Colors.white70,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  // View on GitHub button
-                  GestureDetector(
-                    onTap: _launchGitHub,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        gradient: LinearGradient(colors: widget.gradientColors),
-                        boxShadow: [
-                          BoxShadow(
-                            color: widget.gradientColors.first.withOpacity(0.4),
-                            blurRadius: 15,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                    // Content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.code, color: Colors.white, size: 18),
-                          const SizedBox(width: 8),
                           Text(
-                            'View Code',
-                            style: GoogleFonts.poppins(
-                              fontSize: 13,
+                            widget.title.toUpperCase(),
+                            style: GoogleFonts.syne(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
                               color: Colors.white,
-                              fontWeight: FontWeight.w600,
+                              letterSpacing: -1,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            widget.category,
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              color: _isHovered
+                                  ? const Color(0xFF00FF94)
+                                  : Colors.white54,
+                              letterSpacing: 1,
                             ),
                           ),
                         ],
                       ),
                     ),
+
+                    // Arrow Icon
+                    AnimatedRotation(
+                      turns: _isHovered ? -0.125 : 0, // 45 degrees
+                      duration: const Duration(milliseconds: 300),
+                      child: Icon(
+                        Icons.arrow_forward,
+                        color: _isHovered
+                            ? const Color(0xFF00FF94)
+                            : Colors.white,
+                        size: 30,
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Reveal Images Gallery on Hover
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  height: _isHovered ? 300 : 0, // Sufficient height for images
+                  width: double.infinity,
+                  curve: Curves.fastOutSlowIn,
+                  margin: EdgeInsets.only(top: _isHovered ? 30 : 0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    child: Row(
+                      children: widget.imageUrls.map((path) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 20),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              path,
+                              height: 300,
+                              fit: BoxFit.contain, // Maintain aspect ratio
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      height: 300,
+                                      width: 400,
+                                      color: Colors.white10,
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Color(0xFF00FF94),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  height: 300,
+                                  width: 400,
+                                  color: Colors.red.withOpacity(0.1),
+                                  child: const Center(
+                                    child: Icon(Icons.error, color: Colors.red),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
