@@ -6,7 +6,8 @@ import 'package:my_portfolio/service/downloadcv.dart';
 import 'dart:math' as math;
 
 class DesktopScreen extends StatefulWidget {
-  const DesktopScreen({super.key});
+  final VoidCallback? onContactTap;
+  const DesktopScreen({super.key, this.onContactTap});
 
   @override
   State<DesktopScreen> createState() => _DesktopScreenState();
@@ -234,7 +235,7 @@ class _DesktopScreenState extends State<DesktopScreen>
                           _ModernButton(
                             text: 'Contact Me',
                             isFilled: false,
-                            onTap: () {}, // Can scroll to contact section
+                            onTap: widget.onContactTap ?? () {},
                             icon: Icons.arrow_forward_rounded,
                           ),
                         ],

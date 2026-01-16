@@ -169,12 +169,20 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
             controller: _scrollController,
             physics: const ClampingScrollPhysics(), // Sturdy feel
             child: Column(
-              children: const [
-                DesktopScreen(),
-                AboutMe(),
-                SkillsScreen(),
-                ProjectsScreen(),
-                ContactMe(),
+              children: [
+                DesktopScreen(
+                  onContactTap: () {
+                    _scrollController.animateTo(
+                      _scrollController.position.maxScrollExtent,
+                      duration: const Duration(seconds: 1),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                ),
+                const AboutMe(),
+                const SkillsScreen(),
+                const ProjectsScreen(),
+                const ContactMe(),
               ],
             ),
           ),
