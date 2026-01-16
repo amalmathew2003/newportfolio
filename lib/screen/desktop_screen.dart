@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:my_portfolio/service/downloadcv.dart';
+import 'package:my_portfolio/widgets/gradient_button.dart';
 
 class DesktopScreen extends StatefulWidget {
   const DesktopScreen({super.key});
@@ -11,28 +12,47 @@ class DesktopScreen extends StatefulWidget {
   State<DesktopScreen> createState() => _DesktopScreenState();
 }
 
-class _DesktopScreenState extends State<DesktopScreen> {
+class _DesktopScreenState extends State<DesktopScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
 
-
-    return Scaffold(
-      body: LayoutBuilder(
+    return SizedBox(
+      height: size.height,
+      child: LayoutBuilder(
         builder: (context, constraints) {
-          final size = constraints.biggest;
-          final isMobile = size.width < 600;
-          final isTablet = size.width >= 600 && size.width < 1200;
+          final isMobile = constraints.maxWidth < 600;
+          final isTablet =
+              constraints.maxWidth >= 600 && constraints.maxWidth < 1200;
 
           double titleFontSize = isMobile
-              ? 32
+              ? 36
               : isTablet
-              ? 48
-              : 60;
+              ? 52
+              : 68;
           double subtitleFontSize = isMobile
-              ? 16
+              ? 18
               : isTablet
-              ? 20
-              : 24;
+              ? 22
+              : 28;
           double horizontalPadding = isMobile
               ? 20
               : isTablet
@@ -41,31 +61,112 @@ class _DesktopScreenState extends State<DesktopScreen> {
 
           return Stack(
             children: [
-              // Background image
+              // Animated gradient background
+              AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color.lerp(
+                            const Color(0xFF0a0a0a),
+                            const Color(0xFF1a1a2e),
+                            _controller.value,
+                          )!,
+                          Color.lerp(
+                            const Color(0xFF16213e),
+                            const Color(0xFF0f3460),
+                            _controller.value,
+                          )!,
+                          Color.lerp(
+                            const Color(0xFF1a1a2e),
+                            const Color(0xFF0a0a0a),
+                            _controller.value,
+                          )!,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              // Background image with overlay
               Positioned.fill(
-                child: Image.asset(
-                  'assests/images/landingpage.jpg',
-                  fit: BoxFit.cover,
+                child: FadeIn(
+                  duration: const Duration(seconds: 2),
+                  child: Stack(
+                    children: [
+                      Image.asset(
+                        'assests/images/landingpage.jpg',
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
+                      // Dark overlay for better text visibility
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.black.withOpacity(0.7),
+                              Colors.black.withOpacity(0.4),
+                              Colors.black.withOpacity(0.7),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
-              // Overlay gradient
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.black.withOpacity(0.6),
-                        Colors.transparent,
-                      ],
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
+              // Floating glow orbs
+              Positioned(
+                top: size.height * 0.2,
+                left: size.width * 0.1,
+                child: FadeIn(
+                  delay: const Duration(seconds: 1),
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFF667eea).withOpacity(0.3),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: size.height * 0.15,
+                right: size.width * 0.05,
+                child: FadeIn(
+                  delay: const Duration(milliseconds: 1500),
+                  child: Container(
+                    width: 150,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFFf093fb).withOpacity(0.3),
+                          Colors.transparent,
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
 
-              // Centered content
+              // Main content
               Align(
                 alignment: isMobile ? Alignment.center : Alignment.centerRight,
                 child: Padding(
@@ -73,10 +174,10 @@ class _DesktopScreenState extends State<DesktopScreen> {
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       maxWidth: isMobile
-                          ? size.width * 0.9
+                          ? constraints.maxWidth * 0.9
                           : isTablet
-                          ? size.width * 0.7
-                          : size.width * 0.5,
+                          ? constraints.maxWidth * 0.7
+                          : constraints.maxWidth * 0.55,
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -84,123 +185,148 @@ class _DesktopScreenState extends State<DesktopScreen> {
                           ? CrossAxisAlignment.center
                           : CrossAxisAlignment.end,
                       children: [
-                        // Name animation
-                        Row(
-                          mainAxisAlignment: isMobile
-                              ? MainAxisAlignment.center
-                              : MainAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            FadeInUp(
-                              duration: const Duration(seconds: 2),
-                              child: Text(
-                                'Amal ',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: titleFontSize,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                        // Greeting text
+                        FadeInDown(
+                          duration: const Duration(milliseconds: 800),
+                          child: Text(
+                            'Hello, I\'m',
+                            style: GoogleFonts.poppins(
+                              color: const Color(0xFF00d4ff),
+                              fontSize: subtitleFontSize * 0.8,
+                              fontWeight: FontWeight.w300,
+                              letterSpacing: 2,
                             ),
-                            FadeInDown(
-                              duration: const Duration(seconds: 3),
-                              child: Text(
-                                'Mathew',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: titleFontSize,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 10),
 
-                        // Subtitle
-                        Wrap(
-                          alignment: isMobile
-                              ? WrapAlignment.center
-                              : WrapAlignment.end,
-                          children: [
-                            AnimatedTextKit(
-                              repeatForever: true,
-                              pause: const Duration(seconds: 2),
-                              animatedTexts: [
-                                TyperAnimatedText(
-                                  'Flutter Developer |',
-                                  textStyle: GoogleFonts.namdhinggo(
-                                    color: Colors.white70,
-                                    fontSize: subtitleFontSize,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            AnimatedTextKit(
-                              repeatForever: true,
-                              pause: const Duration(seconds: 2),
-                              animatedTexts: [
-                                TyperAnimatedText(
-                                  ' UI/UX Enthusiast',
-                                  textStyle: GoogleFonts.namdhinggo(
-                                    color: Colors.white70,
-                                    fontSize: subtitleFontSize,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 30),
-
-                        // Download CV button
-                        ElasticInUp(
-                          duration: const Duration(seconds: 2),
-                          delay: const Duration(milliseconds: 800),
-                          child: GestureDetector(
-                            onTap: () {
-                              downloadCV(context);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 30,
-                                vertical: 15,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30),
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFF0F2027),
-                                    Color(0xFF203A43),
-                                    Color(0xFF2C5364),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.blueAccent.withValues(alpha: .4),
-                                    blurRadius: 20,
-                                    spreadRadius: 2,
-                                    offset: const Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: const Text(
-                                'Download CV',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 1.2,
-                                ),
+                        // Name with gradient effect
+                        FadeInUp(
+                          duration: const Duration(seconds: 1),
+                          child: ShaderMask(
+                            shaderCallback: (bounds) => const LinearGradient(
+                              colors: [Color(0xFFffffff), Color(0xFF00d4ff)],
+                            ).createShader(bounds),
+                            child: Text(
+                              'Amal Mathew',
+                              textAlign: isMobile
+                                  ? TextAlign.center
+                                  : TextAlign.right,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: titleFontSize,
+                                fontWeight: FontWeight.bold,
+                                height: 1.1,
                               ),
                             ),
                           ),
                         ),
+
+                        const SizedBox(height: 20),
+
+                        // Animated subtitle
+                        FadeIn(
+                          delay: const Duration(milliseconds: 500),
+                          child: DefaultTextStyle(
+                            style: GoogleFonts.poppins(
+                              color: Colors.white70,
+                              fontSize: subtitleFontSize,
+                              fontWeight: FontWeight.w300,
+                            ),
+                            textAlign: isMobile
+                                ? TextAlign.center
+                                : TextAlign.right,
+                            child: AnimatedTextKit(
+                              repeatForever: true,
+                              pause: const Duration(seconds: 2),
+                              animatedTexts: [
+                                TypewriterAnimatedText(
+                                  'Flutter Developer',
+                                  speed: const Duration(milliseconds: 100),
+                                ),
+                                TypewriterAnimatedText(
+                                  'UI/UX Enthusiast',
+                                  speed: const Duration(milliseconds: 100),
+                                ),
+                                TypewriterAnimatedText(
+                                  'Mobile App Creator',
+                                  speed: const Duration(milliseconds: 100),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 40),
+
+                        // CTA Buttons
+                        FadeInUp(
+                          delay: const Duration(milliseconds: 800),
+                          child: Wrap(
+                            alignment: isMobile
+                                ? WrapAlignment.center
+                                : WrapAlignment.end,
+                            spacing: 20,
+                            runSpacing: 15,
+                            children: [
+                              GradientButton(
+                                text: 'Download CV',
+                                icon: Icons.download_rounded,
+                                onPressed: () => downloadCV(context),
+                                gradientColors: const [
+                                  Color(0xFF667eea),
+                                  Color(0xFF764ba2),
+                                ],
+                              ),
+                              GradientButton(
+                                text: 'View Projects',
+                                icon: Icons.work_outline_rounded,
+                                onPressed: () {
+                                  // Scroll to projects
+                                },
+                                gradientColors: const [
+                                  Color(0xFF00d4ff),
+                                  Color(0xFF00a8cc),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // Scroll indicator
+              Positioned(
+                bottom: 30,
+                left: 0,
+                right: 0,
+                child: FadeInUp(
+                  delay: const Duration(seconds: 2),
+                  child: Center(
+                    child: Pulse(
+                      infinite: true,
+                      child: Column(
+                        children: [
+                          Text(
+                            'Scroll Down',
+                            style: GoogleFonts.poppins(
+                              color: Colors.white54,
+                              fontSize: 12,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: Colors.white54,
+                            size: 28,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

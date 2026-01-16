@@ -1,6 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class AboutMe extends StatefulWidget {
@@ -16,143 +17,227 @@ class _AboutMeState extends State<AboutMe> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isMobile = size.width < 800;
+    final isMobile = size.width < 900;
 
     return VisibilityDetector(
       key: const Key('about-me-section'),
       onVisibilityChanged: (info) {
         if (info.visibleFraction > 0.1 && !_visible) {
           setState(() {
-            _visible = true; // triggers the animations
+            _visible = true;
           });
         }
       },
       child: Container(
         width: double.infinity,
-        color: Colors.grey[50],
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF0a0a0a), Color(0xFF1a1a2e), Color(0xFF16213e)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 20 : 80,
-          vertical: isMobile ? 40 : 80,
+          horizontal: isMobile ? 20 : 60,
+          vertical: isMobile ? 60 : 100,
         ),
         child: Column(
           children: [
-            // Title with fadeInDown
-            _visible
-                ? FadeInUpBig(
-                    duration: const Duration(seconds: 1),
-
-                    child: Text(
-                      "About Me",
-                      style: TextStyle(
-                        fontSize: isMobile ? 32 : 48,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+            // Section Title
+            if (_visible)
+              FadeInUp(
+                duration: const Duration(milliseconds: 800),
+                child: Column(
+                  children: [
+                    Text(
+                      'ABOUT ME',
+                      style: GoogleFonts.poppins(
+                        fontSize: isMobile ? 14 : 16,
+                        fontWeight: FontWeight.w300,
+                        color: const Color(0xFF00d4ff),
+                        letterSpacing: 4,
                       ),
                     ),
-                  )
-                : const SizedBox.shrink(),
-
-            SizedBox(height: isMobile ? 20 : 40),
-
-            // Divider
-            _visible
-                ? FadeIn(
-                    duration: const Duration(seconds: 1),
-                    child: Container(
-                      width: 120,
+                    const SizedBox(height: 10),
+                    ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [Colors.white, Color(0xFF00d4ff)],
+                      ).createShader(bounds),
+                      child: Text(
+                        'Know Me More',
+                        style: GoogleFonts.poppins(
+                          fontSize: isMobile ? 32 : 48,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      width: 80,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.blueAccent,
                         borderRadius: BorderRadius.circular(2),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                        ),
                       ),
                     ),
-                  )
-                : const SizedBox.shrink(),
+                  ],
+                ),
+              ),
 
-            SizedBox(height: isMobile ? 30 : 60),
+            SizedBox(height: isMobile ? 40 : 80),
 
-            Flex(
-              direction: isMobile ? Axis.vertical : Axis.horizontal,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+            // Content - Responsive layout
+            if (isMobile) _buildMobileLayout() else _buildDesktopLayout(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return Column(
+      children: [
+        if (_visible) _buildProfileImage(true),
+        const SizedBox(height: 40),
+        if (_visible) _buildAboutCard(true),
+      ],
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        if (_visible) Flexible(flex: 0, child: _buildProfileImage(false)),
+        const SizedBox(width: 40),
+        if (_visible) Expanded(child: _buildAboutCard(false)),
+      ],
+    );
+  }
+
+  Widget _buildProfileImage(bool isMobile) {
+    return FadeInLeft(
+      duration: const Duration(milliseconds: 800),
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF667eea).withOpacity(0.5),
+              blurRadius: 40,
+              spreadRadius: 10,
+            ),
+          ],
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(5),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+            ),
+          ),
+          child: ClipOval(
+            child: Image.asset(
+              'assests/images/portfolio.png',
+              width: isMobile ? 180 : 220,
+              height: isMobile ? 180 : 220,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAboutCard(bool isMobile) {
+    return FadeInRight(
+      duration: const Duration(milliseconds: 800),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: isMobile ? double.infinity : 600,
+            ),
+            padding: EdgeInsets.all(isMobile ? 25 : 35),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.2),
+                width: 1.5,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _visible
-                    ? FadeInLeft(
-                        duration: const Duration(seconds: 1),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(200),
-                          child: Image.asset(
-                            'assests/images/portfolio.png',
-                            width: isMobile ? 150 : 180,
-                            height: isMobile ? 150 : 180,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-
-                SizedBox(width: isMobile ? 0 : 50, height: isMobile ? 30 : 0),
-
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _visible
-                          ? FadeInRight(
-                              duration: const Duration(seconds: 1),
-                              child: Text(
-                                "Hi! I’m Amal Mathew, a passionate Flutter developer with a knack for building beautiful, responsive, and high-performance mobile and web applications. I enjoy turning ideas into real, functional apps and creating smooth user experiences..",
-                                style: TextStyle(
-                                  fontSize: isMobile ? 16 : 18,
-                                  color: Colors.black87,
-                                  height: 1.6,
-                                ),
-                              ),
-                            )
-                          : const SizedBox.shrink(),
-                      const SizedBox(height: 20),
-                      _visible
-                          ? FadeInRight(
-                              duration: const Duration(seconds: 1),
-                              delay: const Duration(milliseconds: 200),
-                              child: Text(
-                                "With hands-on experience in Flutter, Dart, Provider, Dio, and Firebase,\nI love exploring new technologies, optimizing code, and solving challenging problems.",
-                                style: TextStyle(
-                                  fontSize: isMobile ? 16 : 18,
-                                  color: Colors.black54,
-                                  height: 1.6,
-                                ),
-                              ),
-                            )
-                          : const SizedBox.shrink(),
-                      const SizedBox(height: 20),
-                      _visible
-                          ? FadeInUp(
-                              duration: const Duration(seconds: 1),
-                              child: AnimatedTextKit(
-                                repeatForever: true,
-                                pause: const Duration(milliseconds: 500),
-                                animatedTexts: [
-                                  TypewriterAnimatedText(
-                                    'Flutter Developer |',
-                                    textStyle: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blueAccent,
-                                    ),
-                                    speed: const Duration(milliseconds: 100),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : const SizedBox.shrink(),
-                    ],
+                Text(
+                  "Hi! I'm Amal Mathew",
+                  style: GoogleFonts.poppins(
+                    fontSize: isMobile ? 22 : 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  "A passionate Flutter developer with a knack for building beautiful, responsive, and high-performance mobile and web applications. I enjoy turning ideas into real, functional apps and creating smooth user experiences.",
+                  style: GoogleFonts.poppins(
+                    fontSize: isMobile ? 14 : 16,
+                    color: Colors.white70,
+                    height: 1.8,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  "With hands-on experience in Flutter, Dart, Provider, Dio, and Firebase, I love exploring new technologies, optimizing code, and solving challenging problems.",
+                  style: GoogleFonts.poppins(
+                    fontSize: isMobile ? 14 : 16,
+                    color: Colors.white60,
+                    height: 1.8,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                // Tech tags
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    'Flutter',
+                    'Dart',
+                    'Firebase',
+                    'Provider',
+                    'Bloc',
+                  ].map((tech) => _buildTechTag(tech)).toList(),
                 ),
               ],
             ),
-          ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTechTag(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF00d4ff).withOpacity(0.5)),
+        color: const Color(0xFF00d4ff).withOpacity(0.1),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.poppins(
+          fontSize: 12,
+          color: const Color(0xFF00d4ff),
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
