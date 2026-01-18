@@ -68,7 +68,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   children: [
                     Expanded(
                       child: Text(
-                        "SELECTED\nWORKS",
+                        "MY WORKS",
                         style: GoogleFonts.syne(
                           fontSize: isMobile ? 40 : 80,
                           fontWeight: FontWeight.bold,
@@ -213,17 +213,6 @@ class _BrutalistProjectCard extends StatefulWidget {
 
 class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
   bool _isHovered = false;
-
-  Future<void> _launchGitHub() async {
-    final Uri url = Uri.parse(widget.githubUrl);
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Could not launch ${widget.githubUrl}")),
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

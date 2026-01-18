@@ -1,4 +1,3 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -184,7 +183,7 @@ class _DesktopScreenState extends State<DesktopScreen>
                 child: Text(
                   'EXPERIENCES',
                   style: GoogleFonts.syne(
-                    fontSize: isMobile ? 50 : 120,
+                    fontSize: isMobile ? 50 : 110,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
                     height: 0.9,
