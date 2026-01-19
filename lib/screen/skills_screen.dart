@@ -1,202 +1,224 @@
-import 'package:animate_do/animate_do.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+import 'package:animate_do/animate_do.dart';
 
-class SkillsScreen extends StatelessWidget {
+class SkillsScreen extends StatefulWidget {
   const SkillsScreen({super.key});
+
+  @override
+  State<SkillsScreen> createState() => _SkillsScreenState();
+}
+
+class _SkillsScreenState extends State<SkillsScreen> {
+  final List<String> row1 = [
+    "FLUTTER",
+    "DART",
+    "FIREBASE",
+    "SUPABASE",
+    "ANDROID",
+    "IOS",
+    "WEB",
+    "UI/UX",
+  ];
+
+  final List<String> row2 = [
+    "PROVIDER",
+    "BLOC",
+    "GETX",
+    "RIVERPOD",
+    "FIGMA",
+    "GIT",
+    "REST API",
+  ];
+
+  bool _visible = false;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 600;
-    final isTablet = size.width < 1100 && !isMobile;
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        vertical: isMobile ? 50 : 80,
-        horizontal: isMobile ? 20 : 60,
-      ),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          FadeInDown(
-            duration: const Duration(milliseconds: 800),
-            child: Text(
-              "My Skills",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: isMobile
-                    ? 30
-                    : isTablet
-                    ? 42
-                    : 54,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.3,
+    return VisibilityDetector(
+      key: const Key('skills-section'),
+      onVisibilityChanged: (info) {
+        if (info.visibleFraction > 0.1 && !_visible) {
+          setState(() {
+            _visible = true;
+          });
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 100),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 80),
+              child: FadeInUp(
+                duration: const Duration(milliseconds: 1000),
+                child: Text(
+                  "MY SKILLS",
+                  style: GoogleFonts.syne(
+                    fontSize: isMobile ? 40 : 80,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: -2,
+                  ),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          FadeInUp(
-            duration: const Duration(milliseconds: 1000),
-            child: Container(
-              width: 100,
-              height: 3,
-              decoration: BoxDecoration(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.circular(2),
+
+            const SizedBox(height: 60),
+
+            // Marquee Rows
+            if (_visible) ...[
+              _InfiniteTextScroll(
+                items: row1,
+                direction: Axis.horizontal,
+                speed: 30,
+                isReverse: false,
               ),
-            ),
-          ),
-          const SizedBox(height: 60),
-
-          // Categories
-          FadeInUp(
-            duration: const Duration(milliseconds: 1200),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: const [
-                _SkillCategory(
-                  title: "Core Flutter Skills",
-                  skills: [
-                    "Flutter",
-                    "Dart",
-                    "Bloc",
-                    "Provider",
-                    "Riverpod",
-                    "Sqflite",
-                    "API Integration",
-                    "Firebase",
-                  ],
-                ),
-                SizedBox(height: 50),
-                _SkillCategory(
-                  title: "Version Control ",
-                  skills: ["Git / GitHub"],
-                ),
-                SizedBox(height: 50),
-                _SkillCategory(
-                  title: "Basic Programming Knowledge",
-                  skills: ["C (Basic)", "C++ (Basic)", "HTML (Basic)"],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SkillCategory extends StatelessWidget {
-  final String title;
-  final List<String> skills;
-  const _SkillCategory({required this.title, required this.skills});
-
-  @override
-  Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 600;
-    return Column(
-      children: [
-        FadeInDown(
-          duration: const Duration(milliseconds: 700),
-          child: Text(
-            title,
-            style: TextStyle(
-              color: Colors.cyanAccent,
-              fontSize: isMobile ? 22 : 26,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.2,
-            ),
-          ),
-        ),
-        const SizedBox(height: 25),
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 20,
-          runSpacing: 20,
-          children: skills
-              .map((skill) => _HoverSkillCard(skill: skill))
-              .toList(),
-        ),
-      ],
-    );
-  }
-}
-
-class _HoverSkillCard extends StatefulWidget {
-  final String skill;
-  const _HoverSkillCard({required this.skill});
-
-  @override
-  State<_HoverSkillCard> createState() => _HoverSkillCardState();
-}
-
-class _HoverSkillCardState extends State<_HoverSkillCard> {
-  bool isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 600;
-
-    return BounceInUp(
-      duration: const Duration(milliseconds: 700),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => setState(() => isHovered = true),
-        onExit: (_) => setState(() => isHovered = false),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-          transform: Matrix4.identity()..scale(isHovered ? 1.08 : 1.0),
-          width: isMobile ? 150 : 220,
-          height: isMobile ? 70 : 90,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: isHovered
-                  ? [
-                      Colors.cyanAccent.withValues(alpha: .4),
-                      Colors.blueAccent.withValues(alpha: 0.3),
-                    ]
-                  : [
-                      Colors.blueAccent.withValues(alpha: 0.25),
-                      Colors.black.withValues(alpha: 0.4),
-                    ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: isHovered
-                  ? Colors.cyanAccent
-                  : Colors.cyanAccent.withValues(alpha: 0.5),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: isHovered
-                    ? Colors.cyanAccent.withValues(alpha: 0.7)
-                    : Colors.cyanAccent.withValues(alpha: 0.3),
-                blurRadius: isHovered ? 20 : 10,
-                offset: const Offset(0, 6),
+              const SizedBox(height: 20),
+              _InfiniteTextScroll(
+                items: row2,
+                direction: Axis.horizontal,
+                speed: 30,
+                isReverse: true,
               ),
             ],
-          ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+///===================================InfiniteTextScroll===================================//
+class _InfiniteTextScroll extends StatefulWidget {
+  final List<String> items;
+  final Axis direction;
+  final double speed;
+  final bool isReverse;
+
+  const _InfiniteTextScroll({
+    required this.items,
+    this.direction = Axis.horizontal,
+    this.speed = 50,
+    this.isReverse = false,
+  });
+
+  @override
+  State<_InfiniteTextScroll> createState() => _InfiniteTextScrollState();
+}
+
+class _InfiniteTextScrollState extends State<_InfiniteTextScroll> {
+  late ScrollController _scrollController;
+  late Timer _timer;
+  double _offset = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _startAutoScroll();
+  }
+
+  void _startAutoScroll() {
+    _timer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
+      if (!_scrollController.hasClients) return;
+
+      if (widget.isReverse) {
+        _offset -= 1; // Simplify speed for now
+        if (_offset <= 0) {
+          _offset = _scrollController.position.maxScrollExtent;
+          _scrollController.jumpTo(_offset);
+        } else {
+          _scrollController.jumpTo(_offset);
+        }
+      } else {
+        _offset += 1;
+        if (_offset >= _scrollController.position.maxScrollExtent) {
+          _offset = 0;
+          _scrollController.jumpTo(_offset);
+        } else {
+          _scrollController.jumpTo(_offset);
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Duplicate list many times to create infinite effect
+    final displayList = [
+      ...widget.items,
+      ...widget.items,
+      ...widget.items,
+      ...widget.items,
+    ];
+
+    return SizedBox(
+      height: 100,
+      child: ListView.builder(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: displayList.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 0,
+            ), // handled inside
+            child: _SkillItem(text: displayList[index]),
+          );
+        },
+      ),
+    );
+  }
+}
+
+///===================================SkillItem===================================//
+class _SkillItem extends StatefulWidget {
+  final String text;
+  const _SkillItem({required this.text});
+
+  @override
+  State<_SkillItem> createState() => _SkillItemState();
+}
+
+class _SkillItemState extends State<_SkillItem> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+        decoration: BoxDecoration(
+          color: _isHovered ? const Color(0xFF00D2FF) : Colors.transparent,
+          border: Border.all(color: Colors.white24),
+        ),
+        child: Center(
           child: Text(
-            widget.skill,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isHovered ? Colors.cyanAccent : Colors.white,
-              fontSize: isMobile ? 16 : 18,
+            widget.text,
+            style: GoogleFonts.dmSans(
+              fontSize: 32,
               fontWeight: FontWeight.bold,
-              letterSpacing: 1.1,
+              color: _isHovered ? Colors.black : Colors.white54,
+              letterSpacing: 1,
             ),
           ),
         ),

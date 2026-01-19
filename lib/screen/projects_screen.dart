@@ -1,8 +1,8 @@
 import 'package:animate_do/animate_do.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:my_portfolio/screen/project_details_screen.dart';
 
 class ProjectsScreen extends StatefulWidget {
   const ProjectsScreen({super.key});
@@ -14,241 +14,343 @@ class ProjectsScreen extends StatefulWidget {
 class _ProjectsScreenState extends State<ProjectsScreen> {
   bool _visible = false;
 
+  void _navigateToDetails(
+    BuildContext context, {
+    required String title,
+    required String category,
+    required String description,
+    required List<String> imageUrls,
+    required String githubUrl,
+    String? videoUrl,
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProjectDetailsScreen(
+          title: title,
+          category: category,
+          description: description,
+          imageUrls: imageUrls,
+          githubUrl: githubUrl,
+          videoUrl: videoUrl,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isMobile = size.width < 800;
+    final isMobile = size.width < 900;
 
     return VisibilityDetector(
       key: const Key('Project-section'),
       onVisibilityChanged: (info) {
         if (info.visibleFraction > 0.1 && !_visible) {
           setState(() {
-            _visible = true; // triggers the animations
+            _visible = true;
           });
         }
       },
       child: Container(
-        height: isMobile ? 600 : 700,
-        color: const Color(0xFF0F2027),
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Column(
-            children: [
-              SizedBox(height: isMobile ? 10 : 20),
-
-              _visible
-                  ? FadeInUpBig(
-                      duration: const Duration(seconds: 1),
-
+        padding: const EdgeInsets.symmetric(vertical: 100),
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 80),
+              child: FadeInUp(
+                duration: const Duration(milliseconds: 1000),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
                       child: Text(
-                        "My Project",
-                        style: TextStyle(
-                          fontSize: isMobile ? 32 : 48,
+                        "MY WORKS",
+                        style: GoogleFonts.syne(
+                          fontSize: isMobile ? 40 : 80,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
+                          letterSpacing: -2,
+                          height: 0.9,
                         ),
                       ),
-                    )
-                  : const SizedBox.shrink(),
-              SizedBox(height: isMobile ? 10 : 20),
-              //divider
-              _visible
-                  ? FadeIn(
-                      duration: const Duration(seconds: 1),
-                      child: Container(
-                        width: 120,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.blueAccent,
-                          borderRadius: BorderRadius.circular(2),
+                    ),
+                    if (!isMobile)
+                      Text(
+                        "(2023 - 2024)",
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          color: Colors.white54,
                         ),
                       ),
-                    )
-                  : const SizedBox.shrink(),
-              SizedBox(height: isMobile ? 30 : 60),
+                  ],
+                ),
+              ),
+            ),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            const SizedBox(height: 80),
+
+            // Projects List
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 80),
+              child: Column(
                 children: [
-                  _visible
-                      ? const ProjectCard(
-                          title: "Facebook UI Clone",
-                          description:
-                              "A Flutter project that replicates Facebook's UI, including stories, feed, and navigation bar.",
-                          imagePath: "assests/images/facebook.png",
-                          githubUrl:
-                              'https://github.com/amalmathew2003/Facebook',
-                          gradientColors: [
-                            Color(0xFF2C5364),
-                            Color(0xFF0F2027),
-                          ],
-                        )
-                      : const SizedBox.shrink(),
-                  const SizedBox(width: 20),
-                  _visible
-                      ? const ProjectCard(
-                          title: "OP Booking App",
-                          description:
-                              "Flutter & Firebase-based app where users log in, select district, hospital, and doctor, book available slots, and download their OP ticket.",
-                          imagePath: "assests/images/op.png",
-                          githubUrl:
-                              'https://github.com/amalmathew2003/Hospital',
-                          gradientColors: [
-                            Color(0xFF4568DC),
-                            Color(0xFFB06AB3),
-                          ],
-                        )
-                      : const SizedBox.shrink(),
-                  const SizedBox(width: 20),
-                  _visible
-                      ? ProjectCard(
-                          title: "Voice Note App",
-                          description:
-                              "A smart speech-to-text note app that supports multiple Indian languages, allowing users to record, edit,delete,and save notes securely using Firebase Firestore.n",
-                          imagePath: "assests/images/noteapp.png",
-                          githubUrl:
-                              'https://github.com/amalmathew2003/note-app',
-                          gradientColors: [
-                            Color(0xFF43C6AC),
-                            Color(0xFF191654),
-                          ],
-                        )
-                      : const SizedBox.shrink(),
+                  if (_visible)
+                    _BrutalistProjectCard(
+                      index: "01",
+                      title: "Facebook Clone",
+                      category: "Mobile App • Flutter",
+                      imageUrls: const [
+                        "assests/images/VN1bg.png",
+                        "assests/images/VN2bg.png",
+                        "assests/images/VN3bg.png",
+                      ],
+                      githubUrl: "https://github.com/amalmathew2003/Facebook",
+                      delay: 200,
+                      onTap: () => _navigateToDetails(
+                        context,
+                        title: "Facebook Clone",
+                        category: "Mobile App • Flutter",
+                        githubUrl: "https://github.com/amalmathew2003/Facebook",
+                        imageUrls: const [
+                          "assests/images/VN1bg.png",
+                          "assests/images/VN2bg.png",
+                          "assests/images/VN3bg.png",
+                        ],
+                        videoUrl: "assests/video/VN.mp4",
+                        description:
+                            "A pixel-perfect Facebook clone built using Flutter.",
+                      ),
+                    ),
+
+                  if (_visible)
+                    _BrutalistProjectCard(
+                      index: "02",
+                      title: "OP Booking",
+                      category: "Medical • Firebase",
+                      imageUrls: const [
+                        "assests/images/VN1bg.png",
+                        "assests/images/VN2bg.png",
+                        "assests/images/VN3bg.png",
+                      ],
+                      githubUrl: "https://github.com/amalmathew2003/Hospital",
+                      delay: 400,
+                      onTap: () => _navigateToDetails(
+                        context,
+                        title: "OP Booking",
+                        category: "Medical • Firebase",
+                        githubUrl: "https://github.com/amalmathew2003/Hospital",
+                        imageUrls: const [
+                          "assests/images/VN1bg.png",
+                          "assests/images/VN2bg.png",
+                          "assests/images/VN3bg.png",
+                        ],
+                        videoUrl: "assests/video/VN.mp4",
+                        description:
+                            "An Outpatient Booking System designed to streamline hospital appointments. Built with Flutter and backed by Firebase, this app allows patients to book slots with doctors real-time. It features user authentication, doctor availability management, live appointment status tracking, and an admin dashboard for hospital staff.",
+                      ),
+                    ),
+                  if (_visible)
+                    _BrutalistProjectCard(
+                      index: "03",
+                      title: "Voice Notes",
+                      category: "AI • Productivity",
+                      imageUrls: const [
+                        "assests/images/VN1bg.png",
+                        "assests/images/VN2bg.png",
+                        "assests/images/VN3bg.png",
+                      ],
+                      githubUrl: "https://github.com/amalmathew2003/note-app",
+                      delay: 600,
+                      onTap: () => _navigateToDetails(
+                        context,
+                        title: "Voice Notes",
+                        category: "AI • Productivity",
+                        githubUrl: "https://github.com/amalmathew2003/note-app",
+                        imageUrls: const [
+                          "assests/images/VN1bg.png",
+                          "assests/images/VN2bg.png",
+                          "assests/images/VN3bg.png",
+                        ],
+                        videoUrl: "assests/video/VN.mp4",
+                        description:
+                            "The Smart Voice Note App is a Flutter-Firebase based mobile application developed to provide users with a simple, reliable, and efficient way to record, store, and manage voice notes. The primary goal of the application is to help users capture ideas, reminders, meetings, and personal notes instantly through audio, without the need for typing. The app emphasizes usability, performance, and clean architecture while maintaining a modern and intuitive user interface.\n\n"
+                            "In today’s fast-paced environment, users often need a quick way to save thoughts or information. This application addresses that requirement by offering a seamless one-tap recording experience combined with organized storage and smooth playback functionality. The app is designed to work offline, ensuring that users can access their recordings anytime without depending on network connectivity.\n\n"
+                            "Key Features:\n"
+                            "* One-tap high-quality audio recording\n"
+                            "* Automatic organization with date and time labels\n"
+                            "* View a list of recorded notes with timestamps\n"
+                            "* Play, pause, and control audio playback\n"
+                            "* Delete recordings when no longer needed\n"
+                            "The application follows a clean and minimal UI approach, making it accessible for users of all age groups. From recording to playback, every interaction is designed to be intuitive and responsive.",
+                      ),
+                    ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class ProjectCard extends StatefulWidget {
+///===================================BrutalistProjectCard===================================//
+///
+class _BrutalistProjectCard extends StatefulWidget {
+  final String index;
   final String title;
-  final String description;
-  final String imagePath;
-  final List<Color> gradientColors;
-  final String githubUrl; // 👈 new field
+  final String category;
+  final List<String> imageUrls;
+  final String githubUrl;
+  final int delay;
+  final VoidCallback onTap;
 
-  const ProjectCard({
-    super.key,
+  const _BrutalistProjectCard({
+    required this.index,
     required this.title,
-    required this.description,
-    required this.imagePath,
-    required this.gradientColors,
+    required this.category,
+    required this.imageUrls,
     required this.githubUrl,
+    required this.delay,
+    required this.onTap,
   });
 
   @override
-  State<ProjectCard> createState() => _ProjectCardState();
+  State<_BrutalistProjectCard> createState() => _BrutalistProjectCardState();
 }
 
-class _ProjectCardState extends State<ProjectCard> {
-  Future<void> _launchGitHub() async {
-    if (widget.githubUrl.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("GitHub link not available")),
-      );
-      return;
-    }
-
-    final Uri url = Uri.parse(widget.githubUrl);
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Could not launch ${widget.githubUrl}")),
-      );
-    }
-  }
+class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
+  bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 280,
-      height: 450,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          colors: widget.gradientColors,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: .4),
-            blurRadius: 8,
-            offset: const Offset(4, 4),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(15),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          // 📱 Project image
-          ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: Image.asset(
-              widget.imagePath,
-              fit: BoxFit.contain,
-              height: 250,
-            ),
-          ),
-          const SizedBox(height: 2),
-
-          // 🧾 Title and Description
-          Column(
-            children: [
-              AnimatedTextKit(
-                animatedTexts: [
-                  TypewriterAnimatedText(
-                    widget.title,
-                    textStyle: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    speed: Duration(milliseconds: 80),
-                  ),
-                ],
-                repeatForever: true,
-                totalRepeatCount: 1,
-              ),
-
-              const SizedBox(height: 10),
-              FadeInUpBig(
-                animate: true,
-                child: Text(
-                  widget.description,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: .8),
-                    fontSize: 12,
-                  ),
-                  textAlign: TextAlign.center,
+    return FadeInUp(
+      delay: Duration(milliseconds: widget.delay),
+      duration: const Duration(milliseconds: 1000),
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 40),
+            padding: const EdgeInsets.only(bottom: 40),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: .2),
+                  width: 1,
                 ),
               ),
-            ],
-          ),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Index
+                    Text(
+                      widget.index,
+                      style: GoogleFonts.syne(
+                        fontSize: 20,
+                        color: _isHovered
+                            ? const Color(0xFF00D2FF)
+                            : Colors.white54,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 40),
 
-          // 🔗 GitHub button
-          ElevatedButton.icon(
-            onPressed: _launchGitHub,
-            icon: const Icon(Icons.code, color: Colors.white),
-            label: const Text(
-              "View on GitHub",
-              style: TextStyle(color: Colors.white),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black.withValues(alpha: .6),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+                    // Content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.title.toUpperCase(),
+                            style: GoogleFonts.syne(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: -1,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            widget.category,
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              color: _isHovered
+                                  ? const Color(0xFF00D2FF)
+                                  : Colors.white54,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Arrow Icon
+                    AnimatedRotation(
+                      turns: _isHovered ? -0.125 : 0, // 45 degrees
+                      duration: const Duration(milliseconds: 300),
+                      child: Icon(
+                        Icons.arrow_forward,
+                        color: _isHovered
+                            ? const Color(0xFF00D2FF)
+                            : Colors.white,
+                        size: 30,
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Reveal Images Gallery on Hover
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  height: _isHovered ? 300 : 0, // Sufficient height for images
+                  width: double.infinity,
+                  curve: Curves.fastOutSlowIn,
+                  margin: EdgeInsets.only(top: _isHovered ? 30 : 0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    child: Row(
+                      children: widget.imageUrls.map((path) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 20),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.asset(
+                              path,
+                              height: 300,
+                              width: 400,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  height: 300,
+                                  width: 400,
+                                  color: Colors.red.withValues(alpha: .1),
+                                  child: const Center(
+                                    child: Icon(Icons.error, color: Colors.red),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

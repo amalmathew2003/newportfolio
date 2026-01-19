@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart';
 
 Future<void> downloadCV(BuildContext context) async {
   const url =
-      'https://drive.google.com/uc?export=download&id=1IHv9wvUS_4hLGwYae-wX0sOlYwpYr1cx';
+      'https://drive.google.com/uc?export=download&id=17h5411blpgTnBbFyKTYms1dgPzZRhPzX';
 
   try {
     if (kIsWeb) {
