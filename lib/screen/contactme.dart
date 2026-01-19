@@ -190,7 +190,7 @@ class _ContactMeState extends State<ContactMe> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.85),
+                        color: Colors.white.withValues(alpha: .85),
                         fontSize: 12,
                       ),
                       textAlign: TextAlign.center,
