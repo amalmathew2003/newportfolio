@@ -104,9 +104,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       title: "Facebook Clone",
                       category: "Mobile App • Flutter",
                       imageUrls: const [
-                        "https://picsum.photos/id/1/800/600",
-                        "https://picsum.photos/id/2/800/600",
-                        "https://picsum.photos/id/3/800/600",
+                        "assests/images/VN1bg.png",
+                        "assests/images/VN2bg.png",
+                        "assests/images/VN3bg.png",
                       ],
                       githubUrl: "https://github.com/amalmathew2003/Facebook",
                       delay: 200,
@@ -116,24 +116,26 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         category: "Mobile App • Flutter",
                         githubUrl: "https://github.com/amalmathew2003/Facebook",
                         imageUrls: const [
-                          "https://picsum.photos/id/1/800/600",
-                          "https://picsum.photos/id/2/800/600",
-                          "https://picsum.photos/id/3/800/600",
+                          "assests/images/VN1bg.png",
+                          "assests/images/VN2bg.png",
+                          "assests/images/VN3bg.png",
                         ],
                         videoUrl:
                             "https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4",
                         description:
-                            "A pixel-perfect replication of the Facebook mobile application built with Flutter. This project demonstrates complex UI implementation, state management using Provider to handle posts and interactions, and responsive design principles. It features a home feed, story reels, marketplace UI, and profile screens, closely mimicking the native experience.",
+                            "A pixel-perfect Facebook clone built using Flutter.",
                       ),
                     ),
+
                   if (_visible)
                     _BrutalistProjectCard(
                       index: "02",
                       title: "OP Booking",
                       category: "Medical • Firebase",
                       imageUrls: const [
-                        "https://picsum.photos/id/4/800/600",
-                        "https://picsum.photos/id/5/800/600",
+                        "assests/images/VN1bg.png",
+                        "assests/images/VN2bg.png",
+                        "assests/images/VN3bg.png",
                       ],
                       githubUrl: "https://github.com/amalmathew2003/Hospital",
                       delay: 400,
@@ -143,8 +145,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         category: "Medical • Firebase",
                         githubUrl: "https://github.com/amalmathew2003/Hospital",
                         imageUrls: const [
-                          "https://picsum.photos/id/4/800/600",
-                          "https://picsum.photos/id/5/800/600",
+                          "assests/images/VN1bg.png",
+                          "assests/images/VN2bg.png",
+                          "assests/images/VN3bg.png",
                         ],
                         videoUrl:
                             "https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4",
@@ -158,8 +161,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       title: "Voice Notes",
                       category: "AI • Productivity",
                       imageUrls: const [
-                        "https://picsum.photos/id/6/800/600",
-                        "https://picsum.photos/id/7/800/600",
+                        "assests/images/VN1bg.png",
+                        "assests/images/VN2bg.png",
+                        "assests/images/VN3bg.png",
                       ],
                       githubUrl: "https://github.com/amalmathew2003/note-app",
                       delay: 600,
@@ -169,8 +173,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         category: "AI • Productivity",
                         githubUrl: "https://github.com/amalmathew2003/note-app",
                         imageUrls: const [
-                          "https://picsum.photos/id/6/800/600",
-                          "https://picsum.photos/id/7/800/600",
+                          "assests/images/VN1bg.png",
+                          "assests/images/VN2bg.png",
+                          "assests/images/VN3bg.png",
                         ],
                         videoUrl:
                             "https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4",
@@ -314,24 +319,11 @@ class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
                           padding: const EdgeInsets.only(right: 20),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
+                            child: Image.asset(
                               path,
                               height: 300,
-                              fit: BoxFit.contain, // Maintain aspect ratio
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Container(
-                                      height: 300,
-                                      width: 400,
-                                      color: Colors.white10,
-                                      child: const Center(
-                                        child: CircularProgressIndicator(
-                                          color: Color(0xFF00D2FF),
-                                        ),
-                                      ),
-                                    );
-                                  },
+                              width: 400,
+                              fit: BoxFit.contain,
                               errorBuilder: (context, error, stackTrace) {
                                 return Container(
                                   height: 300,

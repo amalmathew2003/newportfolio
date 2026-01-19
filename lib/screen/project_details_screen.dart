@@ -74,10 +74,10 @@ class ProjectDetailsScreen extends StatelessWidget {
                     children: [
                       Hero(
                         tag: title,
-                        child: Image.network(
+                        child: Image.asset(
                           imageUrls.isNotEmpty
                               ? imageUrls[0]
-                              : 'https://via.placeholder.com/800',
+                              : 'assests/images/portfolio.png',
                           fit: BoxFit.cover,
                           alignment: Alignment.topCenter,
                         ),
@@ -238,21 +238,19 @@ class ProjectDetailsScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 40),
-                            ...imageUrls
-                                .skip(1)
-                                .map(
-                                  (url) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 40),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.network(
-                                        url,
-                                        width: double.infinity,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
+                            ...imageUrls.map(
+                              (url) => Padding(
+                                padding: const EdgeInsets.only(bottom: 40),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.asset(
+                                    url,
+                                    width: double.infinity,
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
+                              ),
+                            ),
                           ],
                         ),
 
