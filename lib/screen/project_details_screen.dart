@@ -77,7 +77,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                         child: Image.asset(
                           imageUrls.isNotEmpty
                               ? imageUrls[0]
-                              : 'assests/images/portfolio.png',
+                              : 'https://via.placeholder.com/800',
                           fit: BoxFit.cover,
                           alignment: Alignment.topCenter,
                         ),
@@ -246,7 +246,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                                   child: Image.asset(
                                     url,
                                     width: double.infinity,
-                                    fit: BoxFit.contain,
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
                               ),
@@ -415,10 +415,11 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     _initializePlayer();
   }
 
+  bool _isInitialized = false;
+
   Future<void> _initializePlayer() async {
-    // If usage is assets, we use VideoPlayerController.asset(widget.videoUrl)
-    // If usage is network, we use VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
-    // We will assume network for the "dummy" part unless it starts with "assets"
+    // ✅ Prevent re-initialization (THIS IS THE KEY FIX)
+    if (_isInitialized) return;
 
     if (widget.videoUrl.startsWith('assets') ||
         widget.videoUrl.startsWith('assests')) {
@@ -431,16 +432,23 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
 
     await _videoPlayerController.initialize();
 
+    // ✅ PRELOAD VIDEO (buffer once, no loading on replay)
+    await _videoPlayerController.play();
+    await Future.delayed(const Duration(milliseconds: 300));
+    await _videoPlayerController.pause();
+
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController,
       autoPlay: false,
       looping: true,
+      showControls: true,
+      allowFullScreen: true,
       aspectRatio: _videoPlayerController.value.aspectRatio,
       materialProgressColors: ChewieProgressColors(
         playedColor: const Color(0xFF00D2FF),
         handleColor: const Color(0xFF00D2FF),
-        backgroundColor: Colors.white24,
         bufferedColor: Colors.white38,
+        backgroundColor: Colors.white24,
       ),
       placeholder: Container(
         color: Colors.black12,
@@ -457,13 +465,15 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
         );
       },
     );
+
+    _isInitialized = true;
+
     if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
-    _chewieController?.dispose();
+    _chewieController?.pause(); // keep buffer
     super.dispose();
   }
 

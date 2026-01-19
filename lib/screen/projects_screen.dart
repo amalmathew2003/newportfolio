@@ -120,8 +120,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                           "assests/images/VN2bg.png",
                           "assests/images/VN3bg.png",
                         ],
-                        videoUrl:
-                            "https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4",
+                        videoUrl: "assests/video/VN.mp4",
                         description:
                             "A pixel-perfect Facebook clone built using Flutter.",
                       ),
@@ -149,8 +148,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                           "assests/images/VN2bg.png",
                           "assests/images/VN3bg.png",
                         ],
-                        videoUrl:
-                            "https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4",
+                        videoUrl: "assests/video/VN.mp4",
                         description:
                             "An Outpatient Booking System designed to streamline hospital appointments. Built with Flutter and backed by Firebase, this app allows patients to book slots with doctors real-time. It features user authentication, doctor availability management, live appointment status tracking, and an admin dashboard for hospital staff.",
                       ),
@@ -177,8 +175,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                           "assests/images/VN2bg.png",
                           "assests/images/VN3bg.png",
                         ],
-                        videoUrl:
-                            "https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4",
+                        videoUrl: "assests/video/VN.mp4",
                         description:
                             "A smart productivity tool that converts speech to text details. Leveraging local database storage for offline access and efficient note organization. The app focuses on minimalism and speed, allowing users to capture ideas instantly.",
                       ),
