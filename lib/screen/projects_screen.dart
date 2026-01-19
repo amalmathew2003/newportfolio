@@ -1,7 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:my_portfolio/screen/project_details_screen.dart';
 
@@ -243,7 +242,7 @@ class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: .2),
                   width: 1,
                 ),
               ),
@@ -335,7 +334,7 @@ class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
                                 return Container(
                                   height: 300,
                                   width: 400,
-                                  color: Colors.red.withOpacity(0.1),
+                                  color: Colors.red.withValues(alpha: .1),
                                   child: const Center(
                                     child: Icon(Icons.error, color: Colors.red),
                                   ),

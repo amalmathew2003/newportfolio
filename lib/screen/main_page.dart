@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 import 'package:my_portfolio/screen/aboutme.dart';
 import 'package:my_portfolio/screen/contactme.dart';
@@ -75,7 +74,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF00D2FF).withOpacity(0.25),
+                        const Color(0xFF00D2FF).withValues(alpha: .25),
                         Colors.transparent,
                       ],
                       center: Alignment.center,
@@ -101,7 +100,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF7000FF).withOpacity(0.2),
+                        const Color(0xFF7000FF).withValues(alpha: .2),
                         Colors.transparent,
                       ],
                       center: Alignment.center,
@@ -134,7 +133,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            const Color(0xFFFF0055).withOpacity(0.15),
+                            const Color(0xFFFF0055).withValues(alpha: .15),
                             Colors.transparent,
                           ],
                           center: Alignment.center,

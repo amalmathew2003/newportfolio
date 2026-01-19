@@ -51,7 +51,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF00D2FF).withOpacity(0.1),
+                    const Color(0xFF00D2FF).withValues(alpha: .1),
                     Colors.transparent,
                   ],
                 ),
@@ -90,7 +90,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              const Color(0xFF050A1F).withOpacity(0.8),
+                              const Color(0xFF050A1F).withValues(alpha: .8),
                               const Color(0xFF050A1F),
                             ],
                             stops: const [0.2, 0.8, 1.0],
@@ -272,7 +272,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: .5),
                     border: Border.all(color: Colors.white24),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -512,7 +512,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
         height: 300,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withValues(alpha: .3),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.white10),
         ),

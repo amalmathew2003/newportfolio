@@ -48,7 +48,7 @@ class _DesktopScreenState extends State<DesktopScreen>
             right: 50,
             child: _FloatingShape(
               size: 200,
-              color: Colors.blueAccent.withOpacity(0.1),
+              color: Colors.blueAccent.withValues(alpha: .1),
               duration: 6,
             ),
           ),
@@ -57,7 +57,7 @@ class _DesktopScreenState extends State<DesktopScreen>
             left: 50,
             child: _FloatingShape(
               size: 150,
-              color: Colors.purpleAccent.withOpacity(0.1),
+              color: Colors.purpleAccent.withValues(alpha: .1),
               duration: 8,
             ),
           ),
@@ -78,7 +78,7 @@ class _DesktopScreenState extends State<DesktopScreen>
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: .05),
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(color: Colors.white24),
                   ),
@@ -124,7 +124,7 @@ class _DesktopScreenState extends State<DesktopScreen>
                 child: Text(
                   'BUILDING',
                   style: GoogleFonts.syne(
-                    fontSize: isMobile ? 50 : 120,
+                    fontSize: isMobile ? 50 : 110,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
                     height: 0.9,
@@ -162,7 +162,7 @@ class _DesktopScreenState extends State<DesktopScreen>
                       child: Text(
                         'DIGITAL',
                         style: GoogleFonts.syne(
-                          fontSize: isMobile ? 50 : 120,
+                          fontSize: isMobile ? 50 : 110,
                           fontWeight: FontWeight.w800,
                           color:
                               Colors.white, // Color is overridden by ShaderMask
@@ -289,7 +289,7 @@ class _ModernButtonState extends State<_ModernButton> {
             color: widget.isFilled
                 ? (_isHovered ? const Color(0xFF00D2FF) : Colors.white)
                 : (_isHovered
-                      ? Colors.white.withOpacity(0.1)
+                      ? Colors.white.withValues(alpha: .1)
                       : Colors.transparent),
             borderRadius: BorderRadius.circular(50),
             border: Border.all(

@@ -127,7 +127,7 @@ class _AboutMeState extends State<AboutMe> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF7000FF).withOpacity(0.4),
+              color: const Color(0xFF7000FF).withValues(alpha: .4),
               blurRadius: 40,
               spreadRadius: 5,
             ),
@@ -169,15 +169,15 @@ class _AboutMeState extends State<AboutMe> {
             ),
             padding: EdgeInsets.all(isMobile ? 25 : 40),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.03),
+              color: Colors.white.withValues(alpha: .03),
               borderRadius: BorderRadius.circular(30),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: .1),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: .2),
                   blurRadius: 20,
                   spreadRadius: 5,
                 ),
@@ -238,8 +238,8 @@ class _AboutMeState extends State<AboutMe> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF00D2FF).withOpacity(0.3)),
-        color: const Color(0xFF00D2FF).withOpacity(0.05),
+        border: Border.all(color: const Color(0xFF00D2FF).withValues(alpha: .3)),
+        color: const Color(0xFF00D2FF).withValues(alpha: .05),
       ),
       child: Text(
         text,
