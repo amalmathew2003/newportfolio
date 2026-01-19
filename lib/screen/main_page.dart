@@ -56,12 +56,12 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF030303), // Almost Black
+      backgroundColor: const Color(0xFF050A1F), // Deep Navy Blue
       body: Stack(
         children: [
           // === ELEGANT AURORA BACKGROUND ===
 
-          // Blob 1: Soft Indigo
+          // Blob 1: Electric Cyan
           AnimatedBuilder(
             animation: _auroraController1,
             builder: (context, child) {
@@ -75,7 +75,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF4338ca).withOpacity(0.25),
+                        const Color(0xFF00D2FF).withOpacity(0.25),
                         Colors.transparent,
                       ],
                       center: Alignment.center,
@@ -87,7 +87,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
             },
           ),
 
-          // Blob 2: Vibrant Teal/Emerald
+          // Blob 2: Deep Violet
           AnimatedBuilder(
             animation: _auroraController2,
             builder: (context, child) {
@@ -101,7 +101,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF059669).withOpacity(0.2),
+                        const Color(0xFF7000FF).withOpacity(0.2),
                         Colors.transparent,
                       ],
                       center: Alignment.center,
@@ -113,7 +113,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
             },
           ),
 
-          // Blob 3: Accent Purple/Pink
+          // Blob 3: Vibrant Magenta
           AnimatedBuilder(
             animation: _auroraController3,
             builder: (context, child) {
@@ -134,7 +134,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            const Color(0xFFbe185d).withOpacity(0.15),
+                            const Color(0xFFFF0055).withOpacity(0.15),
                             Colors.transparent,
                           ],
                           center: Alignment.center,

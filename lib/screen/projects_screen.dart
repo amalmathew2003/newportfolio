@@ -247,7 +247,7 @@ class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
                       style: GoogleFonts.syne(
                         fontSize: 20,
                         color: _isHovered
-                            ? const Color(0xFF00FF94)
+                            ? const Color(0xFF00D2FF)
                             : Colors.white54,
                         fontWeight: FontWeight.bold,
                       ),
@@ -274,7 +274,7 @@ class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               color: _isHovered
-                                  ? const Color(0xFF00FF94)
+                                  ? const Color(0xFF00D2FF)
                                   : Colors.white54,
                               letterSpacing: 1,
                             ),
@@ -290,7 +290,7 @@ class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
                       child: Icon(
                         Icons.arrow_forward,
                         color: _isHovered
-                            ? const Color(0xFF00FF94)
+                            ? const Color(0xFF00D2FF)
                             : Colors.white,
                         size: 30,
                       ),
@@ -327,7 +327,7 @@ class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
                                       color: Colors.white10,
                                       child: const Center(
                                         child: CircularProgressIndicator(
-                                          color: Color(0xFF00FF94),
+                                          color: Color(0xFF00D2FF),
                                         ),
                                       ),
                                     );

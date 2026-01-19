@@ -48,14 +48,14 @@ class _AboutMeState extends State<AboutMe> {
                       style: GoogleFonts.outfit(
                         fontSize: isMobile ? 14 : 16,
                         fontWeight: FontWeight.w500,
-                        color: const Color(0xFF00FFCC), // Neon Cyan
+                        color: const Color(0xFF00D2FF), // Cyan
                         letterSpacing: 4,
                       ),
                     ),
                     const SizedBox(height: 10),
                     ShaderMask(
                       shaderCallback: (bounds) => const LinearGradient(
-                        colors: [Colors.white, Color(0xFF00FFCC)],
+                        colors: [Colors.white, Color(0xFF00D2FF)],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ).createShader(bounds),
@@ -77,8 +77,8 @@ class _AboutMeState extends State<AboutMe> {
                         borderRadius: BorderRadius.circular(2),
                         gradient: const LinearGradient(
                           colors: [
-                            Color(0xFF7C4DFF),
-                            Color(0xFFD500F9),
+                            Color(0xFF7000FF),
+                            Color(0xFFFF0055),
                           ], // Violet -> Magenta
                         ),
                       ),
@@ -127,7 +127,7 @@ class _AboutMeState extends State<AboutMe> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF7C4DFF).withOpacity(0.4),
+              color: const Color(0xFF7000FF).withOpacity(0.4),
               blurRadius: 40,
               spreadRadius: 5,
             ),
@@ -138,7 +138,7 @@ class _AboutMeState extends State<AboutMe> {
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
-              colors: [Color(0xFF00FFCC), Color(0xFFD500F9)],
+              colors: [Color(0xFF00D2FF), Color(0xFFFF0055)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -238,14 +238,14 @@ class _AboutMeState extends State<AboutMe> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF00FFCC).withOpacity(0.3)),
-        color: const Color(0xFF00FFCC).withOpacity(0.05),
+        border: Border.all(color: const Color(0xFF00D2FF).withOpacity(0.3)),
+        color: const Color(0xFF00D2FF).withOpacity(0.05),
       ),
       child: Text(
         text,
         style: GoogleFonts.spaceGrotesk(
           fontSize: 12,
-          color: const Color(0xFF00FFCC), // Neon Cyan
+          color: const Color(0xFF00D2FF), // Cyan
           fontWeight: FontWeight.w600,
           letterSpacing: 1,
         ),

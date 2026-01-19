@@ -37,7 +37,7 @@ class ProjectDetailsScreen extends StatelessWidget {
     final isMobile = size.width < 900;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF030303),
+      backgroundColor: const Color(0xFF050A1F),
       body: Stack(
         children: [
           // Background Elements
@@ -51,7 +51,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF00FF94).withOpacity(0.1),
+                    const Color(0xFF00D2FF).withOpacity(0.1),
                     Colors.transparent,
                   ],
                 ),
@@ -90,8 +90,8 @@ class ProjectDetailsScreen extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              const Color(0xFF030303).withOpacity(0.8),
-                              const Color(0xFF030303),
+                              const Color(0xFF050A1F).withOpacity(0.8),
+                              const Color(0xFF050A1F),
                             ],
                             stops: const [0.2, 0.8, 1.0],
                           ),
@@ -123,14 +123,14 @@ class ProjectDetailsScreen extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: const Color(0xFF00FF94),
+                                  color: const Color(0xFF00D2FF),
                                 ),
                                 borderRadius: BorderRadius.circular(50),
                               ),
                               child: Text(
                                 category.toUpperCase(),
                                 style: GoogleFonts.inter(
-                                  color: const Color(0xFF00FF94),
+                                  color: const Color(0xFF00D2FF),
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 2,
@@ -333,7 +333,7 @@ class ProjectDetailsScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFF00FF94),
+          color: const Color(0xFF00D2FF),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -439,15 +439,15 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
       looping: true,
       aspectRatio: _videoPlayerController.value.aspectRatio,
       materialProgressColors: ChewieProgressColors(
-        playedColor: const Color(0xFF00FF94),
-        handleColor: const Color(0xFF00FF94),
+        playedColor: const Color(0xFF00D2FF),
+        handleColor: const Color(0xFF00D2FF),
         backgroundColor: Colors.white24,
         bufferedColor: Colors.white38,
       ),
       placeholder: Container(
         color: Colors.black12,
         child: const Center(
-          child: CircularProgressIndicator(color: Color(0xFF00FF94)),
+          child: CircularProgressIndicator(color: Color(0xFF00D2FF)),
         ),
       ),
       errorBuilder: (context, errorMessage) {
@@ -481,7 +481,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
           border: Border.all(color: Colors.white10),
         ),
         child: const Center(
-          child: CircularProgressIndicator(color: Color(0xFF00FF94)),
+          child: CircularProgressIndicator(color: Color(0xFF00D2FF)),
         ),
       );
     }

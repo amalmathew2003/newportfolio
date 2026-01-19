@@ -206,7 +206,7 @@ class _SkillItemState extends State<_SkillItem> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
         decoration: BoxDecoration(
-          color: _isHovered ? Colors.white : Colors.transparent,
+          color: _isHovered ? const Color(0xFF00D2FF) : Colors.transparent,
           border: Border.all(color: Colors.white24),
         ),
         child: Center(

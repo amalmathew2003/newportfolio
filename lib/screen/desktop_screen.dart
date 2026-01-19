@@ -89,11 +89,11 @@ class _DesktopScreenState extends State<DesktopScreen>
                         width: 8,
                         height: 8,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF00FF94), // Bright Green
+                          color: Color(0xFF00D2FF), // Bright Blue
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Color(0xFF00FF94),
+                              color: Color(0xFF00D2FF),
                               blurRadius: 10,
                               spreadRadius: 2,
                             ),
@@ -285,7 +285,7 @@ class _ModernButtonState extends State<_ModernButton> {
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           decoration: BoxDecoration(
             color: widget.isFilled
-                ? (_isHovered ? const Color(0xFF00FF94) : Colors.white)
+                ? (_isHovered ? const Color(0xFF00D2FF) : Colors.white)
                 : (_isHovered
                       ? Colors.white.withOpacity(0.1)
                       : Colors.transparent),
@@ -298,7 +298,7 @@ class _ModernButtonState extends State<_ModernButton> {
             boxShadow: _isHovered && widget.isFilled
                 ? [
                     const BoxShadow(
-                      color: Color(0xFF00FF94),
+                      color: Color(0xFF00D2FF),
                       blurRadius: 20,
                       spreadRadius: -5,
                       offset: Offset(0, 5),

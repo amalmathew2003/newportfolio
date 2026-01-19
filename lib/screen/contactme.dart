@@ -90,7 +90,7 @@ class _ContactMeState extends State<ContactMe> {
                             vertical: isMobile ? 20 : 30,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF00FF94),
+                            color: const Color(0xFF00D2FF),
                             borderRadius: BorderRadius.circular(100),
                           ),
                           child: Text(
@@ -168,7 +168,7 @@ class _SocialLinkState extends State<_SocialLink> {
           duration: const Duration(milliseconds: 200),
           child: Icon(
             widget.icon,
-            color: _isHovered ? const Color(0xFF00FF94) : Colors.white,
+            color: _isHovered ? const Color(0xFF00D2FF) : Colors.white,
             size: 30,
           ),
         ),

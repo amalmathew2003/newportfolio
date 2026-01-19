@@ -80,7 +80,7 @@ class _MouseFollowerState extends State<MouseFollower> {
                     width: size,
                     height: size,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF00FF94),
+                      color: Color(0xFF00D2FF),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -99,11 +99,11 @@ class _MouseFollowerState extends State<MouseFollower> {
                   width: 12,
                   height: 12,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00FF94),
+                    color: const Color(0xFF00D2FF),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF00FF94).withOpacity(0.8),
+                        color: const Color(0xFF00D2FF).withOpacity(0.8),
                         blurRadius: 15,
                         spreadRadius: 2,
                       ),
