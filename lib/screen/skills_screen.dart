@@ -16,6 +16,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
     "FLUTTER",
     "DART",
     "FIREBASE",
+    "SUPABASE",
     "ANDROID",
     "IOS",
     "WEB",
@@ -95,6 +96,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
   }
 }
 
+///===================================InfiniteTextScroll===================================//
 class _InfiniteTextScroll extends StatefulWidget {
   final List<String> items;
   final Axis direction;
@@ -185,6 +187,7 @@ class _InfiniteTextScrollState extends State<_InfiniteTextScroll> {
   }
 }
 
+///===================================SkillItem===================================//
 class _SkillItem extends StatefulWidget {
   final String text;
   const _SkillItem({required this.text});

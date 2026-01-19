@@ -287,13 +287,58 @@ class ProjectDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildDescription() {
-    return Text(
-      description,
-      style: GoogleFonts.inter(
-        fontSize: 18,
-        color: Colors.white70,
-        height: 1.8,
-      ),
+    final paragraphs = description.split('\n');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: paragraphs.map((item) {
+        if (item.trim().isEmpty) return const SizedBox(height: 10);
+
+        final isBullet =
+            item.trim().startsWith('•') ||
+            item.trim().startsWith('-') ||
+            item.trim().startsWith('*');
+
+        if (isBullet) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12, left: 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "• ",
+                  style: GoogleFonts.inter(
+                    fontSize: 20,
+                    color: const Color(0xFF00D2FF),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    item.trim().replaceFirst(RegExp(r'^[•\-\*]\s*'), ''),
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      color: Colors.white70,
+                      height: 1.6,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: Text(
+            item.trim(),
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              color: Colors.white70,
+              height: 1.8,
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -355,26 +400,7 @@ class ProjectDetailsScreen extends StatelessWidget {
   }
 }
 
-class _TechnologyChip extends StatelessWidget {
-  final String label;
-  const _TechnologyChip({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        border: Border.all(color: Colors.white12),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.inter(color: Colors.white, fontSize: 14),
-      ),
-    );
-  }
-}
+///===========================================TechChip===========================================//
 
 class _TechChip extends StatelessWidget {
   final String label;
@@ -396,6 +422,8 @@ class _TechChip extends StatelessWidget {
     );
   }
 }
+
+///===================================VideoPlayerWidget===================================//
 
 class _VideoPlayerWidget extends StatefulWidget {
   final String videoUrl;

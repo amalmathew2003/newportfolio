@@ -251,6 +251,8 @@ class _DesktopScreenState extends State<DesktopScreen>
   }
 }
 
+///===================================ModernButton===================================//
+
 class _ModernButton extends StatefulWidget {
   final String text;
   final bool isFilled;
@@ -336,6 +338,8 @@ class _ModernButtonState extends State<_ModernButton> {
     );
   }
 }
+
+///===================================FloatingShape===================================//
 
 class _FloatingShape extends StatefulWidget {
   final double size;

@@ -177,7 +177,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         ],
                         videoUrl: "assests/video/VN.mp4",
                         description:
-                            "A smart productivity tool that converts speech to text details. Leveraging local database storage for offline access and efficient note organization. The app focuses on minimalism and speed, allowing users to capture ideas instantly.",
+                            "The Smart Voice Note App is a Flutter-based mobile application designed to help users quickly record, store, and manage voice notes with ease. The app provides a simple and intuitive interface that allows users to capture high-quality audio using a single tap. Each recording is automatically saved with relevant details such as date and time, making it easy to organize and identify voice notes. The application works offline and ensures reliable access to recordings at any time"
+                            "This project focuses on performance, usability, and clean architecture. It includes smooth audio playback controls, efficient local file storage, and proper handling of microphone permissions to ensure user privacy and stability. Through this application, I gained hands-on experience in audio recording and playback in Flutter, state management, local storage handling, and building responsive, user-friendly mobile applications.",
                       ),
                     ),
                 ],
@@ -190,6 +191,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 }
 
+///===================================BrutalistProjectCard===================================//
+///
 class _BrutalistProjectCard extends StatefulWidget {
   final String index;
   final String title;
