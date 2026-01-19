@@ -177,8 +177,15 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         ],
                         videoUrl: "assests/video/VN.mp4",
                         description:
-                            "The Smart Voice Note App is a Flutter-based mobile application designed to help users quickly record, store, and manage voice notes with ease. The app provides a simple and intuitive interface that allows users to capture high-quality audio using a single tap. Each recording is automatically saved with relevant details such as date and time, making it easy to organize and identify voice notes. The application works offline and ensures reliable access to recordings at any time"
-                            "This project focuses on performance, usability, and clean architecture. It includes smooth audio playback controls, efficient local file storage, and proper handling of microphone permissions to ensure user privacy and stability. Through this application, I gained hands-on experience in audio recording and playback in Flutter, state management, local storage handling, and building responsive, user-friendly mobile applications.",
+                            "The Smart Voice Note App is a Flutter-Firebase based mobile application developed to provide users with a simple, reliable, and efficient way to record, store, and manage voice notes. The primary goal of the application is to help users capture ideas, reminders, meetings, and personal notes instantly through audio, without the need for typing. The app emphasizes usability, performance, and clean architecture while maintaining a modern and intuitive user interface.\n\n"
+                            "In today’s fast-paced environment, users often need a quick way to save thoughts or information. This application addresses that requirement by offering a seamless one-tap recording experience combined with organized storage and smooth playback functionality. The app is designed to work offline, ensuring that users can access their recordings anytime without depending on network connectivity.\n\n"
+                            "Key Features:\n"
+                            "* One-tap high-quality audio recording\n"
+                            "* Automatic organization with date and time labels\n"
+                            "* View a list of recorded notes with timestamps\n"
+                            "* Play, pause, and control audio playback\n"
+                            "* Delete recordings when no longer needed\n"
+                            "The application follows a clean and minimal UI approach, making it accessible for users of all age groups. From recording to playback, every interaction is designed to be intuitive and responsive.",
                       ),
                     ),
                 ],

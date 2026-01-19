@@ -307,7 +307,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                 Text(
                   "• ",
                   style: GoogleFonts.inter(
-                    fontSize: 20,
+                    fontSize: 18,
                     color: const Color(0xFF00D2FF),
                     fontWeight: FontWeight.bold,
                   ),
@@ -411,7 +411,7 @@ class _TechChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         border: Border.all(color: Colors.white12),
         borderRadius: BorderRadius.circular(4),
       ),
