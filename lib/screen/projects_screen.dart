@@ -79,7 +79,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     ),
                     if (!isMobile)
                       Text(
-                        "(2023 - 2024)",
+                        "(2024 - 2026)",
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           color: Colors.white54,
@@ -100,61 +100,6 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   if (_visible)
                     _BrutalistProjectCard(
                       index: "01",
-                      title: "Facebook Clone",
-                      category: "Mobile App • Flutter",
-                      imageUrls: const [
-                        "assests/images/VN1bg.png",
-                        "assests/images/VN2bg.png",
-                        "assests/images/VN3bg.png",
-                      ],
-                      githubUrl: "https://github.com/amalmathew2003/Facebook",
-                      delay: 200,
-                      onTap: () => _navigateToDetails(
-                        context,
-                        title: "Facebook Clone",
-                        category: "Mobile App • Flutter",
-                        githubUrl: "https://github.com/amalmathew2003/Facebook",
-                        imageUrls: const [
-                          "assests/images/VN1bg.png",
-                          "assests/images/VN2bg.png",
-                          "assests/images/VN3bg.png",
-                        ],
-                        videoUrl: "assests/video/VN.mp4",
-                        description:
-                            "A pixel-perfect Facebook clone built using Flutter.",
-                      ),
-                    ),
-
-                  if (_visible)
-                    _BrutalistProjectCard(
-                      index: "02",
-                      title: "OP Booking",
-                      category: "Medical • Firebase",
-                      imageUrls: const [
-                        "assests/images/VN1bg.png",
-                        "assests/images/VN2bg.png",
-                        "assests/images/VN3bg.png",
-                      ],
-                      githubUrl: "https://github.com/amalmathew2003/Hospital",
-                      delay: 400,
-                      onTap: () => _navigateToDetails(
-                        context,
-                        title: "OP Booking",
-                        category: "Medical • Firebase",
-                        githubUrl: "https://github.com/amalmathew2003/Hospital",
-                        imageUrls: const [
-                          "assests/images/VN1bg.png",
-                          "assests/images/VN2bg.png",
-                          "assests/images/VN3bg.png",
-                        ],
-                        videoUrl: "assests/video/VN.mp4",
-                        description:
-                            "An Outpatient Booking System designed to streamline hospital appointments. Built with Flutter and backed by Firebase, this app allows patients to book slots with doctors real-time. It features user authentication, doctor availability management, live appointment status tracking, and an admin dashboard for hospital staff.",
-                      ),
-                    ),
-                  if (_visible)
-                    _BrutalistProjectCard(
-                      index: "03",
                       title: "Voice Notes",
                       category: "AI • Productivity",
                       imageUrls: const [
@@ -170,6 +115,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         category: "AI • Productivity",
                         githubUrl: "https://github.com/amalmathew2003/note-app",
                         imageUrls: const [
+                          "assests/images/vn1full.png",
+
                           "assests/images/VN1bg.png",
                           "assests/images/VN2bg.png",
                           "assests/images/VN3bg.png",
@@ -185,6 +132,64 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                             "* Play, pause, and control audio playback\n"
                             "* Delete recordings when no longer needed\n"
                             "The application follows a clean and minimal UI approach, making it accessible for users of all age groups. From recording to playback, every interaction is designed to be intuitive and responsive.",
+                      ),
+                    ),
+
+                  if (_visible)
+                    _BrutalistProjectCard(
+                      index: "02",
+                      title: "Travel Tracker App",
+                      category: "Mobile App • Flutter",
+                      imageUrls: const [
+                        "assests/images/travalappfull.png",
+                        "assests/images/travalapp.png",
+                        "assests/images/travalapp2.png",
+                      ],
+                      githubUrl: "https://github.com/amalmathew2003/travelapp",
+                      delay: 400,
+                      onTap: () => _navigateToDetails(
+                        context,
+                        title: "Travel Tracker App",
+                        category: "Mobile App • Flutter",
+                        githubUrl:
+                            "https://github.com/amalmathew2003/travelapp",
+                        imageUrls: const [
+                          "assests/images/travalappfull.png",
+                          "assests/images/travalapp.png",
+                          "assests/images/travalapp2.png",
+                        ],
+                        videoUrl: "assests/video/travalApp.mp4",
+                        description:
+                            "The Travel Tracker App is a Flutter-based mobile application developed to help users track and record their travel activities in real time. The app allows users to monitor their location movements during a journey and maintain a record of travel routes and trips. It focuses on accurately capturing travel data while providing a simple and intuitive interface for viewing tracked information.\n\n"
+                            "This project emphasizes real-time location tracking, background execution, and efficient data handling. The app is designed to work continuously during travel and reliably store tracking information for later reference. Through this project, I gained hands-on experience in location services, background task handling, permission management, and building Flutter applications that operate smoothly while tracking movement over extended periods.\n\n",
+                      ),
+                    ),
+                  if (_visible)
+                    _BrutalistProjectCard(
+                      index: "03",
+                      title: "Motion Detection App",
+                      category: "Mobile App • Flutter",
+                      imageUrls: const [
+                        "assests/images/motion.png",
+                        "assests/images/motion2.png",
+                      ],
+                      githubUrl:
+                          "https://github.com/amalmathew2003/MotionDetectionApp",
+                      delay: 200,
+                      onTap: () => _navigateToDetails(
+                        context,
+                        title: "Motion Detection App",
+                        category: "Mobile App • Flutter",
+                        githubUrl:
+                            "https://github.com/amalmathew2003/MotionDetectionApp",
+                        imageUrls: const [
+                          "assests/images/motion.png",
+                          "assests/images/motion2.png",
+                        ],
+                        // videoUrl: "assests/video/VN.mp4",
+                        description:
+                            "The Motion Detection App is a Flutter-based mobile application designed to detect physical movement of the device using built-in sensors such as the accelerometer, gyroscope, and proximity sensor. The application continuously monitors sensor data to identify any significant movement or orientation changes of the phone. When motion is detected, the app immediately triggers an alarm sound, making it suitable for device security, theft prevention, and motion-based alert use cases. The app is capable of running in the background, ensuring continuous monitoring even when the application is not actively in use.\n\n"
+                            "This project emphasizes real-time sensor data processing, background execution, and efficient system resource management. Motion detection is implemented using the sensors_plus package for accelerometer and gyroscope data, proximity_sensor for near-device detection, and audioplayers for triggering alarm sounds. Through this project, I gained hands-on experience in working with mobile sensors, managing background services, handling permissions, and building reliable Flutter applications that respond instantly to real-world physical interactions.",
                       ),
                     ),
                 ],
