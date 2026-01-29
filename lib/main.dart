@@ -23,7 +23,6 @@ class PortfolioLandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Return different screens based on width
-
     return const PortfolioScrollablePage();
   }
 }
