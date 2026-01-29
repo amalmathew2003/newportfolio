@@ -5,6 +5,7 @@ import 'package:my_portfolio/screen/aboutme.dart';
 import 'package:my_portfolio/screen/contactme.dart';
 import 'package:my_portfolio/screen/projects_screen.dart';
 import 'package:my_portfolio/screen/skills_screen.dart';
+import 'package:my_portfolio/screen/experience_screen.dart';
 import 'desktop_screen.dart';
 
 class PortfolioScrollablePage extends StatefulWidget {
@@ -180,6 +181,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                 ),
                 const AboutMe(),
                 const SkillsScreen(),
+                const ExperienceScreen(),
                 const ProjectsScreen(),
                 const ContactMe(),
               ],

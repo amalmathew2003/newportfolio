@@ -232,6 +232,9 @@ class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isMobile = size.width < 900;
+
     return FadeInUp(
       delay: Duration(milliseconds: widget.delay),
       duration: const Duration(milliseconds: 1000),
@@ -299,17 +302,30 @@ class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
                       ),
                     ),
 
-                    // Arrow Icon
-                    AnimatedRotation(
-                      turns: _isHovered ? -0.125 : 0, // 45 degrees
-                      duration: const Duration(milliseconds: 300),
-                      child: Icon(
-                        Icons.arrow_forward,
-                        color: _isHovered
-                            ? const Color(0xFF00D2FF)
-                            : Colors.white,
-                        size: 30,
-                      ),
+                    // Arrow Icon & Click Me Badge
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_isHovered)
+                          FadeIn(
+                            duration: const Duration(milliseconds: 400),
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 25),
+                              child: _HoverBadge(),
+                            ),
+                          ),
+                        AnimatedRotation(
+                          turns: _isHovered ? -0.125 : 0, // 45 degrees
+                          duration: const Duration(milliseconds: 300),
+                          child: Icon(
+                            Icons.arrow_forward,
+                            color: _isHovered
+                                ? const Color(0xFF00D2FF)
+                                : Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -317,7 +333,7 @@ class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
                 // Reveal Images Gallery on Hover
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 400),
-                  height: _isHovered ? 300 : 0, // Sufficient height for images
+                  height: _isHovered ? 400 : 0, // Sufficient height for images
                   width: double.infinity,
                   curve: Curves.fastOutSlowIn,
                   margin: EdgeInsets.only(top: _isHovered ? 30 : 0),
@@ -329,11 +345,11 @@ class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
                         return Padding(
                           padding: const EdgeInsets.only(right: 20),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(12),
                             child: Image.asset(
                               path,
-                              height: 300,
-                              width: 400,
+                              height: 400,
+                              width: isMobile ? size.width * 0.8 : 500,
                               fit: BoxFit.contain,
                               errorBuilder: (context, error, stackTrace) {
                                 return Container(
@@ -354,6 +370,41 @@ class _BrutalistProjectCardState extends State<_BrutalistProjectCard> {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HoverBadge extends StatefulWidget {
+  @override
+  State<_HoverBadge> createState() => _HoverBadgeState();
+}
+
+class _HoverBadgeState extends State<_HoverBadge> {
+  bool _isBadgeHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isBadgeHovered = true),
+      onExit: (_) => setState(() => _isBadgeHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: _isBadgeHovered ? Colors.white : Colors.transparent,
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          "VIEW DETAILS",
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            color: _isBadgeHovered ? Colors.black : Colors.white,
+            letterSpacing: 2,
           ),
         ),
       ),
