@@ -16,30 +16,24 @@ class _DesktopScreenState extends State<DesktopScreen>
     with TickerProviderStateMixin {
   late AnimationController _glowController;
   late AnimationController _floatController;
-  late AnimationController _typewriterController;
 
   @override
   void initState() {
     super.initState();
     _glowController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 4),
     )..repeat(reverse: true);
     _floatController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 6),
+      duration: const Duration(seconds: 8),
     )..repeat(reverse: true);
-    _typewriterController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 4),
-    )..repeat();
   }
 
   @override
   void dispose() {
     _glowController.dispose();
     _floatController.dispose();
-    _typewriterController.dispose();
     super.dispose();
   }
 
@@ -51,7 +45,11 @@ class _DesktopScreenState extends State<DesktopScreen>
     return Container(
       height: size.height,
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: isMobile ? 24 : 100),
+      padding: EdgeInsets.only(
+        left: isMobile ? 24 : 100,
+        right: isMobile ? 24 : 100,
+        top: 70, // clear the nav bar
+      ),
       child: Stack(
         children: [
           // Floating geometric shapes
@@ -64,15 +62,13 @@ class _DesktopScreenState extends State<DesktopScreen>
                 ? CrossAxisAlignment.center
                 : CrossAxisAlignment.start,
             children: [
-              SizedBox(height: isMobile ? 80 : 0),
-
               // Status badge
               FadeInDown(
                 duration: const Duration(milliseconds: 800),
                 child: _buildStatusBadge(),
               ),
 
-              SizedBox(height: isMobile ? 30 : 50),
+              SizedBox(height: isMobile ? 20 : 30),
 
               // Main heading with unique design
               FadeInUp(
@@ -90,7 +86,7 @@ class _DesktopScreenState extends State<DesktopScreen>
                 child: _buildSubtitle(isMobile),
               ),
 
-              const SizedBox(height: 50),
+              const SizedBox(height: 40),
 
               // CTA Buttons
               FadeInUp(
@@ -99,7 +95,7 @@ class _DesktopScreenState extends State<DesktopScreen>
                 child: _buildCTAButtons(isMobile),
               ),
 
-              const SizedBox(height: 60),
+              const SizedBox(height: 40),
 
               // Stats row
               FadeInUp(
@@ -240,12 +236,11 @@ class _DesktopScreenState extends State<DesktopScreen>
 
         const SizedBox(height: 16),
 
-        // Role with typing cursor effect
+        // Role with typing cursor effect (reuses glowController)
         AnimatedBuilder(
-          animation: _typewriterController,
+          animation: _glowController,
           builder: (context, child) {
-            final showCursor =
-                (_typewriterController.value * 4).floor() % 2 == 0;
+            final showCursor = (_glowController.value * 6).floor() % 2 == 0;
             return Row(
               mainAxisSize: isMobile ? MainAxisSize.min : MainAxisSize.max,
               children: [

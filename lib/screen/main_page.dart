@@ -20,10 +20,9 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
     with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
 
-  // Animated mesh controllers
-  late AnimationController _meshController1;
-  late AnimationController _meshController2;
-  late AnimationController _meshController3;
+  // Single animation controller for subtle background motion
+  late AnimationController _meshController;
+  // Separate lightweight controller for nav pulse
   late AnimationController _pulseController;
 
   // Navigation
@@ -41,18 +40,12 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
   @override
   void initState() {
     super.initState();
-    _meshController1 = AnimationController(
+    // Single slow controller instead of 3 fast ones
+    _meshController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 20),
+      duration: const Duration(seconds: 30),
     )..repeat(reverse: true);
-    _meshController2 = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 25),
-    )..repeat(reverse: true);
-    _meshController3 = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 18),
-    )..repeat(reverse: true);
+
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -62,7 +55,6 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
   }
 
   void _onScroll() {
-    // Determine which section is most visible
     final scrollOffset = _scrollController.offset;
     final viewportHeight = MediaQuery.of(context).size.height;
 
@@ -97,9 +89,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
   @override
   void dispose() {
     _scrollController.dispose();
-    _meshController1.dispose();
-    _meshController2.dispose();
-    _meshController3.dispose();
+    _meshController.dispose();
     _pulseController.dispose();
     super.dispose();
   }
@@ -113,22 +103,34 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
       backgroundColor: const Color(0xFF0A0A0F),
       body: Stack(
         children: [
-          // === ANIMATED MESH GRADIENT BACKGROUND ===
+          // === STATIC MESH GRADIENT BACKGROUND (no per-frame rebuild) ===
           _buildMeshBackground(size),
 
-          // === NOISE TEXTURE OVERLAY ===
+          // === NOISE TEXTURE OVERLAY (cached, never repaints) ===
           Positioned.fill(
-            child: Opacity(
-              opacity: 0.03,
-              child: CustomPaint(painter: _NoisePainter()),
+            child: RepaintBoundary(
+              child: Opacity(
+                opacity: 0.03,
+                child: CustomPaint(
+                  painter: _NoisePainter(),
+                  isComplex: true,
+                  willChange: false,
+                ),
+              ),
             ),
           ),
 
-          // === SCAN LINE EFFECT ===
+          // === SCAN LINE EFFECT (cached, never repaints) ===
           Positioned.fill(
-            child: Opacity(
-              opacity: 0.015,
-              child: CustomPaint(painter: _ScanLinePainter()),
+            child: RepaintBoundary(
+              child: Opacity(
+                opacity: 0.015,
+                child: CustomPaint(
+                  painter: _ScanLinePainter(),
+                  isComplex: true,
+                  willChange: false,
+                ),
+              ),
             ),
           ),
 
@@ -138,23 +140,17 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
             physics: const BouncingScrollPhysics(),
             child: Column(
               children: [
-                // Hero Section
                 Container(
                   key: _sectionKeys[0],
                   child: DesktopScreen(onContactTap: () => _scrollToSection(5)),
                 ),
-                // About Section
                 Container(key: _sectionKeys[1], child: const AboutMe()),
-                // Skills Section
                 Container(key: _sectionKeys[2], child: const SkillsScreen()),
-                // Experience Section
                 Container(
                   key: _sectionKeys[3],
                   child: const ExperienceScreen(),
                 ),
-                // Projects Section
                 Container(key: _sectionKeys[4], child: const ProjectsScreen()),
-                // Contact Section
                 Container(key: _sectionKeys[5], child: const ContactMe()),
               ],
             ),
@@ -177,94 +173,78 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
   }
 
   Widget _buildMeshBackground(Size size) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([
-        _meshController1,
-        _meshController2,
-        _meshController3,
-      ]),
-      builder: (context, child) {
-        return Stack(
-          children: [
-            // Base dark overlay
-            Positioned.fill(
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment.center,
-                    radius: 1.5,
-                    colors: [Color(0xFF0F0F1A), Color(0xFF0A0A0F)],
+    // Use RepaintBoundary to isolate background repaints from the rest of the tree
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _meshController,
+        builder: (context, child) {
+          final v = _meshController.value;
+          return Stack(
+            children: [
+              // Base dark
+              Positioned.fill(child: Container(color: const Color(0xFF0A0A0F))),
+
+              // Blob 1 — Emerald
+              Positioned(
+                top: -200 + (v * 80),
+                left: -150 + (v * 60),
+                child: _MeshBlob(
+                  size: size.width * 0.6,
+                  color: const Color(0xFF00FFA3),
+                  opacity: 0.08,
+                ),
+              ),
+
+              // Blob 2 — Violet (offset phase)
+              Positioned(
+                bottom: -300 + ((1 - v) * 50),
+                right: -200 + ((1 - v) * 80),
+                child: _MeshBlob(
+                  size: size.width * 0.7,
+                  color: const Color(0xFF8B5CF6),
+                  opacity: 0.06,
+                ),
+              ),
+
+              // Blob 3 — Pink
+              Positioned(
+                top: size.height * 0.3,
+                right: size.width * 0.1,
+                child: Transform.translate(
+                  offset: Offset(sin(v * 2 * pi) * 60, cos(v * 2 * pi) * 40),
+                  child: _MeshBlob(
+                    size: 400,
+                    color: const Color(0xFFFF006E),
+                    opacity: 0.04,
                   ),
                 ),
               ),
-            ),
 
-            // Mesh blob 1 — Emerald Green
-            Positioned(
-              top: -200 + (_meshController1.value * 100),
-              left: -150 + (_meshController2.value * 80),
-              child: _MeshBlob(
-                size: size.width * 0.7,
-                color: const Color(0xFF00FFA3),
-                opacity: 0.08,
-              ),
-            ),
-
-            // Mesh blob 2 — Electric Violet
-            Positioned(
-              bottom: -300 + (_meshController2.value * -60),
-              right: -200 + (_meshController1.value * -100),
-              child: _MeshBlob(
-                size: size.width * 0.8,
-                color: const Color(0xFF8B5CF6),
-                opacity: 0.06,
-              ),
-            ),
-
-            // Mesh blob 3 — Hot Pink
-            Positioned(
-              top: size.height * 0.3,
-              right: size.width * 0.1,
-              child: Transform.translate(
-                offset: Offset(
-                  sin(_meshController3.value * 2 * pi) * 120,
-                  cos(_meshController3.value * 2 * pi) * 80,
-                ),
-                child: _MeshBlob(
-                  size: 500,
-                  color: const Color(0xFFFF006E),
-                  opacity: 0.05,
+              // Blob 4 — Cyan
+              Positioned(
+                top: size.height * 0.6,
+                left: size.width * 0.05,
+                child: Transform.translate(
+                  offset: Offset(cos(v * 2 * pi) * 40, sin(v * 2 * pi) * 30),
+                  child: _MeshBlob(
+                    size: 350,
+                    color: const Color(0xFF00D4FF),
+                    opacity: 0.04,
+                  ),
                 ),
               ),
-            ),
 
-            // Mesh blob 4 — Cyan accent
-            Positioned(
-              top: size.height * 0.6,
-              left: size.width * 0.05,
-              child: Transform.translate(
-                offset: Offset(
-                  cos(_meshController1.value * 2 * pi) * 60,
-                  sin(_meshController2.value * 2 * pi) * 40,
-                ),
-                child: _MeshBlob(
-                  size: 400,
-                  color: const Color(0xFF00D4FF),
-                  opacity: 0.04,
+              // Single blur pass — reduced sigma for performance
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
+                  child: Container(color: Colors.transparent),
                 ),
               ),
-            ),
-
-            // Heavy blur to blend everything
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-                child: Container(color: Colors.transparent),
-              ),
-            ),
-          ],
-        );
-      },
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -286,20 +266,18 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 onTap: () => _scrollToSection(index),
-                child: AnimatedBuilder(
-                  animation: _pulseController,
-                  builder: (context, child) {
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      width: isActive ? 12 : 6,
-                      height: isActive ? 12 : 6,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isActive
-                            ? const Color(0xFF00FFA3)
-                            : Colors.white.withValues(alpha: .3),
-                        boxShadow: isActive
-                            ? [
+                child: isActive
+                    // Only the active dot animates with the pulse controller
+                    ? AnimatedBuilder(
+                        animation: _pulseController,
+                        builder: (context, child) {
+                          return Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xFF00FFA3),
+                              boxShadow: [
                                 BoxShadow(
                                   color: const Color(0xFF00FFA3).withValues(
                                     alpha: 0.3 + (_pulseController.value * 0.3),
@@ -307,12 +285,20 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                                   blurRadius: 12,
                                   spreadRadius: 2,
                                 ),
-                              ]
-                            : [],
+                              ],
+                            ),
+                          );
+                        },
+                      )
+                    // Inactive dots are completely static
+                    : Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: .3),
+                        ),
                       ),
-                    );
-                  },
-                ),
               ),
             ),
           );
@@ -491,13 +477,14 @@ class _NavItemState extends State<_NavItem> {
   }
 }
 
-// === Noise Painter ===
+// === Noise Painter (static, seeded) ===
 class _NoisePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final random = Random(42);
+    final random = Random(42); // fixed seed = deterministic
     final paint = Paint()..color = Colors.white;
-    for (int i = 0; i < 800; i++) {
+    for (int i = 0; i < 500; i++) {
+      // reduced from 800
       final x = random.nextDouble() * size.width;
       final y = random.nextDouble() * size.height;
       final radius = random.nextDouble() * 1.5;
@@ -509,12 +496,13 @@ class _NoisePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-// === Scan Line Painter ===
+// === Scan Line Painter (static) ===
 class _ScanLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = Colors.white;
-    for (double y = 0; y < size.height; y += 3) {
+    for (double y = 0; y < size.height; y += 4) {
+      // increased gap from 3 to 4
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
   }

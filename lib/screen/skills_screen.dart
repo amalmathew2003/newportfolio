@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -179,46 +178,50 @@ class _InfiniteScrollBand extends StatefulWidget {
   State<_InfiniteScrollBand> createState() => _InfiniteScrollBandState();
 }
 
-class _InfiniteScrollBandState extends State<_InfiniteScrollBand> {
+class _InfiniteScrollBandState extends State<_InfiniteScrollBand>
+    with SingleTickerProviderStateMixin {
   late ScrollController _scrollController;
-  late Timer _timer;
+  late AnimationController _animController;
   double _offset = 0;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1), // placeholder, runs forever
+    )..addListener(_tick);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.isReverse && _scrollController.hasClients) {
         _offset = _scrollController.position.maxScrollExtent;
         _scrollController.jumpTo(_offset);
       }
-      _startAutoScroll();
+      _animController.repeat();
     });
   }
 
-  void _startAutoScroll() {
-    _timer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
-      if (!_scrollController.hasClients) return;
+  void _tick() {
+    if (!_scrollController.hasClients) return;
 
-      if (widget.isReverse) {
-        _offset -= 0.8;
-        if (_offset <= 0) {
-          _offset = _scrollController.position.maxScrollExtent;
-        }
-      } else {
-        _offset += 0.8;
-        if (_offset >= _scrollController.position.maxScrollExtent) {
-          _offset = 0;
-        }
+    if (widget.isReverse) {
+      _offset -= 0.8;
+      if (_offset <= 0) {
+        _offset = _scrollController.position.maxScrollExtent;
       }
-      _scrollController.jumpTo(_offset);
-    });
+    } else {
+      _offset += 0.8;
+      if (_offset >= _scrollController.position.maxScrollExtent) {
+        _offset = 0;
+      }
+    }
+    _scrollController.jumpTo(_offset);
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    _animController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
