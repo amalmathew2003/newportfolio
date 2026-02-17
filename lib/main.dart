@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_portfolio/screen/main_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const PortfolioApp());
@@ -10,19 +11,15 @@ class PortfolioApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: PortfolioLandingPage(),
+      title: 'Amal Mathew | Flutter Developer',
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF0A0A0F),
+        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+      ),
+      home: const PortfolioScrollablePage(),
     );
-  }
-}
-
-class PortfolioLandingPage extends StatelessWidget {
-  const PortfolioLandingPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // Return different screens based on width
-    return const PortfolioScrollablePage();
   }
 }

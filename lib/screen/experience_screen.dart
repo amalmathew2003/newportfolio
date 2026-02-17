@@ -50,43 +50,101 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
       },
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 20 : 80,
-          vertical: 100,
+          horizontal: isMobile ? 24 : 100,
+          vertical: 120,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Section Header
+            if (_isVisible)
+              FadeInUp(
+                duration: const Duration(milliseconds: 800),
+                child: _buildSectionHeader(isMobile),
+              ),
+
+            const SizedBox(height: 20),
+
             if (_isVisible)
               FadeInUp(
                 duration: const Duration(milliseconds: 1000),
+                delay: const Duration(milliseconds: 200),
                 child: Text(
-                  "EXPERIENCE",
-                  style: GoogleFonts.syne(
-                    fontSize: isMobile ? 40 : 80,
-                    fontWeight: FontWeight.bold,
+                  "WORK\nJOURNEY",
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: isMobile ? 50 : 100,
+                    fontWeight: FontWeight.w700,
                     color: Colors.white,
-                    letterSpacing: -2,
+                    height: 0.9,
+                    letterSpacing: -3,
                   ),
                 ),
               ),
-            const SizedBox(height: 60),
+
+            const SizedBox(height: 80),
+
             if (_isVisible)
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: experiences.length,
-                itemBuilder: (context, index) {
-                  return _ExperienceCard(
-                    data: experiences[index],
-                    index: index,
-                    isLast: index == experiences.length - 1,
-                    isMobile: isMobile,
-                  );
-                },
-              ),
+              ...experiences.asMap().entries.map((entry) {
+                final index = entry.key;
+                final exp = entry.value;
+                return _ExperienceCard(
+                  data: exp,
+                  index: index,
+                  isLast: index == experiences.length - 1,
+                  isMobile: isMobile,
+                );
+              }),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionHeader(bool isMobile) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: const Color(0xFFFF006E).withValues(alpha: .3),
+            ),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            '03',
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 12,
+              color: const Color(0xFFFF006E),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFFFF006E).withValues(alpha: .3),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Text(
+          'EXPERIENCE',
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: isMobile ? 12 : 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.white54,
+            letterSpacing: 4,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -113,156 +171,187 @@ class _ExperienceCardState extends State<_ExperienceCard> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Timeline line and dot
-            Column(
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  width: 16,
-                  height: 16,
-                  decoration: BoxDecoration(
-                    color: widget.data.isCurrent || _isHovered
-                        ? const Color(0xFF00D2FF)
-                        : Colors.white24,
-                    shape: BoxShape.circle,
-                    boxShadow: widget.data.isCurrent || _isHovered
-                        ? [
-                            BoxShadow(
-                              color: const Color(
-                                0xFF00D2FF,
-                              ).withValues(alpha: .5),
-                              blurRadius: 10,
-                              spreadRadius: 2,
-                            ),
-                          ]
-                        : [],
+    final accentColor = widget.data.isCurrent
+        ? const Color(0xFF00FFA3)
+        : const Color(0xFF8B5CF6);
+
+    return FadeInUp(
+      delay: Duration(milliseconds: 300 * widget.index),
+      duration: const Duration(milliseconds: 800),
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Timeline
+              Column(
+                children: [
+                  // Dot with glow
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: 14,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: widget.data.isCurrent || _isHovered
+                          ? accentColor
+                          : Colors.white.withValues(alpha: .15),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: accentColor.withValues(alpha: .3),
+                        width: 2,
+                      ),
+                      boxShadow: widget.data.isCurrent || _isHovered
+                          ? [
+                              BoxShadow(
+                                color: accentColor.withValues(alpha: .4),
+                                blurRadius: 12,
+                                spreadRadius: 2,
+                              ),
+                            ]
+                          : [],
+                    ),
                   ),
-                ),
-                if (!widget.isLast)
-                  Expanded(child: Container(width: 2, color: Colors.white12)),
-              ],
-            ),
-            const SizedBox(width: 30),
-            // Content card
-            Expanded(
-              child: FadeInRight(
-                delay: Duration(milliseconds: 200 * widget.index),
-                duration: const Duration(milliseconds: 800),
-                child: Column(
-                  children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      padding: EdgeInsets.all(widget.isMobile ? 20 : 30),
-                      margin: const EdgeInsets.only(bottom: 40),
-                      decoration: BoxDecoration(
-                        color: _isHovered
-                            ? Colors.white.withValues(alpha: .05)
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: _isHovered ? Colors.white24 : Colors.white10,
+                  // Line
+                  if (!widget.isLast)
+                    Expanded(
+                      child: Container(
+                        width: 1,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              accentColor.withValues(alpha: .3),
+                              Colors.white.withValues(alpha: .05),
+                            ],
+                          ),
                         ),
                       ),
-                      child: Column(
+                    ),
+                ],
+              ),
+              const SizedBox(width: 30),
+
+              // Card Content
+              Expanded(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  padding: EdgeInsets.all(widget.isMobile ? 24 : 32),
+                  margin: const EdgeInsets.only(bottom: 40),
+                  decoration: BoxDecoration(
+                    color: _isHovered
+                        ? accentColor.withValues(alpha: .03)
+                        : Colors.white.withValues(alpha: .02),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: _isHovered
+                          ? accentColor.withValues(alpha: .2)
+                          : Colors.white.withValues(alpha: .05),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Top row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  widget.data.company,
-                                  style: GoogleFonts.syne(
-                                    fontSize: widget.isMobile ? 20 : 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                          Expanded(
+                            child: Text(
+                              widget.data.company,
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: widget.isMobile ? 22 : 28,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
                               ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xFF00D2FF,
-                                  ).withValues(alpha: .1),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  widget.data.period,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    color: const Color(0xFF00D2FF),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.work_outline,
-                                size: 16,
-                                color: Colors.white54,
+                          // Period badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: accentColor.withValues(alpha: .1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: accentColor.withValues(alpha: .2),
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                widget.data.role,
-                                style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  color: const Color(0xFF00D2FF),
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            ),
+                            child: Text(
+                              widget.data.period,
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 11,
+                                color: accentColor,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1,
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.location_on_outlined,
-                                size: 16,
-                                color: Colors.white54,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                widget.data.location,
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  color: Colors.white54,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            widget.data.description,
-                            style: GoogleFonts.inter(
-                              fontSize: 15,
-                              color: Colors.white70,
-                              height: 1.6,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 12),
+
+                      // Role
+                      Row(
+                        children: [
+                          Container(
+                            width: 16,
+                            height: 2,
+                            color: accentColor.withValues(alpha: .5),
+                            margin: const EdgeInsets.only(right: 10),
+                          ),
+                          Text(
+                            widget.data.role,
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              color: accentColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+
+                      // Location
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: 14,
+                            color: Colors.white.withValues(alpha: .3),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            widget.data.location,
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              color: Colors.white.withValues(alpha: .3),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Description
+                      Text(
+                        widget.data.description,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: Colors.white.withValues(alpha: .5),
+                          height: 1.7,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

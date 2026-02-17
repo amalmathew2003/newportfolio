@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,8 +11,24 @@ class AboutMe extends StatefulWidget {
   State<AboutMe> createState() => _AboutMeState();
 }
 
-class _AboutMeState extends State<AboutMe> {
+class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
   bool _visible = false;
+  late AnimationController _orbController;
+
+  @override
+  void initState() {
+    super.initState();
+    _orbController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 8),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _orbController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,227 +46,312 @@ class _AboutMeState extends State<AboutMe> {
       },
       child: Container(
         width: double.infinity,
-        // Removed opaque background to let main gradient show through
         padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 20 : 60,
-          vertical: isMobile ? 60 : 100,
+          horizontal: isMobile ? 24 : 100,
+          vertical: isMobile ? 80 : 120,
         ),
         child: Column(
           children: [
-            // Section Title
+            // Section Header
             if (_visible)
               FadeInUp(
                 duration: const Duration(milliseconds: 800),
-                child: Column(
-                  children: [
-                    Text(
-                      'This is Me',
-                      style: GoogleFonts.outfit(
-                        fontSize: isMobile ? 14 : 16,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF00D2FF), // Cyan
-                        letterSpacing: 4,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ShaderMask(
-                      shaderCallback: (bounds) => const LinearGradient(
-                        colors: [Colors.white, Color(0xFF00D2FF)],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ).createShader(bounds),
-                      child: Text(
-                        'ABOUT ME',
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: isMobile ? 32 : 48,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: -1,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      width: 80,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(2),
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF7000FF),
-                            Color(0xFFFF0055),
-                          ], // Violet -> Magenta
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                child: _buildSectionHeader(isMobile),
               ),
 
-            SizedBox(height: isMobile ? 40 : 80),
+            SizedBox(height: isMobile ? 60 : 100),
 
-            // Content - Responsive layout
-            if (isMobile) _buildMobileLayout() else _buildDesktopLayout(),
+            // Content
+            if (isMobile) _buildMobileLayout() else _buildDesktopLayout(size),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionHeader(bool isMobile) {
+    return Row(
+      children: [
+        // Number tag
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: const Color(0xFF00FFA3).withValues(alpha: .3),
+            ),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            '01',
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 12,
+              color: const Color(0xFF00FFA3),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        // Line
+        Expanded(
+          child: Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF00FFA3).withValues(alpha: .3),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Text(
+          'ABOUT',
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: isMobile ? 12 : 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.white54,
+            letterSpacing: 4,
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildMobileLayout() {
     return Column(
       children: [
-        if (_visible) _buildProfileImage(true),
-        const SizedBox(height: 40),
-        if (_visible) _buildAboutCard(true),
+        if (_visible) _buildProfileOrb(true),
+        const SizedBox(height: 50),
+        if (_visible) _buildInfoContent(true),
       ],
     );
   }
 
-  Widget _buildDesktopLayout() {
+  Widget _buildDesktopLayout(Size size) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_visible) Flexible(flex: 0, child: _buildProfileImage(false)),
-        const SizedBox(width: 40),
-        if (_visible) Expanded(child: _buildAboutCard(false)),
+        // Left — Profile orb
+        if (_visible) _buildProfileOrb(false),
+        SizedBox(width: size.width * 0.06),
+        // Right — About info
+        if (_visible) Expanded(child: _buildInfoContent(false)),
       ],
     );
   }
 
-  Widget _buildProfileImage(bool isMobile) {
+  Widget _buildProfileOrb(bool isMobile) {
+    final imageSize = isMobile ? 200.0 : 280.0;
+
     return FadeInLeft(
       duration: const Duration(milliseconds: 800),
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF7000FF).withValues(alpha: .4),
-              blurRadius: 40,
-              spreadRadius: 5,
-            ),
-          ],
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(4),
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [Color(0xFF00D2FF), Color(0xFFFF0055)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: ClipOval(
-            child: Image.asset(
-              'assests/images/portfolio.png',
-              width: isMobile ? 180 : 250,
-              height: isMobile ? 180 : 250,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAboutCard(bool isMobile) {
-    return FadeInRight(
-      duration: const Duration(milliseconds: 800),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-          child: Container(
-            constraints: BoxConstraints(
-              maxWidth: isMobile ? double.infinity : 600,
-            ),
-            padding: EdgeInsets.all(isMobile ? 25 : 40),
+      child: AnimatedBuilder(
+        animation: _orbController,
+        builder: (context, child) {
+          return Container(
+            width: imageSize + 20,
+            height: imageSize + 20,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: .03),
-              borderRadius: BorderRadius.circular(30),
+              shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.white.withValues(alpha: .1),
-                width: 1.5,
+                color: Color.lerp(
+                  const Color(0xFF00FFA3).withValues(alpha: .2),
+                  const Color(0xFF8B5CF6).withValues(alpha: .4),
+                  _orbController.value,
+                )!,
+                width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: .2),
-                  blurRadius: 20,
+                  color: Color.lerp(
+                    const Color(0xFF00FFA3).withValues(alpha: .1),
+                    const Color(0xFF8B5CF6).withValues(alpha: .2),
+                    _orbController.value,
+                  )!,
+                  blurRadius: 40,
                   spreadRadius: 5,
                 ),
               ],
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                Text(
-                  "Hi! I'm Amal Mathew",
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: isMobile ? 24 : 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                // Rotating dashed border effect
+                Transform.rotate(
+                  angle: _orbController.value * math.pi * 2,
+                  child: CustomPaint(
+                    size: Size(imageSize + 20, imageSize + 20),
+                    painter: _DashedCirclePainter(
+                      color: const Color(0xFF00FFA3).withValues(alpha: .15),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  "A passionate Flutter developer with a knack for building beautiful, responsive, and high-performance mobile and web applications. I enjoy turning ideas into real, functional apps and creating smooth user experiences.",
-                  style: GoogleFonts.outfit(
-                    fontSize: isMobile ? 14 : 16,
-                    color: Colors.white70,
-                    height: 1.8,
+                // Image
+                ClipOval(
+                  child: Image.asset(
+                    'assests/images/portfolio.png',
+                    width: imageSize,
+                    height: imageSize,
+                    fit: BoxFit.cover,
                   ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  "With hands-on experience in Flutter, Dart, Provider, Dio, and Firebase, I love exploring new technologies, optimizing code, and solving challenging problems.",
-                  style: GoogleFonts.outfit(
-                    fontSize: isMobile ? 14 : 16,
-                    color: Colors.white60,
-                    height: 1.8,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                // Tech tags
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    'Flutter',
-                    'Dart',
-                    'Firebase',
-                    'Provider',
-                    'Bloc',
-                  ].map((tech) => _buildTechTag(tech)).toList(),
                 ),
               ],
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildTechTag(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF00D2FF).withValues(alpha: .3)),
-        color: const Color(0xFF00D2FF).withValues(alpha: .05),
+  Widget _buildInfoContent(bool isMobile) {
+    return FadeInRight(
+      duration: const Duration(milliseconds: 800),
+      child: Column(
+        crossAxisAlignment: isMobile
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start,
+        children: [
+          // Greeting
+          Text(
+            "Who am I?",
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: isMobile ? 32 : 48,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              letterSpacing: -1,
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Bio paragraphs
+          _buildBioParagraph(
+            "A passionate Flutter developer with a knack for building beautiful, responsive, and high-performance mobile and web applications. I enjoy turning ideas into real, functional apps and creating smooth user experiences.",
+            isMobile,
+          ),
+          const SizedBox(height: 16),
+          _buildBioParagraph(
+            "With hands-on experience in Flutter, Dart, Provider, Dio, and Firebase, I love exploring new technologies, optimizing code, and solving challenging problems.",
+            isMobile,
+            opacity: 0.5,
+          ),
+
+          const SizedBox(height: 40),
+
+          // Tech Stack Grid
+          _buildTechStackGrid(isMobile),
+        ],
       ),
-      child: Text(
-        text,
-        style: GoogleFonts.spaceGrotesk(
-          fontSize: 12,
-          color: const Color(0xFF00D2FF), // Cyan
-          fontWeight: FontWeight.w600,
-          letterSpacing: 1,
-        ),
+    );
+  }
+
+  Widget _buildBioParagraph(
+    String text,
+    bool isMobile, {
+    double opacity = 0.6,
+  }) {
+    return Text(
+      text,
+      style: GoogleFonts.inter(
+        fontSize: isMobile ? 14 : 16,
+        color: Colors.white.withValues(alpha: opacity),
+        height: 1.8,
+      ),
+      textAlign: isMobile ? TextAlign.center : TextAlign.start,
+    );
+  }
+
+  Widget _buildTechStackGrid(bool isMobile) {
+    final techs = [
+      _TechItem('Flutter', const Color(0xFF00FFA3)),
+      _TechItem('Dart', const Color(0xFF8B5CF6)),
+      _TechItem('Firebase', const Color(0xFFFF006E)),
+      _TechItem('Provider', const Color(0xFF00D4FF)),
+      _TechItem('Bloc', const Color(0xFFFFC107)),
+      _TechItem('UI/UX', const Color(0xFF00FFA3)),
+    ];
+
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
+      children: techs.map((tech) => _buildTechChip(tech)).toList(),
+    );
+  }
+
+  Widget _buildTechChip(_TechItem tech) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: tech.color.withValues(alpha: .05),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: tech.color.withValues(alpha: .15)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: tech.color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            tech.name,
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 12,
+              color: tech.color,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
+class _TechItem {
+  final String name;
+  final Color color;
+  _TechItem(this.name, this.color);
+}
+
+// Dashed circle painter for profile orb
+class _DashedCirclePainter extends CustomPainter {
+  final Color color;
+  _DashedCirclePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+
+    final radius = size.width / 2;
+    final center = Offset(size.width / 2, size.height / 2);
+    const dashCount = 40;
+    const dashAngle = (2 * math.pi) / dashCount;
+    const gapFraction = 0.4;
+
+    for (int i = 0; i < dashCount; i++) {
+      final startAngle = i * dashAngle;
+      final sweepAngle = dashAngle * (1 - gapFraction);
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        startAngle,
+        sweepAngle,
+        false,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
