@@ -74,7 +74,9 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: isMobile ? 50 : 100,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
                     height: 0.9,
                     letterSpacing: -3,
                   ),
@@ -107,7 +109,11 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFFFF006E).withValues(alpha: .3),
+              color:
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFFFF006E)
+                          : const Color(0xFFEC4899))
+                      .withValues(alpha: .3),
             ),
             borderRadius: BorderRadius.circular(6),
           ),
@@ -115,7 +121,9 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
             '03',
             style: GoogleFonts.jetBrainsMono(
               fontSize: 12,
-              color: const Color(0xFFFF006E),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFFFF006E)
+                  : const Color(0xFFEC4899),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -127,7 +135,10 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFFFF006E).withValues(alpha: .3),
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFFFF006E)
+                          : const Color(0xFFEC4899))
+                      .withValues(alpha: .3),
                   Colors.transparent,
                 ],
               ),
@@ -140,7 +151,9 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
           style: GoogleFonts.spaceGrotesk(
             fontSize: isMobile ? 12 : 14,
             fontWeight: FontWeight.w600,
-            color: Colors.white54,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white54
+                : Colors.black54,
             letterSpacing: 4,
           ),
         ),
@@ -171,9 +184,10 @@ class _ExperienceCardState extends State<_ExperienceCard> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentColor = widget.data.isCurrent
-        ? const Color(0xFF00FFA3)
-        : const Color(0xFF8B5CF6);
+        ? (isDark ? const Color(0xFF00FFA3) : const Color(0xFF3B82F6))
+        : (isDark ? const Color(0xFF8B5CF6) : const Color(0xFFEC4899));
 
     return FadeInUp(
       delay: Duration(milliseconds: 300 * widget.index),
@@ -196,7 +210,9 @@ class _ExperienceCardState extends State<_ExperienceCard> {
                     decoration: BoxDecoration(
                       color: widget.data.isCurrent || _isHovered
                           ? accentColor
-                          : Colors.white.withValues(alpha: .15),
+                          : (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white.withValues(alpha: .15)
+                                : Colors.black.withValues(alpha: .15)),
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: accentColor.withValues(alpha: .3),
@@ -243,12 +259,16 @@ class _ExperienceCardState extends State<_ExperienceCard> {
                   decoration: BoxDecoration(
                     color: _isHovered
                         ? accentColor.withValues(alpha: .03)
-                        : Colors.white.withValues(alpha: .02),
+                        : (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white.withValues(alpha: .02)
+                              : Colors.black.withValues(alpha: .02)),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: _isHovered
                           ? accentColor.withValues(alpha: .2)
-                          : Colors.white.withValues(alpha: .05),
+                          : (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white.withValues(alpha: .05)
+                                : Colors.black.withValues(alpha: .08)),
                     ),
                   ),
                   child: Column(
@@ -265,7 +285,11 @@ class _ExperienceCardState extends State<_ExperienceCard> {
                               style: GoogleFonts.spaceGrotesk(
                                 fontSize: widget.isMobile ? 22 : 28,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black87,
                               ),
                             ),
                           ),
@@ -323,14 +347,21 @@ class _ExperienceCardState extends State<_ExperienceCard> {
                           Icon(
                             Icons.location_on_outlined,
                             size: 14,
-                            color: Colors.white.withValues(alpha: .3),
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white.withValues(alpha: .3)
+                                : Colors.black.withValues(alpha: .4),
                           ),
                           const SizedBox(width: 6),
                           Text(
                             widget.data.location,
                             style: GoogleFonts.inter(
                               fontSize: 13,
-                              color: Colors.white.withValues(alpha: .3),
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white.withValues(alpha: .3)
+                                  : Colors.black.withValues(alpha: .6),
                             ),
                           ),
                         ],
@@ -342,7 +373,9 @@ class _ExperienceCardState extends State<_ExperienceCard> {
                         widget.data.description,
                         style: GoogleFonts.inter(
                           fontSize: 14,
-                          color: Colors.white.withValues(alpha: .5),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white.withValues(alpha: .5)
+                              : Colors.black.withValues(alpha: .75),
                           height: 1.7,
                         ),
                       ),

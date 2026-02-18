@@ -38,7 +38,7 @@ class ProjectDetailsScreen extends StatelessWidget {
     final isMobile = size.width < 900;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Background mesh blobs
@@ -115,9 +115,13 @@ class ProjectDetailsScreen extends StatelessWidget {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              const Color(0xFF0A0A0F).withValues(alpha: .3),
-                              const Color(0xFF0A0A0F).withValues(alpha: .8),
-                              const Color(0xFF0A0A0F),
+                              Theme.of(
+                                context,
+                              ).scaffoldBackgroundColor.withValues(alpha: .3),
+                              Theme.of(
+                                context,
+                              ).scaffoldBackgroundColor.withValues(alpha: .8),
+                              Theme.of(context).scaffoldBackgroundColor,
                             ],
                             stops: const [0.1, 0.7, 1.0],
                           ),
@@ -148,20 +152,30 @@ class ProjectDetailsScreen extends StatelessWidget {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(
-                                  0xFF00FFA3,
-                                ).withValues(alpha: .1),
+                                color:
+                                    (Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? const Color(0xFF00FFA3)
+                                            : const Color(0xFF3B82F6))
+                                        .withValues(alpha: .1),
                                 border: Border.all(
-                                  color: const Color(
-                                    0xFF00FFA3,
-                                  ).withValues(alpha: .3),
+                                  color:
+                                      (Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? const Color(0xFF00FFA3)
+                                              : const Color(0xFF3B82F6))
+                                          .withValues(alpha: .3),
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 category.toUpperCase(),
                                 style: GoogleFonts.jetBrainsMono(
-                                  color: const Color(0xFF00FFA3),
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF00FFA3)
+                                      : const Color(0xFF2563EB),
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 2,
@@ -174,7 +188,11 @@ class ProjectDetailsScreen extends StatelessWidget {
                               style: GoogleFonts.spaceGrotesk(
                                 fontSize: isMobile ? 40 : 80,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
                                 height: 0.9,
                                 letterSpacing: -2,
                               ),
@@ -196,9 +214,9 @@ class ProjectDetailsScreen extends StatelessWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      _buildDescription(),
+                                      _buildDescription(context),
                                       const SizedBox(height: 40),
-                                      _buildTechStack(),
+                                      _buildTechStack(context),
                                       const SizedBox(height: 40),
                                       if (videoUrl != null)
                                         Column(
@@ -209,7 +227,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                                             const SizedBox(height: 40),
                                           ],
                                         ),
-                                      _buildActions(),
+                                      _buildActions(context),
                                     ],
                                   )
                                 : Row(
@@ -222,7 +240,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            _buildDescription(),
+                                            _buildDescription(context),
                                             if (videoUrl != null)
                                               Padding(
                                                 padding: const EdgeInsets.only(
@@ -242,9 +260,9 @@ class ProjectDetailsScreen extends StatelessWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            _buildTechStack(),
+                                            _buildTechStack(context),
                                             const SizedBox(height: 40),
-                                            _buildActions(),
+                                            _buildActions(context),
                                           ],
                                         ),
                                       ),
@@ -275,7 +293,11 @@ class ProjectDetailsScreen extends StatelessWidget {
                                     "GALLERY",
                                     style: GoogleFonts.spaceGrotesk(
                                       fontSize: 20,
-                                      color: Colors.white,
+                                      color:
+                                          Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black,
                                       fontWeight: FontWeight.w700,
                                       letterSpacing: 2,
                                     ),
@@ -290,10 +312,25 @@ class ProjectDetailsScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(16),
                                     child: Container(
                                       decoration: BoxDecoration(
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white.withValues(
+                                                alpha: .05,
+                                              )
+                                            : Colors.black.withValues(
+                                                alpha: .08,
+                                              ),
                                         border: Border.all(
-                                          color: Colors.white.withValues(
-                                            alpha: .05,
-                                          ),
+                                          color:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.white.withValues(
+                                                  alpha: .05,
+                                                )
+                                              : Colors.black.withValues(
+                                                  alpha: .08,
+                                                ),
                                         ),
                                         borderRadius: BorderRadius.circular(16),
                                       ),
@@ -331,7 +368,7 @@ class ProjectDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDescription() {
+  Widget _buildDescription(BuildContext context) {
     final paragraphs = description.split('\n');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -363,7 +400,9 @@ class ProjectDetailsScreen extends StatelessWidget {
                     item.trim().replaceFirst(RegExp(r'^[•\-\*]\s*'), ''),
                     style: GoogleFonts.inter(
                       fontSize: 16,
-                      color: Colors.white.withValues(alpha: .6),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withValues(alpha: .6)
+                          : Colors.black.withValues(alpha: .75),
                       height: 1.6,
                     ),
                   ),
@@ -379,7 +418,9 @@ class ProjectDetailsScreen extends StatelessWidget {
             item.trim(),
             style: GoogleFonts.inter(
               fontSize: 16,
-              color: Colors.white.withValues(alpha: .6),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white.withValues(alpha: .6)
+                  : Colors.black.withValues(alpha: .7),
               height: 1.8,
             ),
           ),
@@ -388,7 +429,7 @@ class ProjectDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTechStack() {
+  Widget _buildTechStack(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -396,7 +437,9 @@ class ProjectDetailsScreen extends StatelessWidget {
           "TECH STACK",
           style: GoogleFonts.jetBrainsMono(
             fontSize: 12,
-            color: Colors.white.withValues(alpha: .3),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withValues(alpha: .3)
+                : Colors.black.withValues(alpha: .4),
             fontWeight: FontWeight.w600,
             letterSpacing: 3,
           ),
@@ -416,7 +459,7 @@ class ProjectDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActions() {
+  Widget _buildActions(BuildContext context) {
     return _GithubButton(onTap: _launchUrl);
   }
 }
@@ -518,7 +561,7 @@ class _GithubButtonState extends State<_GithubButton> {
                 "VIEW CODE",
                 style: GoogleFonts.inter(
                   color: _isHovered
-                      ? const Color(0xFF0A0A0F)
+                      ? Theme.of(context).scaffoldBackgroundColor
                       : const Color(0xFF00FFA3),
                   fontWeight: FontWeight.w700,
                   fontSize: 14,
@@ -558,18 +601,32 @@ class _BackButtonState extends State<_BackButton> {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: _isHovered
-                ? Colors.white.withValues(alpha: .1)
-                : const Color(0xFF0A0A0F).withValues(alpha: .6),
+                ? (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withValues(alpha: .1)
+                      : Colors.black.withValues(alpha: .05))
+                : Theme.of(
+                    context,
+                  ).scaffoldBackgroundColor.withValues(alpha: .6),
             border: Border.all(
               color: _isHovered
-                  ? Colors.white.withValues(alpha: .2)
-                  : Colors.white.withValues(alpha: .08),
+                  ? (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withValues(alpha: .2)
+                        : Colors.black.withValues(alpha: .2))
+                  : (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withValues(alpha: .08)
+                        : Colors.black.withValues(alpha: .1)),
             ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
             Icons.arrow_back,
-            color: _isHovered ? Colors.white : Colors.white70,
+            color: _isHovered
+                ? (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black)
+                : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white70
+                      : Colors.black54),
             size: 22,
           ),
         ),
@@ -630,14 +687,14 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
         backgroundColor: Colors.white24,
       ),
       placeholder: Container(
-        color: const Color(0xFF0A0A0F),
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: const Center(
           child: CircularProgressIndicator(color: Color(0xFF00FFA3)),
         ),
       ),
       errorBuilder: (context, errorMessage) {
         return Container(
-          color: const Color(0xFF0A0A0F),
+          color: Theme.of(context).scaffoldBackgroundColor,
           child: const Center(
             child: Icon(Icons.error, color: Colors.white, size: 40),
           ),
@@ -662,9 +719,15 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
         height: 300,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: .02),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: .02)
+              : Colors.black.withValues(alpha: .03),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: .05)),
+          border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withValues(alpha: .05)
+                : Colors.black.withValues(alpha: .08),
+          ),
         ),
         child: const Center(
           child: CircularProgressIndicator(color: Color(0xFF00FFA3)),
@@ -677,8 +740,12 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
       child: Container(
         height: 300,
         decoration: BoxDecoration(
-          color: Colors.black,
-          border: Border.all(color: Colors.white.withValues(alpha: .05)),
+          color: Theme.of(context).scaffoldBackgroundColor,
+          border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withValues(alpha: .05)
+                : Colors.black.withValues(alpha: .08),
+          ),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Chewie(controller: _chewieController!),

@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:provider/provider.dart';
+import 'package:my_portfolio/service/theme_service.dart';
 import 'package:my_portfolio/screen/aboutme.dart';
 import 'package:my_portfolio/screen/contactme.dart';
 import 'package:my_portfolio/screen/projects_screen.dart';
@@ -100,7 +102,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
     final isMobile = size.width < 900;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // === STATIC MESH GRADIENT BACKGROUND (no per-frame rebuild) ===
@@ -112,7 +114,11 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
               child: Opacity(
                 opacity: 0.03,
                 child: CustomPaint(
-                  painter: _NoisePainter(),
+                  painter: _NoisePainter(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                  ),
                   isComplex: true,
                   willChange: false,
                 ),
@@ -126,7 +132,11 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
               child: Opacity(
                 opacity: 0.015,
                 child: CustomPaint(
-                  painter: _ScanLinePainter(),
+                  painter: _ScanLinePainter(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                  ),
                   isComplex: true,
                   willChange: false,
                 ),
@@ -181,8 +191,12 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
           final v = _meshController.value;
           return Stack(
             children: [
-              // Base dark
-              Positioned.fill(child: Container(color: const Color(0xFF0A0A0F))),
+              // Base background
+              Positioned.fill(
+                child: Container(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                ),
+              ),
 
               // Blob 1 — Emerald
               Positioned(
@@ -252,9 +266,15 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: .03),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white.withValues(alpha: .03)
+            : Colors.black.withValues(alpha: .03),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withValues(alpha: .05)),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: .05)
+              : Colors.black.withValues(alpha: .05),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -276,7 +296,11 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                             height: 12,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: const Color(0xFF00FFA3),
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? const Color(0xFF00FFA3)
+                                  : const Color(0xFF3B82F6),
                               boxShadow: [
                                 BoxShadow(
                                   color: const Color(0xFF00FFA3).withValues(
@@ -296,7 +320,9 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                         height: 6,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: .3),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white.withValues(alpha: .3)
+                              : Colors.black.withValues(alpha: .3),
                         ),
                       ),
               ),
@@ -317,9 +343,15 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
             vertical: 16,
           ),
           decoration: BoxDecoration(
-            color: const Color(0xFF0A0A0F).withValues(alpha: .7),
+            color: Theme.of(
+              context,
+            ).scaffoldBackgroundColor.withValues(alpha: .7),
             border: Border(
-              bottom: BorderSide(color: Colors.white.withValues(alpha: .05)),
+              bottom: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withValues(alpha: .05)
+                    : Colors.black.withValues(alpha: .05),
+              ),
             ),
           ),
           child: Row(
@@ -346,7 +378,9 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                   Text(
                     'Amal Mathew',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black87,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 2,
@@ -358,18 +392,23 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
               // Nav Links (desktop only)
               if (!isMobile)
                 Row(
-                  children: List.generate(_sectionLabels.length, (index) {
-                    final isActive = _activeSection == index;
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 32),
-                      child: _NavItem(
-                        label: _sectionLabels[index],
-                        isActive: isActive,
-                        onTap: () => _scrollToSection(index),
-                      ),
-                    );
-                  }),
+                  children: [
+                    ...List.generate(_sectionLabels.length, (index) {
+                      final isActive = _activeSection == index;
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 32),
+                        child: _NavItem(
+                          label: _sectionLabels[index],
+                          isActive: isActive,
+                          onTap: () => _scrollToSection(index),
+                        ),
+                      );
+                    }),
+                    const SizedBox(width: 32),
+                    _ThemeToggle(),
+                  ],
                 ),
+              if (isMobile) _ThemeToggle(),
             ],
           ),
         ),
@@ -441,10 +480,16 @@ class _NavItemState extends State<_NavItem> {
           duration: const Duration(milliseconds: 200),
           style: TextStyle(
             color: widget.isActive
-                ? const Color(0xFF00FFA3)
+                ? (Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF00FFA3)
+                      : const Color(0xFF3B82F6))
                 : _hovered
-                ? Colors.white
-                : Colors.white54,
+                ? (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black)
+                : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white54
+                      : Colors.black54),
             fontSize: 11,
             fontWeight: widget.isActive ? FontWeight.w700 : FontWeight.w500,
             letterSpacing: 2,
@@ -479,12 +524,14 @@ class _NavItemState extends State<_NavItem> {
 
 // === Noise Painter (static, seeded) ===
 class _NoisePainter extends CustomPainter {
+  final Color color;
+  _NoisePainter({required this.color});
+
   @override
   void paint(Canvas canvas, Size size) {
     final random = Random(42); // fixed seed = deterministic
-    final paint = Paint()..color = Colors.white;
+    final paint = Paint()..color = color;
     for (int i = 0; i < 500; i++) {
-      // reduced from 800
       final x = random.nextDouble() * size.width;
       final y = random.nextDouble() * size.height;
       final radius = random.nextDouble() * 1.5;
@@ -493,20 +540,54 @@ class _NoisePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _NoisePainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 // === Scan Line Painter (static) ===
 class _ScanLinePainter extends CustomPainter {
+  final Color color;
+  _ScanLinePainter({required this.color});
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white;
+    final paint = Paint()..color = color.withValues(alpha: 0.5);
     for (double y = 0; y < size.height; y += 4) {
-      // increased gap from 3 to 4
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _ScanLinePainter oldDelegate) =>
+      oldDelegate.color != color;
+}
+
+class _ThemeToggle extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final themeService = Provider.of<ThemeService>(context);
+    final isDark = themeService.isDarkMode;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: themeService.toggleTheme,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isDark
+                ? Colors.white.withValues(alpha: .05)
+                : Colors.black.withValues(alpha: .05),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+            color: isDark ? const Color(0xFF00FFA3) : const Color(0xFF3B82F6),
+            size: 20,
+          ),
+        ),
+      ),
+    );
+  }
 }

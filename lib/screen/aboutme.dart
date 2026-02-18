@@ -77,7 +77,11 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFF00FFA3).withValues(alpha: .3),
+              color:
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00FFA3)
+                          : const Color(0xFF3B82F6))
+                      .withValues(alpha: .3),
             ),
             borderRadius: BorderRadius.circular(6),
           ),
@@ -85,7 +89,9 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
             '01',
             style: GoogleFonts.jetBrainsMono(
               fontSize: 12,
-              color: const Color(0xFF00FFA3),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF00FFA3)
+                  : const Color(0xFF3B82F6),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -98,7 +104,10 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFF00FFA3).withValues(alpha: .3),
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00FFA3)
+                          : const Color(0xFF3B82F6))
+                      .withValues(alpha: .3),
                   Colors.transparent,
                 ],
               ),
@@ -111,7 +120,9 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
           style: GoogleFonts.spaceGrotesk(
             fontSize: isMobile ? 12 : 14,
             fontWeight: FontWeight.w600,
-            color: Colors.white54,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white54
+                : Colors.black54,
             letterSpacing: 4,
           ),
         ),
@@ -157,8 +168,14 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
               shape: BoxShape.circle,
               border: Border.all(
                 color: Color.lerp(
-                  const Color(0xFF00FFA3).withValues(alpha: .2),
-                  const Color(0xFF8B5CF6).withValues(alpha: .4),
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00FFA3)
+                          : const Color(0xFF3B82F6))
+                      .withValues(alpha: .2),
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8B5CF6)
+                          : const Color(0xFFEC4899))
+                      .withValues(alpha: .4),
                   _orbController.value,
                 )!,
                 width: 1,
@@ -219,7 +236,9 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
             style: GoogleFonts.spaceGrotesk(
               fontSize: isMobile ? 32 : 48,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black87,
               letterSpacing: -1,
             ),
           ),
@@ -255,7 +274,9 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
       text,
       style: GoogleFonts.inter(
         fontSize: isMobile ? 14 : 16,
-        color: Colors.white.withValues(alpha: opacity),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white.withValues(alpha: opacity)
+            : Colors.black.withValues(alpha: opacity + 0.1),
         height: 1.8,
       ),
       textAlign: isMobile ? TextAlign.center : TextAlign.start,

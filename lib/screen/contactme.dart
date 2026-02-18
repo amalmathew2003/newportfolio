@@ -87,7 +87,9 @@ class _ContactMeState extends State<ContactMe>
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: isMobile ? 40 : 80,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black,
                         letterSpacing: -2,
                         height: 0.9,
                       ),
@@ -98,7 +100,9 @@ class _ContactMeState extends State<ContactMe>
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: isMobile ? 40 : 80,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white.withValues(alpha: .15),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withValues(alpha: .15)
+                            : Colors.black.withValues(alpha: .1),
                         letterSpacing: -2,
                         height: 0.9,
                       ),
@@ -114,7 +118,9 @@ class _ContactMeState extends State<ContactMe>
                         "Got a project in mind? I'd love to hear about it. Let's work together to build something extraordinary.",
                         style: GoogleFonts.inter(
                           fontSize: 15,
-                          color: Colors.white.withValues(alpha: .4),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white.withValues(alpha: .4)
+                              : Colors.black.withValues(alpha: .5),
                           height: 1.7,
                         ),
                         textAlign: TextAlign.center,
@@ -142,7 +148,9 @@ class _ContactMeState extends State<ContactMe>
                       "or find me on",
                       style: GoogleFonts.jetBrainsMono(
                         fontSize: 12,
-                        color: Colors.white.withValues(alpha: .2),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withValues(alpha: .2)
+                            : Colors.black.withValues(alpha: .3),
                         letterSpacing: 2,
                       ),
                     ),
@@ -164,7 +172,9 @@ class _ContactMeState extends State<ContactMe>
                         _SocialButton(
                           icon: FontAwesomeIcons.github,
                           label: 'GitHub',
-                          color: Colors.white,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
                           url: 'https://github.com/amalmathew2003',
                           onTap: _launchUrl,
                         ),
@@ -195,7 +205,11 @@ class _ContactMeState extends State<ContactMe>
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFF00FFA3).withValues(alpha: .3),
+              color:
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00FFA3)
+                          : const Color(0xFF3B82F6))
+                      .withValues(alpha: .3),
             ),
             borderRadius: BorderRadius.circular(6),
           ),
@@ -203,7 +217,9 @@ class _ContactMeState extends State<ContactMe>
             '05',
             style: GoogleFonts.jetBrainsMono(
               fontSize: 12,
-              color: const Color(0xFF00FFA3),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF00FFA3)
+                  : const Color(0xFF3B82F6),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -215,7 +231,10 @@ class _ContactMeState extends State<ContactMe>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFF00FFA3).withValues(alpha: .3),
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00FFA3)
+                          : const Color(0xFF3B82F6))
+                      .withValues(alpha: .3),
                   Colors.transparent,
                 ],
               ),
@@ -228,7 +247,9 @@ class _ContactMeState extends State<ContactMe>
           style: GoogleFonts.spaceGrotesk(
             fontSize: isMobile ? 12 : 14,
             fontWeight: FontWeight.w600,
-            color: Colors.white54,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white54
+                : Colors.black54,
             letterSpacing: 4,
           ),
         ),
@@ -240,9 +261,9 @@ class _ContactMeState extends State<ContactMe>
     return Column(
       children: [
         Container(
-          width: double.infinity,
-          height: 1,
-          color: Colors.white.withValues(alpha: .05),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: .05)
+              : Colors.black.withValues(alpha: .08),
         ),
         const SizedBox(height: 30),
         Row(
@@ -252,7 +273,9 @@ class _ContactMeState extends State<ContactMe>
               '© 2026 Amal Mathew',
               style: GoogleFonts.jetBrainsMono(
                 fontSize: 11,
-                color: Colors.white.withValues(alpha: .2),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withValues(alpha: .2)
+                    : Colors.black.withValues(alpha: .3),
                 letterSpacing: 1,
               ),
             ),
@@ -260,7 +283,9 @@ class _ContactMeState extends State<ContactMe>
               'Built with Flutter 💙',
               style: GoogleFonts.jetBrainsMono(
                 fontSize: 11,
-                color: Colors.white.withValues(alpha: .2),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withValues(alpha: .2)
+                    : Colors.black.withValues(alpha: .3),
                 letterSpacing: 1,
               ),
             ),
@@ -292,6 +317,11 @@ class _GlowingEmailButtonState extends State<_GlowingEmailButton> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = isDark
+        ? const Color(0xFF00FFA3)
+        : const Color(0xFF3B82F6);
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -302,18 +332,16 @@ class _GlowingEmailButtonState extends State<_GlowingEmailButton> {
           duration: const Duration(milliseconds: 300),
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
           decoration: BoxDecoration(
-            color: _isHovered
-                ? const Color(0xFF00FFA3)
-                : const Color(0xFF00FFA3).withValues(alpha: .1),
+            color: _isHovered ? accentColor : accentColor.withValues(alpha: .1),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: const Color(
-                0xFF00FFA3,
-              ).withValues(alpha: 0.3 + (widget.pulseValue * 0.3)),
+              color: accentColor.withValues(
+                alpha: 0.3 + (widget.pulseValue * 0.3),
+              ),
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF00FFA3).withValues(
+                color: accentColor.withValues(
                   alpha: _isHovered ? 0.3 : (0.05 + widget.pulseValue * 0.1),
                 ),
                 blurRadius: _isHovered ? 30 : 20,
@@ -327,8 +355,8 @@ class _GlowingEmailButtonState extends State<_GlowingEmailButton> {
               Icon(
                 Icons.email_outlined,
                 color: _isHovered
-                    ? const Color(0xFF0A0A0F)
-                    : const Color(0xFF00FFA3),
+                    ? Theme.of(context).scaffoldBackgroundColor
+                    : accentColor,
                 size: 20,
               ),
               const SizedBox(width: 12),
@@ -338,8 +366,8 @@ class _GlowingEmailButtonState extends State<_GlowingEmailButton> {
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: _isHovered
-                      ? const Color(0xFF0A0A0F)
-                      : const Color(0xFF00FFA3),
+                      ? Theme.of(context).scaffoldBackgroundColor
+                      : accentColor,
                   letterSpacing: 2,
                 ),
               ),
@@ -388,12 +416,16 @@ class _SocialButtonState extends State<_SocialButton> {
           decoration: BoxDecoration(
             color: _isHovered
                 ? widget.color.withValues(alpha: .1)
-                : Colors.white.withValues(alpha: .03),
+                : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withValues(alpha: .03)
+                      : Colors.black.withValues(alpha: .04)),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: _isHovered
                   ? widget.color.withValues(alpha: .3)
-                  : Colors.white.withValues(alpha: .06),
+                  : (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withValues(alpha: .06)
+                        : Colors.black.withValues(alpha: .1)),
             ),
           ),
           child: Row(
@@ -401,7 +433,11 @@ class _SocialButtonState extends State<_SocialButton> {
             children: [
               Icon(
                 widget.icon,
-                color: _isHovered ? widget.color : Colors.white54,
+                color: _isHovered
+                    ? widget.color
+                    : (Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white54
+                          : Colors.black54),
                 size: 18,
               ),
               const SizedBox(width: 10),
@@ -409,7 +445,11 @@ class _SocialButtonState extends State<_SocialButton> {
                 widget.label,
                 style: GoogleFonts.inter(
                   fontSize: 13,
-                  color: _isHovered ? widget.color : Colors.white54,
+                  color: _isHovered
+                      ? widget.color
+                      : (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white54
+                            : Colors.black54),
                   fontWeight: FontWeight.w500,
                 ),
               ),

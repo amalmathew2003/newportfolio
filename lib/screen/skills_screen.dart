@@ -78,7 +78,9 @@ class _SkillsScreenState extends State<SkillsScreen> {
                         style: GoogleFonts.spaceGrotesk(
                           fontSize: isMobile ? 50 : 100,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
                           height: 0.9,
                           letterSpacing: -3,
                         ),
@@ -95,14 +97,18 @@ class _SkillsScreenState extends State<SkillsScreen> {
                 items: row1,
                 speed: 30,
                 isReverse: false,
-                accentColor: const Color(0xFF00FFA3),
+                accentColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF00FFA3)
+                    : const Color(0xFF3B82F6),
               ),
               const SizedBox(height: 4),
               _InfiniteScrollBand(
                 items: row2,
                 speed: 30,
                 isReverse: true,
-                accentColor: const Color(0xFF8B5CF6),
+                accentColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF8B5CF6)
+                    : const Color(0xFFEC4899),
               ),
             ],
           ],
@@ -118,7 +124,11 @@ class _SkillsScreenState extends State<SkillsScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFF8B5CF6).withValues(alpha: .3),
+              color:
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8B5CF6)
+                          : const Color(0xFFEC4899))
+                      .withValues(alpha: .3),
             ),
             borderRadius: BorderRadius.circular(6),
           ),
@@ -126,7 +136,9 @@ class _SkillsScreenState extends State<SkillsScreen> {
             '02',
             style: GoogleFonts.jetBrainsMono(
               fontSize: 12,
-              color: const Color(0xFF8B5CF6),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF8B5CF6)
+                  : const Color(0xFFEC4899),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -138,7 +150,10 @@ class _SkillsScreenState extends State<SkillsScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFF8B5CF6).withValues(alpha: .3),
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8B5CF6)
+                          : const Color(0xFFEC4899))
+                      .withValues(alpha: .3),
                   Colors.transparent,
                 ],
               ),
@@ -151,7 +166,9 @@ class _SkillsScreenState extends State<SkillsScreen> {
           style: GoogleFonts.spaceGrotesk(
             fontSize: isMobile ? 12 : 14,
             fontWeight: FontWeight.w600,
-            color: Colors.white54,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white54
+                : Colors.black54,
             letterSpacing: 4,
           ),
         ),
@@ -280,11 +297,15 @@ class _SkillChipState extends State<_SkillChip> {
         decoration: BoxDecoration(
           color: _isHovered
               ? widget.accentColor.withValues(alpha: .15)
-              : Colors.white.withValues(alpha: .02),
+              : (Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withValues(alpha: .02)
+                    : Colors.black.withValues(alpha: .03)),
           border: Border.all(
             color: _isHovered
                 ? widget.accentColor.withValues(alpha: .4)
-                : Colors.white.withValues(alpha: .06),
+                : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withValues(alpha: .06)
+                      : Colors.black.withValues(alpha: .08)),
           ),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -296,7 +317,9 @@ class _SkillChipState extends State<_SkillChip> {
               fontWeight: FontWeight.w700,
               color: _isHovered
                   ? widget.accentColor
-                  : Colors.white.withValues(alpha: .4),
+                  : (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withValues(alpha: .4)
+                        : Colors.black.withValues(alpha: .75)),
               letterSpacing: 2,
             ),
           ),

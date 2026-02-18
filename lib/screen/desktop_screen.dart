@@ -122,18 +122,23 @@ class _DesktopScreenState extends State<DesktopScreen>
   }
 
   Widget _buildStatusBadge() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = isDark
+        ? const Color(0xFF00FFA3)
+        : const Color(0xFF3B82F6);
+
     return AnimatedBuilder(
       animation: _glowController,
       builder: (context, child) {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
-            color: const Color(0xFF00FFA3).withValues(alpha: .05),
+            color: accentColor.withValues(alpha: .05),
             borderRadius: BorderRadius.circular(40),
             border: Border.all(
               color: Color.lerp(
-                const Color(0xFF00FFA3).withValues(alpha: .2),
-                const Color(0xFF00FFA3).withValues(alpha: .5),
+                accentColor.withValues(alpha: .2),
+                accentColor.withValues(alpha: .5),
                 _glowController.value,
               )!,
             ),
@@ -146,13 +151,13 @@ class _DesktopScreenState extends State<DesktopScreen>
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00FFA3),
+                  color: accentColor,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(
-                        0xFF00FFA3,
-                      ).withValues(alpha: 0.3 + (_glowController.value * 0.5)),
+                      color: accentColor.withValues(
+                        alpha: 0.3 + (_glowController.value * 0.5),
+                      ),
                       blurRadius: 8 + (_glowController.value * 8),
                       spreadRadius: _glowController.value * 2,
                     ),
@@ -163,7 +168,9 @@ class _DesktopScreenState extends State<DesktopScreen>
               Text(
                 'OPEN TO OPPORTUNITIES',
                 style: GoogleFonts.jetBrainsMono(
-                  color: const Color(0xFF00FFA3),
+                  color: isDark
+                      ? accentColor
+                      : const Color(0xFF2563EB), // Darker blue for visibility
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 3,
@@ -198,7 +205,9 @@ class _DesktopScreenState extends State<DesktopScreen>
               'Hello, I\'m',
               style: GoogleFonts.inter(
                 fontSize: isMobile ? 14 : 20,
-                color: Colors.white54,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white54
+                    : Colors.black54,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -212,8 +221,13 @@ class _DesktopScreenState extends State<DesktopScreen>
           builder: (context, child) {
             return ShaderMask(
               shaderCallback: (bounds) {
+                final isDark = Theme.of(context).brightness == Brightness.dark;
                 return LinearGradient(
-                  colors: const [Colors.white, Color(0xFF00FFA3), Colors.white],
+                  colors: [
+                    isDark ? Colors.white : Colors.black87,
+                    isDark ? const Color(0xFF00FFA3) : const Color(0xFF3B82F6),
+                    isDark ? Colors.white : Colors.black87,
+                  ],
                   stops: [0.0, _glowController.value, 1.0],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
@@ -224,7 +238,9 @@ class _DesktopScreenState extends State<DesktopScreen>
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: isMobile ? 60 : 120,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
                   height: 0.9,
                   letterSpacing: -3,
                 ),
@@ -284,7 +300,9 @@ class _DesktopScreenState extends State<DesktopScreen>
         'Crafting seamless mobile & web experiences with pixel-perfect precision, fluid animations, and clean architecture.',
         style: GoogleFonts.inter(
           fontSize: isMobile ? 14 : 16,
-          color: Colors.white.withValues(alpha: .5),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: .5)
+              : Colors.black.withValues(alpha: .6),
           height: 1.8,
           letterSpacing: 0.3,
         ),
@@ -325,14 +343,18 @@ class _DesktopScreenState extends State<DesktopScreen>
         Container(
           width: 1,
           height: 40,
-          color: Colors.white.withValues(alpha: .1),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: .1)
+              : Colors.black.withValues(alpha: .1),
           margin: const EdgeInsets.symmetric(horizontal: 30),
         ),
         _StatItem(value: '5+', label: 'Projects'),
         Container(
           width: 1,
           height: 40,
-          color: Colors.white.withValues(alpha: .1),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: .1)
+              : Colors.black.withValues(alpha: .1),
           margin: const EdgeInsets.symmetric(horizontal: 30),
         ),
         _StatItem(value: '∞', label: 'Passion'),
@@ -352,7 +374,9 @@ class _DesktopScreenState extends State<DesktopScreen>
                 'SCROLL',
                 style: GoogleFonts.jetBrainsMono(
                   fontSize: 10,
-                  color: Colors.white30,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white30
+                      : Colors.black38,
                   letterSpacing: 4,
                 ),
               ),
@@ -364,7 +388,12 @@ class _DesktopScreenState extends State<DesktopScreen>
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.white30, Colors.transparent],
+                    colors: [
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white30
+                          : Colors.black26,
+                      Colors.transparent,
+                    ],
                   ),
                 ),
               ),
@@ -498,7 +527,9 @@ class _StatItem extends StatelessWidget {
           style: GoogleFonts.spaceGrotesk(
             fontSize: 28,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black,
           ),
         ),
         const SizedBox(height: 4),
@@ -506,7 +537,9 @@ class _StatItem extends StatelessWidget {
           label,
           style: GoogleFonts.inter(
             fontSize: 12,
-            color: Colors.white38,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white38
+                : Colors.black.withValues(alpha: .6),
             letterSpacing: 1,
           ),
         ),
@@ -538,9 +571,10 @@ class _NeonButtonState extends State<_NeonButton> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentColor = widget.isPrimary
-        ? const Color(0xFF00FFA3)
-        : const Color(0xFF8B5CF6);
+        ? (isDark ? const Color(0xFF00FFA3) : const Color(0xFF3B82F6))
+        : (isDark ? const Color(0xFF8B5CF6) : const Color(0xFFEC4899));
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -562,7 +596,11 @@ class _NeonButtonState extends State<_NeonButton> {
             border: Border.all(
               color: widget.isPrimary
                   ? accentColor.withValues(alpha: _isHovered ? 1.0 : 0.3)
-                  : Colors.white.withValues(alpha: _isHovered ? 0.3 : 0.1),
+                  : (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withValues(alpha: _isHovered ? 0.3 : 0.1)
+                        : Colors.black.withValues(
+                            alpha: _isHovered ? 0.2 : 0.1,
+                          )),
               width: 1,
             ),
             boxShadow: _isHovered && widget.isPrimary
@@ -583,8 +621,12 @@ class _NeonButtonState extends State<_NeonButton> {
                 widget.text,
                 style: GoogleFonts.inter(
                   color: widget.isPrimary
-                      ? (_isHovered ? const Color(0xFF0A0A0F) : accentColor)
-                      : Colors.white,
+                      ? (_isHovered
+                            ? Theme.of(context).scaffoldBackgroundColor
+                            : accentColor)
+                      : (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black87),
                   fontWeight: FontWeight.w600,
                   letterSpacing: 1.5,
                   fontSize: 12,
@@ -597,8 +639,12 @@ class _NeonButtonState extends State<_NeonButton> {
                 child: Icon(
                   widget.icon,
                   color: widget.isPrimary
-                      ? (_isHovered ? const Color(0xFF0A0A0F) : accentColor)
-                      : Colors.white,
+                      ? (_isHovered
+                            ? Theme.of(context).scaffoldBackgroundColor
+                            : accentColor)
+                      : (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black87),
                   size: 16,
                 ),
               ),

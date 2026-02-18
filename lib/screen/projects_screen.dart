@@ -86,7 +86,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                             style: GoogleFonts.spaceGrotesk(
                               fontSize: isMobile ? 50 : 100,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
                               height: 0.9,
                               letterSpacing: -3,
                             ),
@@ -118,7 +122,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       index: "01",
                       title: "Voice Notes",
                       category: "AI • Productivity",
-                      accentColor: const Color(0xFF00FFA3),
+                      accentColor:
+                          Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00FFA3)
+                          : const Color(0xFF3B82F6),
                       imageUrls: const [
                         "assests/images/VN1bg.png",
                         "assests/images/VN2bg.png",
@@ -155,7 +162,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       index: "02",
                       title: "Travel Tracker",
                       category: "Mobile App • Flutter",
-                      accentColor: const Color(0xFF8B5CF6),
+                      accentColor:
+                          Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8B5CF6)
+                          : const Color(0xFFEC4899),
                       imageUrls: const [
                         "assests/images/travalappfull.png",
                         "assests/images/travalapp.png",
@@ -185,7 +195,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       index: "03",
                       title: "Motion Detection",
                       category: "Mobile App • Flutter",
-                      accentColor: const Color(0xFFFF006E),
+                      accentColor:
+                          Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFFFF006E)
+                          : const Color(0xFF3B82F6),
                       imageUrls: const [
                         "assests/images/motion.png",
                         "assests/images/motion2.png",
@@ -222,7 +235,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             border: Border.all(
-              color: const Color(0xFF00D4FF).withValues(alpha: .3),
+              color:
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00D4FF)
+                          : const Color(0xFF3B82F6))
+                      .withValues(alpha: .3),
             ),
             borderRadius: BorderRadius.circular(6),
           ),
@@ -230,7 +247,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             '04',
             style: GoogleFonts.jetBrainsMono(
               fontSize: 12,
-              color: const Color(0xFF00D4FF),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF00D4FF)
+                  : const Color(0xFF3B82F6),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -242,7 +261,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFF00D4FF).withValues(alpha: .3),
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00D4FF)
+                          : const Color(0xFF3B82F6))
+                      .withValues(alpha: .3),
                   Colors.transparent,
                 ],
               ),
@@ -255,7 +277,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           style: GoogleFonts.spaceGrotesk(
             fontSize: isMobile ? 12 : 14,
             fontWeight: FontWeight.w600,
-            color: Colors.white54,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white54
+                : Colors.black54,
             letterSpacing: 4,
           ),
         ),
@@ -312,12 +336,16 @@ class _ProjectCardState extends State<_ProjectCard> {
             decoration: BoxDecoration(
               color: _isHovered
                   ? widget.accentColor.withValues(alpha: .03)
-                  : Colors.white.withValues(alpha: .01),
+                  : (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withValues(alpha: .01)
+                        : Colors.black.withValues(alpha: .02)),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: _isHovered
                     ? widget.accentColor.withValues(alpha: .2)
-                    : Colors.white.withValues(alpha: .04),
+                    : (Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withValues(alpha: .04)
+                          : Colors.black.withValues(alpha: .06)),
               ),
             ),
             child: Column(
@@ -333,7 +361,9 @@ class _ProjectCardState extends State<_ProjectCard> {
                         fontSize: 14,
                         color: _isHovered
                             ? widget.accentColor
-                            : Colors.white.withValues(alpha: .2),
+                            : (Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white.withValues(alpha: .2)
+                                  : Colors.black.withValues(alpha: .2)),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -349,7 +379,11 @@ class _ProjectCardState extends State<_ProjectCard> {
                             style: GoogleFonts.spaceGrotesk(
                               fontSize: isMobile ? 28 : 42,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
                               letterSpacing: -1,
                               height: 1,
                             ),
@@ -361,7 +395,10 @@ class _ProjectCardState extends State<_ProjectCard> {
                               fontSize: 12,
                               color: _isHovered
                                   ? widget.accentColor
-                                  : Colors.white.withValues(alpha: .3),
+                                  : (Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white.withValues(alpha: .3)
+                                        : Colors.black.withValues(alpha: .5)),
                               letterSpacing: 2,
                             ),
                           ),
@@ -419,11 +456,17 @@ class _ProjectCardState extends State<_ProjectCard> {
                             shape: BoxShape.circle,
                             color: _isHovered
                                 ? widget.accentColor.withValues(alpha: .15)
-                                : Colors.white.withValues(alpha: .03),
+                                : (Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white.withValues(alpha: .03)
+                                      : Colors.black.withValues(alpha: .03)),
                             border: Border.all(
                               color: _isHovered
                                   ? widget.accentColor.withValues(alpha: .3)
-                                  : Colors.white.withValues(alpha: .08),
+                                  : (Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white.withValues(alpha: .08)
+                                        : Colors.black.withValues(alpha: .1)),
                             ),
                           ),
                           child: AnimatedRotation(
@@ -433,7 +476,10 @@ class _ProjectCardState extends State<_ProjectCard> {
                               Icons.arrow_forward,
                               color: _isHovered
                                   ? widget.accentColor
-                                  : Colors.white.withValues(alpha: .4),
+                                  : (Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white.withValues(alpha: .4)
+                                        : Colors.black.withValues(alpha: .4)),
                               size: 18,
                             ),
                           ),

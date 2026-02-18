@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:my_portfolio/screen/main_page.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_portfolio/service/theme_service.dart';
 
 void main() {
-  runApp(const PortfolioApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeService(),
+      child: const PortfolioApp(),
+    ),
+  );
 }
 
 class PortfolioApp extends StatelessWidget {
@@ -11,14 +17,14 @@ class PortfolioApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeService = Provider.of<ThemeService>(context);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Amal Mathew | Flutter Developer',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0A0A0F),
-        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
-      ),
+      themeMode: themeService.themeMode,
+      theme: ThemeService.lightTheme,
+      darkTheme: ThemeService.darkTheme,
       home: const PortfolioScrollablePage(),
     );
   }
