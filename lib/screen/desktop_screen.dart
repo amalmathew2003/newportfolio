@@ -430,6 +430,29 @@ class _DesktopScreenState extends State<DesktopScreen>
           );
         },
       ),
+      AnimatedBuilder(
+        animation: _floatController,
+        builder: (context, child) {
+          return Positioned(
+            right: size.width * 0.5,
+            top: size.height * 0.2,
+            child: Transform.rotate(
+              angle: _floatController.value * math.pi * 2,
+              child: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFF00FFA3).withValues(alpha: .15),
+                    width: 1,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
 
       // Floating diamond
       AnimatedBuilder(
@@ -462,6 +485,51 @@ class _DesktopScreenState extends State<DesktopScreen>
       ),
 
       // Small dot cluster
+      AnimatedBuilder(
+        animation: _floatController,
+        builder: (context, child) {
+          return Positioned(
+            left: size.width * 0.2,
+            top: size.height * 0.15,
+            child: Transform.translate(
+              offset: Offset(
+                math.cos(_floatController.value * math.pi * 2) * 10,
+                math.sin(_floatController.value * math.pi * 2) * 15,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF006E).withValues(alpha: .4),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF00FFA3).withValues(alpha: .3),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    width: 3,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF8B5CF6).withValues(alpha: .4),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
       AnimatedBuilder(
         animation: _floatController,
         builder: (context, child) {
