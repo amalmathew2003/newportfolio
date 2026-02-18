@@ -83,17 +83,22 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         children: [
                           Text(
                             "SELECTED\nWORKS",
-                            style: GoogleFonts.spaceGrotesk(
-                              fontSize: isMobile ? 50 : 100,
-                              fontWeight: FontWeight.w700,
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black,
-                              height: 0.9,
-                              letterSpacing: -3,
-                            ),
+                            style:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? GoogleFonts.spaceGrotesk(
+                                    fontSize: isMobile ? 50 : 100,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                    height: 0.9,
+                                    letterSpacing: -3,
+                                  )
+                                : GoogleFonts.playfairDisplay(
+                                    fontSize: isMobile ? 50 : 100,
+                                    fontWeight: FontWeight.w900,
+                                    color: const Color(0xFF111111),
+                                    height: 0.95,
+                                    letterSpacing: -2,
+                                  ),
                           ),
                           if (!isMobile)
                             Text(
@@ -125,7 +130,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       accentColor:
                           Theme.of(context).brightness == Brightness.dark
                           ? const Color(0xFF00FFA3)
-                          : const Color(0xFF3B82F6),
+                          : const Color(0xFF111111),
                       imageUrls: const [
                         "assests/images/VN1bg.png",
                         "assests/images/VN2bg.png",
@@ -165,7 +170,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       accentColor:
                           Theme.of(context).brightness == Brightness.dark
                           ? const Color(0xFF8B5CF6)
-                          : const Color(0xFFEC4899),
+                          : const Color(0xFF96805D),
                       imageUrls: const [
                         "assests/images/travalappfull.png",
                         "assests/images/travalapp.png",
@@ -198,7 +203,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       accentColor:
                           Theme.of(context).brightness == Brightness.dark
                           ? const Color(0xFFFF006E)
-                          : const Color(0xFF3B82F6),
+                          : const Color(0xFF96805D),
                       imageUrls: const [
                         "assests/images/motion.png",
                         "assests/images/motion2.png",
@@ -238,7 +243,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               color:
                   (Theme.of(context).brightness == Brightness.dark
                           ? const Color(0xFF00D4FF)
-                          : const Color(0xFF3B82F6))
+                          : const Color(0xFF96805D))
                       .withValues(alpha: .3),
             ),
             borderRadius: BorderRadius.circular(6),
@@ -249,7 +254,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               fontSize: 12,
               color: Theme.of(context).brightness == Brightness.dark
                   ? const Color(0xFF00D4FF)
-                  : const Color(0xFF3B82F6),
+                  : const Color(0xFF96805D),
               fontWeight: FontWeight.w600,
             ),
           ),

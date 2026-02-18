@@ -168,9 +168,7 @@ class _DesktopScreenState extends State<DesktopScreen>
               Text(
                 'OPEN TO OPPORTUNITIES',
                 style: GoogleFonts.jetBrainsMono(
-                  color: isDark
-                      ? accentColor
-                      : const Color(0xFF2563EB), // Darker blue for visibility
+                  color: isDark ? accentColor : const Color(0xFF111111),
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 3,
@@ -197,7 +195,11 @@ class _DesktopScreenState extends State<DesktopScreen>
               '// ',
               style: GoogleFonts.jetBrainsMono(
                 fontSize: isMobile ? 14 : 20,
-                color: const Color(0xFF00FFA3).withValues(alpha: .6),
+                color:
+                    (Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF00FFA3)
+                            : const Color(0xFF96805D))
+                        .withValues(alpha: .6),
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -224,9 +226,9 @@ class _DesktopScreenState extends State<DesktopScreen>
                 final isDark = Theme.of(context).brightness == Brightness.dark;
                 return LinearGradient(
                   colors: [
-                    isDark ? Colors.white : Colors.black87,
-                    isDark ? const Color(0xFF00FFA3) : const Color(0xFF3B82F6),
-                    isDark ? Colors.white : Colors.black87,
+                    isDark ? Colors.white : const Color(0xFF111111),
+                    isDark ? const Color(0xFF00FFA3) : const Color(0xFF96805D),
+                    isDark ? Colors.white : const Color(0xFF111111),
                   ],
                   stops: [0.0, _glowController.value, 1.0],
                   begin: Alignment.centerLeft,
@@ -235,15 +237,21 @@ class _DesktopScreenState extends State<DesktopScreen>
               },
               child: Text(
                 'AMAL\nMATHEW',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: isMobile ? 60 : 120,
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
-                  height: 0.9,
-                  letterSpacing: -3,
-                ),
+                style: Theme.of(context).brightness == Brightness.dark
+                    ? GoogleFonts.spaceGrotesk(
+                        fontSize: isMobile ? 60 : 120,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        height: 0.9,
+                        letterSpacing: -3,
+                      )
+                    : GoogleFonts.playfairDisplay(
+                        fontSize: isMobile ? 60 : 120,
+                        fontWeight: FontWeight.w900,
+                        color: const Color(0xFF111111),
+                        height: 0.95,
+                        letterSpacing: -2,
+                      ),
                 textAlign: isMobile ? TextAlign.center : TextAlign.start,
               ),
             );
@@ -444,7 +452,11 @@ class _DesktopScreenState extends State<DesktopScreen>
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: const Color(0xFF00FFA3).withValues(alpha: .15),
+                    color:
+                        (Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF00FFA3)
+                                : const Color(0xFF96805D))
+                            .withValues(alpha: .15),
                     width: 1,
                   ),
                 ),
@@ -473,7 +485,11 @@ class _DesktopScreenState extends State<DesktopScreen>
                   height: 16,
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: const Color(0xFF8B5CF6).withValues(alpha: .3),
+                      color:
+                          (Theme.of(context).brightness == Brightness.dark
+                                  ? const Color(0xFF8B5CF6)
+                                  : const Color(0xFF96805D))
+                              .withValues(alpha: .3),
                       width: 1,
                     ),
                   ),
@@ -502,7 +518,11 @@ class _DesktopScreenState extends State<DesktopScreen>
                     width: 4,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF006E).withValues(alpha: .4),
+                      color:
+                          (Theme.of(context).brightness == Brightness.dark
+                                  ? const Color(0xFFFF006E)
+                                  : const Color(0xFF96805D))
+                              .withValues(alpha: .4),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -511,7 +531,11 @@ class _DesktopScreenState extends State<DesktopScreen>
                     width: 6,
                     height: 6,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF00FFA3).withValues(alpha: .3),
+                      color:
+                          (Theme.of(context).brightness == Brightness.dark
+                                  ? const Color(0xFF00FFA3)
+                                  : const Color(0xFF111111))
+                              .withValues(alpha: .3),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -520,7 +544,11 @@ class _DesktopScreenState extends State<DesktopScreen>
                     width: 3,
                     height: 3,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF8B5CF6).withValues(alpha: .4),
+                      color:
+                          (Theme.of(context).brightness == Brightness.dark
+                                  ? const Color(0xFF8B5CF6)
+                                  : const Color(0xFF96805D))
+                              .withValues(alpha: .4),
                       shape: BoxShape.circle,
                     ),
                   ),

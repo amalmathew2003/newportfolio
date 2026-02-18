@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:my_portfolio/service/theme_service.dart';
@@ -364,11 +365,17 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF00FFA3),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF00FFA3)
+                          : const Color(0xFF96805D), // Bronze
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF00FFA3).withValues(alpha: .5),
+                          color:
+                              (Theme.of(context).brightness == Brightness.dark
+                                      ? const Color(0xFF00FFA3)
+                                      : const Color(0xFF96805D))
+                                  .withValues(alpha: .5),
                           blurRadius: 8,
                         ),
                       ],
@@ -377,14 +384,19 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                   const SizedBox(width: 10),
                   Text(
                     'Amal Mathew',
-                    style: TextStyle(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black87,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 2,
-                    ),
+                    style: Theme.of(context).brightness == Brightness.dark
+                        ? TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 2,
+                          )
+                        : GoogleFonts.playfairDisplay(
+                            color: const Color(0xFF111111),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                          ),
                   ),
                 ],
               ),
@@ -482,14 +494,14 @@ class _NavItemState extends State<_NavItem> {
             color: widget.isActive
                 ? (Theme.of(context).brightness == Brightness.dark
                       ? const Color(0xFF00FFA3)
-                      : const Color(0xFF3B82F6))
+                      : const Color(0xFF96805D))
                 : _hovered
                 ? (Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
-                      : Colors.black)
+                      : const Color(0xFF111111))
                 : (Theme.of(context).brightness == Brightness.dark
                       ? Colors.white54
-                      : Colors.black54),
+                      : const Color(0xFF111111).withValues(alpha: .4)),
             fontSize: 11,
             fontWeight: widget.isActive ? FontWeight.w700 : FontWeight.w500,
             letterSpacing: 2,
@@ -583,7 +595,7 @@ class _ThemeToggle extends StatelessWidget {
           ),
           child: Icon(
             isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-            color: isDark ? const Color(0xFF00FFA3) : const Color(0xFF3B82F6),
+            color: isDark ? const Color(0xFF00FFA3) : const Color(0xFF96805D),
             size: 20,
           ),
         ),

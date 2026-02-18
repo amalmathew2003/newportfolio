@@ -71,15 +71,21 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                 delay: const Duration(milliseconds: 200),
                 child: Text(
                   "WORK\nJOURNEY",
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: isMobile ? 50 : 100,
-                    fontWeight: FontWeight.w700,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black,
-                    height: 0.9,
-                    letterSpacing: -3,
-                  ),
+                  style: Theme.of(context).brightness == Brightness.dark
+                      ? GoogleFonts.spaceGrotesk(
+                          fontSize: isMobile ? 50 : 100,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          height: 0.9,
+                          letterSpacing: -3,
+                        )
+                      : GoogleFonts.playfairDisplay(
+                          fontSize: isMobile ? 50 : 100,
+                          fontWeight: FontWeight.w900,
+                          color: const Color(0xFF111111),
+                          height: 0.95,
+                          letterSpacing: -2,
+                        ),
                 ),
               ),
 
@@ -112,7 +118,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
               color:
                   (Theme.of(context).brightness == Brightness.dark
                           ? const Color(0xFFFF006E)
-                          : const Color(0xFFEC4899))
+                          : const Color(0xFF96805D))
                       .withValues(alpha: .3),
             ),
             borderRadius: BorderRadius.circular(6),
@@ -123,7 +129,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
               fontSize: 12,
               color: Theme.of(context).brightness == Brightness.dark
                   ? const Color(0xFFFF006E)
-                  : const Color(0xFFEC4899),
+                  : const Color(0xFF96805D),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -137,7 +143,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
                 colors: [
                   (Theme.of(context).brightness == Brightness.dark
                           ? const Color(0xFFFF006E)
-                          : const Color(0xFFEC4899))
+                          : const Color(0xFF96805D))
                       .withValues(alpha: .3),
                   Colors.transparent,
                 ],
@@ -186,8 +192,8 @@ class _ExperienceCardState extends State<_ExperienceCard> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentColor = widget.data.isCurrent
-        ? (isDark ? const Color(0xFF00FFA3) : const Color(0xFF3B82F6))
-        : (isDark ? const Color(0xFF8B5CF6) : const Color(0xFFEC4899));
+        ? (isDark ? const Color(0xFF00FFA3) : const Color(0xFF111111))
+        : (isDark ? const Color(0xFF8B5CF6) : const Color(0xFF96805D));
 
     return FadeInUp(
       delay: Duration(milliseconds: 300 * widget.index),
@@ -240,7 +246,9 @@ class _ExperienceCardState extends State<_ExperienceCard> {
                             end: Alignment.bottomCenter,
                             colors: [
                               accentColor.withValues(alpha: .3),
-                              Colors.white.withValues(alpha: .05),
+                              isDark
+                                  ? Colors.white.withValues(alpha: .05)
+                                  : Colors.black.withValues(alpha: .05),
                             ],
                           ),
                         ),

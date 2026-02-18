@@ -32,14 +32,24 @@ class ThemeService extends ChangeNotifier {
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.light,
-      scaffoldBackgroundColor: const Color(0xFFF1F5F9), // Soft Slate
-      primaryColor: const Color(0xFF3B82F6),
+      scaffoldBackgroundColor: const Color(0xFFF9F7F2), // Linen
+      primaryColor: const Color(0xFF111111), // Charcoal
       colorScheme: const ColorScheme.light(
-        primary: Color(0xFF3B82F6),
-        secondary: Color(0xFFEC4899),
+        primary: Color(0xFF111111),
+        secondary: Color(0xFF96805D), // Muted Bronze
         surface: Colors.white,
       ),
-      textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
+      textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme)
+          .copyWith(
+            displayLarge: GoogleFonts.playfairDisplay(
+              color: const Color(0xFF111111),
+              fontWeight: FontWeight.w700,
+            ),
+            displayMedium: GoogleFonts.playfairDisplay(
+              color: const Color(0xFF111111),
+              fontWeight: FontWeight.w700,
+            ),
+          ),
     );
   }
 }

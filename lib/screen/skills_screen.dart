@@ -75,15 +75,21 @@ class _SkillsScreenState extends State<SkillsScreen> {
                       delay: const Duration(milliseconds: 200),
                       child: Text(
                         "MY\nSKILLS",
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: isMobile ? 50 : 100,
-                          fontWeight: FontWeight.w700,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black,
-                          height: 0.9,
-                          letterSpacing: -3,
-                        ),
+                        style: Theme.of(context).brightness == Brightness.dark
+                            ? GoogleFonts.spaceGrotesk(
+                                fontSize: isMobile ? 50 : 100,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                height: 0.9,
+                                letterSpacing: -3,
+                              )
+                            : GoogleFonts.playfairDisplay(
+                                fontSize: isMobile ? 50 : 100,
+                                fontWeight: FontWeight.w900,
+                                color: const Color(0xFF111111),
+                                height: 0.95,
+                                letterSpacing: -2,
+                              ),
                       ),
                     )
                   : const SizedBox.shrink(),
@@ -99,7 +105,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
                 isReverse: false,
                 accentColor: Theme.of(context).brightness == Brightness.dark
                     ? const Color(0xFF00FFA3)
-                    : const Color(0xFF3B82F6),
+                    : const Color(0xFF111111).withValues(alpha: .7),
               ),
               const SizedBox(height: 4),
               _InfiniteScrollBand(
@@ -108,7 +114,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
                 isReverse: true,
                 accentColor: Theme.of(context).brightness == Brightness.dark
                     ? const Color(0xFF8B5CF6)
-                    : const Color(0xFFEC4899),
+                    : const Color(0xFF96805D).withValues(alpha: .8),
               ),
             ],
           ],
@@ -127,7 +133,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
               color:
                   (Theme.of(context).brightness == Brightness.dark
                           ? const Color(0xFF8B5CF6)
-                          : const Color(0xFFEC4899))
+                          : const Color(0xFF96805D))
                       .withValues(alpha: .3),
             ),
             borderRadius: BorderRadius.circular(6),
@@ -138,7 +144,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
               fontSize: 12,
               color: Theme.of(context).brightness == Brightness.dark
                   ? const Color(0xFF8B5CF6)
-                  : const Color(0xFFEC4899),
+                  : const Color(0xFF96805D),
               fontWeight: FontWeight.w600,
             ),
           ),

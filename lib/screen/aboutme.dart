@@ -80,7 +80,7 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
               color:
                   (Theme.of(context).brightness == Brightness.dark
                           ? const Color(0xFF00FFA3)
-                          : const Color(0xFF3B82F6))
+                          : const Color(0xFF96805D))
                       .withValues(alpha: .3),
             ),
             borderRadius: BorderRadius.circular(6),
@@ -91,7 +91,7 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
               fontSize: 12,
               color: Theme.of(context).brightness == Brightness.dark
                   ? const Color(0xFF00FFA3)
-                  : const Color(0xFF3B82F6),
+                  : const Color(0xFF96805D),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -117,14 +117,19 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
         const SizedBox(width: 16),
         Text(
           'ABOUT',
-          style: GoogleFonts.spaceGrotesk(
-            fontSize: isMobile ? 12 : 14,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white54
-                : Colors.black54,
-            letterSpacing: 4,
-          ),
+          style: Theme.of(context).brightness == Brightness.dark
+              ? GoogleFonts.spaceGrotesk(
+                  fontSize: isMobile ? 12 : 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white54,
+                  letterSpacing: 4,
+                )
+              : GoogleFonts.playfairDisplay(
+                  fontSize: isMobile ? 16 : 18,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF111111),
+                  letterSpacing: 2,
+                ),
         ),
       ],
     );
@@ -276,7 +281,7 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
         fontSize: isMobile ? 14 : 16,
         color: Theme.of(context).brightness == Brightness.dark
             ? Colors.white.withValues(alpha: opacity)
-            : Colors.black.withValues(alpha: opacity + 0.1),
+            : const Color(0xFF111111).withValues(alpha: opacity + 0.15),
         height: 1.8,
       ),
       textAlign: isMobile ? TextAlign.center : TextAlign.start,

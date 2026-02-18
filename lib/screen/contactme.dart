@@ -84,28 +84,42 @@ class _ContactMeState extends State<ContactMe>
                     // Big heading
                     Text(
                       "LET'S CREATE",
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: isMobile ? 40 : 80,
-                        fontWeight: FontWeight.w700,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black,
-                        letterSpacing: -2,
-                        height: 0.9,
-                      ),
+                      style: Theme.of(context).brightness == Brightness.dark
+                          ? GoogleFonts.spaceGrotesk(
+                              fontSize: isMobile ? 40 : 80,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: -2,
+                              height: 0.9,
+                            )
+                          : GoogleFonts.playfairDisplay(
+                              fontSize: isMobile ? 40 : 80,
+                              fontWeight: FontWeight.w900,
+                              color: const Color(0xFF111111),
+                              letterSpacing: -1,
+                              height: 1,
+                            ),
                       textAlign: TextAlign.center,
                     ),
                     Text(
                       "SOMETHING AMAZING",
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: isMobile ? 40 : 80,
-                        fontWeight: FontWeight.w700,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white.withValues(alpha: .15)
-                            : Colors.black.withValues(alpha: .1),
-                        letterSpacing: -2,
-                        height: 0.9,
-                      ),
+                      style: Theme.of(context).brightness == Brightness.dark
+                          ? GoogleFonts.spaceGrotesk(
+                              fontSize: isMobile ? 40 : 80,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white.withValues(alpha: .15),
+                              letterSpacing: -2,
+                              height: 0.9,
+                            )
+                          : GoogleFonts.playfairDisplay(
+                              fontSize: isMobile ? 40 : 80,
+                              fontWeight: FontWeight.w900,
+                              color: const Color(
+                                0xFF111111,
+                              ).withValues(alpha: .05),
+                              letterSpacing: -1,
+                              height: 1,
+                            ),
                       textAlign: TextAlign.center,
                     ),
 
@@ -219,7 +233,7 @@ class _ContactMeState extends State<ContactMe>
               fontSize: 12,
               color: Theme.of(context).brightness == Brightness.dark
                   ? const Color(0xFF00FFA3)
-                  : const Color(0xFF3B82F6),
+                  : const Color(0xFF96805D),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -233,7 +247,7 @@ class _ContactMeState extends State<ContactMe>
                 colors: [
                   (Theme.of(context).brightness == Brightness.dark
                           ? const Color(0xFF00FFA3)
-                          : const Color(0xFF3B82F6))
+                          : const Color(0xFF96805D))
                       .withValues(alpha: .3),
                   Colors.transparent,
                 ],
@@ -244,14 +258,19 @@ class _ContactMeState extends State<ContactMe>
         const SizedBox(width: 16),
         Text(
           'CONTACT',
-          style: GoogleFonts.spaceGrotesk(
-            fontSize: isMobile ? 12 : 14,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white54
-                : Colors.black54,
-            letterSpacing: 4,
-          ),
+          style: Theme.of(context).brightness == Brightness.dark
+              ? GoogleFonts.spaceGrotesk(
+                  fontSize: isMobile ? 12 : 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white54,
+                  letterSpacing: 4,
+                )
+              : GoogleFonts.playfairDisplay(
+                  fontSize: isMobile ? 16 : 18,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF111111),
+                  letterSpacing: 2,
+                ),
         ),
       ],
     );
