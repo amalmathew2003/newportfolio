@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -38,7 +37,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isMobile = size.width < 600;
+    final isMobile = size.width < 900;
 
     return VisibilityDetector(
       key: const Key('skills-section'),
@@ -50,43 +49,72 @@ class _SkillsScreenState extends State<SkillsScreen> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 100),
+        padding: const EdgeInsets.symmetric(vertical: 120),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+            // Section Header
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 80),
-              child: FadeInUp(
-                duration: const Duration(milliseconds: 1000),
-                child: Text(
-                  "MY SKILLS",
-                  style: GoogleFonts.syne(
-                    fontSize: isMobile ? 40 : 80,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: -2,
-                  ),
-                ),
-              ),
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 24 : 100),
+              child: _visible
+                  ? FadeInUp(
+                      duration: const Duration(milliseconds: 800),
+                      child: _buildSectionHeader(isMobile),
+                    )
+                  : const SizedBox.shrink(),
             ),
 
-            const SizedBox(height: 60),
+            const SizedBox(height: 20),
 
-            // Marquee Rows
+            // Big title
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 24 : 100),
+              child: _visible
+                  ? FadeInUp(
+                      duration: const Duration(milliseconds: 1000),
+                      delay: const Duration(milliseconds: 200),
+                      child: Text(
+                        "MY\nSKILLS",
+                        style: Theme.of(context).brightness == Brightness.dark
+                            ? GoogleFonts.spaceGrotesk(
+                                fontSize: isMobile ? 50 : 100,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                height: 0.9,
+                                letterSpacing: -3,
+                              )
+                            : GoogleFonts.playfairDisplay(
+                                fontSize: isMobile ? 50 : 100,
+                                fontWeight: FontWeight.w900,
+                                color: const Color(0xFF111111),
+                                height: 0.95,
+                                letterSpacing: -2,
+                              ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+
+            const SizedBox(height: 80),
+
+            // Scrolling marquee rows
             if (_visible) ...[
-              _InfiniteTextScroll(
+              _InfiniteScrollBand(
                 items: row1,
-                direction: Axis.horizontal,
                 speed: 30,
                 isReverse: false,
+                accentColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF00FFA3)
+                    : const Color(0xFF111111).withValues(alpha: .7),
               ),
-              const SizedBox(height: 20),
-              _InfiniteTextScroll(
+              const SizedBox(height: 4),
+              _InfiniteScrollBand(
                 items: row2,
-                direction: Axis.horizontal,
                 speed: 30,
                 isReverse: true,
+                accentColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF8B5CF6)
+                    : const Color(0xFF96805D).withValues(alpha: .8),
               ),
             ],
           ],
@@ -94,73 +122,137 @@ class _SkillsScreenState extends State<SkillsScreen> {
       ),
     );
   }
+
+  Widget _buildSectionHeader(bool isMobile) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color:
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8B5CF6)
+                          : const Color(0xFF96805D))
+                      .withValues(alpha: .3),
+            ),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            '02',
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 12,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF8B5CF6)
+                  : const Color(0xFF96805D),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  (Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF8B5CF6)
+                          : const Color(0xFFEC4899))
+                      .withValues(alpha: .3),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Text(
+          'SKILLS',
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: isMobile ? 12 : 14,
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white54
+                : Colors.black54,
+            letterSpacing: 4,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
-///===================================InfiniteTextScroll===================================//
-class _InfiniteTextScroll extends StatefulWidget {
+// === Infinite Scrolling Band ===
+class _InfiniteScrollBand extends StatefulWidget {
   final List<String> items;
-  final Axis direction;
   final double speed;
   final bool isReverse;
+  final Color accentColor;
 
-  const _InfiniteTextScroll({
+  const _InfiniteScrollBand({
     required this.items,
-    this.direction = Axis.horizontal,
     this.speed = 50,
     this.isReverse = false,
+    required this.accentColor,
   });
 
   @override
-  State<_InfiniteTextScroll> createState() => _InfiniteTextScrollState();
+  State<_InfiniteScrollBand> createState() => _InfiniteScrollBandState();
 }
 
-class _InfiniteTextScrollState extends State<_InfiniteTextScroll> {
+class _InfiniteScrollBandState extends State<_InfiniteScrollBand>
+    with SingleTickerProviderStateMixin {
   late ScrollController _scrollController;
-  late Timer _timer;
+  late AnimationController _animController;
   double _offset = 0;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    _startAutoScroll();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1), // placeholder, runs forever
+    )..addListener(_tick);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.isReverse && _scrollController.hasClients) {
+        _offset = _scrollController.position.maxScrollExtent;
+        _scrollController.jumpTo(_offset);
+      }
+      _animController.repeat();
+    });
   }
 
-  void _startAutoScroll() {
-    _timer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
-      if (!_scrollController.hasClients) return;
+  void _tick() {
+    if (!_scrollController.hasClients) return;
 
-      if (widget.isReverse) {
-        _offset -= 1; // Simplify speed for now
-        if (_offset <= 0) {
-          _offset = _scrollController.position.maxScrollExtent;
-          _scrollController.jumpTo(_offset);
-        } else {
-          _scrollController.jumpTo(_offset);
-        }
-      } else {
-        _offset += 1;
-        if (_offset >= _scrollController.position.maxScrollExtent) {
-          _offset = 0;
-          _scrollController.jumpTo(_offset);
-        } else {
-          _scrollController.jumpTo(_offset);
-        }
+    if (widget.isReverse) {
+      _offset -= 0.8;
+      if (_offset <= 0) {
+        _offset = _scrollController.position.maxScrollExtent;
       }
-    });
+    } else {
+      _offset += 0.8;
+      if (_offset >= _scrollController.position.maxScrollExtent) {
+        _offset = 0;
+      }
+    }
+    _scrollController.jumpTo(_offset);
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    _animController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Duplicate list many times to create infinite effect
     final displayList = [
+      ...widget.items,
       ...widget.items,
       ...widget.items,
       ...widget.items,
@@ -168,18 +260,16 @@ class _InfiniteTextScrollState extends State<_InfiniteTextScroll> {
     ];
 
     return SizedBox(
-      height: 100,
+      height: 80,
       child: ListView.builder(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: displayList.length,
         itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 0,
-            ), // handled inside
-            child: _SkillItem(text: displayList[index]),
+          return _SkillChip(
+            text: displayList[index],
+            accentColor: widget.accentColor,
           );
         },
       ),
@@ -187,16 +277,17 @@ class _InfiniteTextScrollState extends State<_InfiniteTextScroll> {
   }
 }
 
-///===================================SkillItem===================================//
-class _SkillItem extends StatefulWidget {
+// === Skill Chip ===
+class _SkillChip extends StatefulWidget {
   final String text;
-  const _SkillItem({required this.text});
+  final Color accentColor;
+  const _SkillChip({required this.text, required this.accentColor});
 
   @override
-  State<_SkillItem> createState() => _SkillItemState();
+  State<_SkillChip> createState() => _SkillChipState();
 }
 
-class _SkillItemState extends State<_SkillItem> {
+class _SkillChipState extends State<_SkillChip> {
   bool _isHovered = false;
 
   @override
@@ -205,20 +296,37 @@ class _SkillItemState extends State<_SkillItem> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 20),
+        margin: const EdgeInsets.symmetric(horizontal: 2),
         decoration: BoxDecoration(
-          color: _isHovered ? const Color(0xFF00D2FF) : Colors.transparent,
-          border: Border.all(color: Colors.white24),
+          color: _isHovered
+              ? widget.accentColor.withValues(alpha: .15)
+              : (Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withValues(alpha: .02)
+                    : Colors.black.withValues(alpha: .03)),
+          border: Border.all(
+            color: _isHovered
+                ? widget.accentColor.withValues(alpha: .4)
+                : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withValues(alpha: .06)
+                      : Colors.black.withValues(alpha: .08)),
+          ),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
           child: Text(
             widget.text,
-            style: GoogleFonts.dmSans(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: _isHovered ? Colors.black : Colors.white54,
-              letterSpacing: 1,
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: _isHovered
+                  ? widget.accentColor
+                  : (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withValues(alpha: .4)
+                        : Colors.black.withValues(alpha: .75)),
+              letterSpacing: 2,
             ),
           ),
         ),

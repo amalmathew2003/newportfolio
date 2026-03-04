@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:my_portfolio/screen/main_page.dart';
+import 'package:my_portfolio/service/theme_service.dart';
 
 void main() {
-  runApp(const PortfolioApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeService(),
+      child: const PortfolioApp(),
+    ),
+  );
 }
 
 class PortfolioApp extends StatelessWidget {
@@ -10,19 +17,15 @@ class PortfolioApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    final themeService = Provider.of<ThemeService>(context);
+
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: PortfolioLandingPage(),
+      title: 'Amal Mathew | Flutter Developer',
+      themeMode: themeService.themeMode,
+      theme: ThemeService.lightTheme,
+      darkTheme: ThemeService.darkTheme,
+      home: const PortfolioScrollablePage(),
     );
-  }
-}
-
-class PortfolioLandingPage extends StatelessWidget {
-  const PortfolioLandingPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // Return different screens based on width
-    return const PortfolioScrollablePage();
   }
 }

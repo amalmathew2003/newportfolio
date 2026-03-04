@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,7 +13,7 @@ class ProjectDetailsScreen extends StatelessWidget {
   final String description;
   final List<String> imageUrls;
   final String githubUrl;
-  final String? videoUrl; // Add video url
+  final String? videoUrl;
 
   const ProjectDetailsScreen({
     super.key,
@@ -37,13 +38,13 @@ class ProjectDetailsScreen extends StatelessWidget {
     final isMobile = size.width < 900;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF050A1F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
-          // Background Elements
+          // Background mesh blobs
           Positioned(
-            top: -100,
-            right: -100,
+            top: -150,
+            right: -150,
             child: Container(
               width: 500,
               height: 500,
@@ -51,11 +52,36 @@ class ProjectDetailsScreen extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    const Color(0xFF00D2FF).withValues(alpha: .1),
+                    const Color(0xFF00FFA3).withValues(alpha: .06),
                     Colors.transparent,
                   ],
                 ),
               ),
+            ),
+          ),
+          Positioned(
+            bottom: -200,
+            left: -100,
+            child: Container(
+              width: 400,
+              height: 400,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xFF8B5CF6).withValues(alpha: .05),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Blur
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+              child: Container(color: Colors.transparent),
             ),
           ),
 
@@ -65,9 +91,9 @@ class ProjectDetailsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Hero Image Section
+                // Hero Image
                 SizedBox(
-                  height: size.height * 0.6,
+                  height: size.height * 0.55,
                   width: double.infinity,
                   child: Stack(
                     fit: StackFit.expand,
@@ -82,18 +108,22 @@ class ProjectDetailsScreen extends StatelessWidget {
                           alignment: Alignment.topCenter,
                         ),
                       ),
-                      // Gradient Overlay
+                      // Gradient overlay
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Colors.transparent,
-                              const Color(0xFF050A1F).withValues(alpha: .8),
-                              const Color(0xFF050A1F),
+                              Theme.of(
+                                context,
+                              ).scaffoldBackgroundColor.withValues(alpha: .3),
+                              Theme.of(
+                                context,
+                              ).scaffoldBackgroundColor.withValues(alpha: .8),
+                              Theme.of(context).scaffoldBackgroundColor,
                             ],
-                            stops: const [0.2, 0.8, 1.0],
+                            stops: const [0.1, 0.7, 1.0],
                           ),
                         ),
                       ),
@@ -101,16 +131,16 @@ class ProjectDetailsScreen extends StatelessWidget {
                   ),
                 ),
 
-                // 2. Project Info
+                // Project Info
                 Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 20 : 80,
+                    horizontal: isMobile ? 24 : 100,
                     vertical: 20,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Title & Category
+                      // Category badge + Title
                       FadeInUp(
                         duration: const Duration(milliseconds: 800),
                         child: Column(
@@ -118,20 +148,35 @@ class ProjectDetailsScreen extends StatelessWidget {
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
+                                horizontal: 14,
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
+                                color:
+                                    (Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? const Color(0xFF00FFA3)
+                                            : const Color(0xFF3B82F6))
+                                        .withValues(alpha: .1),
                                 border: Border.all(
-                                  color: const Color(0xFF00D2FF),
+                                  color:
+                                      (Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? const Color(0xFF00FFA3)
+                                              : const Color(0xFF3B82F6))
+                                          .withValues(alpha: .3),
                                 ),
-                                borderRadius: BorderRadius.circular(50),
+                                borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 category.toUpperCase(),
-                                style: GoogleFonts.inter(
-                                  color: const Color(0xFF00D2FF),
-                                  fontSize: 12,
+                                style: GoogleFonts.jetBrainsMono(
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xFF00FFA3)
+                                      : const Color(0xFF2563EB),
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 2,
                                 ),
@@ -140,11 +185,16 @@ class ProjectDetailsScreen extends StatelessWidget {
                             const SizedBox(height: 20),
                             Text(
                               title.toUpperCase(),
-                              style: GoogleFonts.syne(
+                              style: GoogleFonts.spaceGrotesk(
                                 fontSize: isMobile ? 40 : 80,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
                                 height: 0.9,
+                                letterSpacing: -2,
                               ),
                             ),
                           ],
@@ -153,7 +203,7 @@ class ProjectDetailsScreen extends StatelessWidget {
 
                       const SizedBox(height: 60),
 
-                      // Description & Tech Stack Grid
+                      // Description & Tech Stack
                       FadeInUp(
                         delay: const Duration(milliseconds: 200),
                         duration: const Duration(milliseconds: 800),
@@ -164,9 +214,9 @@ class ProjectDetailsScreen extends StatelessWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      _buildDescription(),
+                                      _buildDescription(context),
                                       const SizedBox(height: 40),
-                                      _buildTechStack(),
+                                      _buildTechStack(context),
                                       const SizedBox(height: 40),
                                       if (videoUrl != null)
                                         Column(
@@ -177,7 +227,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                                             const SizedBox(height: 40),
                                           ],
                                         ),
-                                      _buildActions(),
+                                      _buildActions(context),
                                     ],
                                   )
                                 : Row(
@@ -190,7 +240,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            _buildDescription(),
+                                            _buildDescription(context),
                                             if (videoUrl != null)
                                               Padding(
                                                 padding: const EdgeInsets.only(
@@ -210,9 +260,9 @@ class ProjectDetailsScreen extends StatelessWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            _buildTechStack(),
+                                            _buildTechStack(context),
                                             const SizedBox(height: 40),
-                                            _buildActions(),
+                                            _buildActions(context),
                                           ],
                                         ),
                                       ),
@@ -224,34 +274,77 @@ class ProjectDetailsScreen extends StatelessWidget {
 
                       const SizedBox(height: 100),
 
-                      // 3. Image Gallery
+                      // Image Gallery
                       if (imageUrls.length > 1)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "GALLERY",
-                              style: GoogleFonts.syne(
-                                fontSize: 30,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                        FadeInUp(
+                          delay: const Duration(milliseconds: 400),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 16,
+                                    height: 2,
+                                    color: const Color(0xFF8B5CF6),
+                                    margin: const EdgeInsets.only(right: 12),
+                                  ),
+                                  Text(
+                                    "GALLERY",
+                                    style: GoogleFonts.spaceGrotesk(
+                                      fontSize: 20,
+                                      color:
+                                          Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 2,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 40),
-                            ...imageUrls.map(
-                              (url) => Padding(
-                                padding: const EdgeInsets.only(bottom: 40),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.asset(
-                                    url,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
+                              const SizedBox(height: 40),
+                              ...imageUrls.map(
+                                (url) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 24),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white.withValues(
+                                                alpha: .05,
+                                              )
+                                            : Colors.black.withValues(
+                                                alpha: .08,
+                                              ),
+                                        border: Border.all(
+                                          color:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.white.withValues(
+                                                  alpha: .05,
+                                                )
+                                              : Colors.black.withValues(
+                                                  alpha: .08,
+                                                ),
+                                        ),
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Image.asset(
+                                        url,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
 
                       const SizedBox(height: 100),
@@ -267,18 +360,7 @@ class ProjectDetailsScreen extends StatelessWidget {
             top: 40,
             left: 20,
             child: SafeArea(
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: .5),
-                    border: Border.all(color: Colors.white24),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(Icons.arrow_back, color: Colors.white),
-                ),
-              ),
+              child: _BackButton(onTap: () => Navigator.pop(context)),
             ),
           ),
         ],
@@ -286,7 +368,7 @@ class ProjectDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDescription() {
+  Widget _buildDescription(BuildContext context) {
     final paragraphs = description.split('\n');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,20 +386,23 @@ class ProjectDetailsScreen extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "• ",
-                  style: GoogleFonts.inter(
-                    fontSize: 18,
-                    color: const Color(0xFF00D2FF),
-                    fontWeight: FontWeight.bold,
+                Container(
+                  width: 6,
+                  height: 6,
+                  margin: const EdgeInsets.only(top: 8, right: 12),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF00FFA3),
+                    shape: BoxShape.circle,
                   ),
                 ),
                 Expanded(
                   child: Text(
                     item.trim().replaceFirst(RegExp(r'^[•\-\*]\s*'), ''),
                     style: GoogleFonts.inter(
-                      fontSize: 18,
-                      color: Colors.white70,
+                      fontSize: 16,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withValues(alpha: .6)
+                          : Colors.black.withValues(alpha: .75),
                       height: 1.6,
                     ),
                   ),
@@ -332,8 +417,10 @@ class ProjectDetailsScreen extends StatelessWidget {
           child: Text(
             item.trim(),
             style: GoogleFonts.inter(
-              fontSize: 18,
-              color: Colors.white70,
+              fontSize: 16,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white.withValues(alpha: .6)
+                  : Colors.black.withValues(alpha: .7),
               height: 1.8,
             ),
           ),
@@ -342,17 +429,19 @@ class ProjectDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTechStack() {
+  Widget _buildTechStack(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           "TECH STACK",
-          style: GoogleFonts.syne(
-            fontSize: 14,
-            color: Colors.white38,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 2,
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 12,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withValues(alpha: .3)
+                : Colors.black.withValues(alpha: .4),
+            fontWeight: FontWeight.w600,
+            letterSpacing: 3,
           ),
         ),
         const SizedBox(height: 20),
@@ -360,71 +449,193 @@ class ProjectDetailsScreen extends StatelessWidget {
           spacing: 10,
           runSpacing: 10,
           children: [
-            _TechChip(label: "Flutter"),
-            _TechChip(label: "Dart"),
-            _TechChip(label: "Firebase"),
-            _TechChip(label: "UI/UX"),
+            _TechChip(label: "Flutter", color: const Color(0xFF00FFA3)),
+            _TechChip(label: "Dart", color: const Color(0xFF8B5CF6)),
+            _TechChip(label: "Firebase", color: const Color(0xFFFF006E)),
+            _TechChip(label: "UI/UX", color: const Color(0xFF00D4FF)),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildActions() {
-    return GestureDetector(
-      onTap: _launchUrl,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-        decoration: BoxDecoration(
-          color: const Color(0xFF00D2FF),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(FontAwesomeIcons.github, color: Colors.black),
-            const SizedBox(width: 15),
-            Text(
-              "VIEW CODE",
-              style: GoogleFonts.inter(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                letterSpacing: 1,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  Widget _buildActions(BuildContext context) {
+    return _GithubButton(onTap: _launchUrl);
   }
 }
 
-///===========================================TechChip===========================================//
-
+// === Tech Chip ===
 class _TechChip extends StatelessWidget {
   final String label;
-  const _TechChip({required this.label});
+  final Color color;
+  const _TechChip({required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
-        border: Border.all(color: Colors.white12),
-        borderRadius: BorderRadius.circular(4),
+        color: color.withValues(alpha: .05),
+        border: Border.all(color: color.withValues(alpha: .15)),
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(
-        label,
-        style: GoogleFonts.inter(color: Colors.white, fontSize: 14),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 5,
+            height: 5,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: GoogleFonts.jetBrainsMono(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-///===================================VideoPlayerWidget===================================//
+// === GitHub Button ===
+class _GithubButton extends StatefulWidget {
+  final VoidCallback onTap;
+  const _GithubButton({required this.onTap});
 
+  @override
+  State<_GithubButton> createState() => _GithubButtonState();
+}
+
+class _GithubButtonState extends State<_GithubButton> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+          decoration: BoxDecoration(
+            color: _isHovered
+                ? const Color(0xFF00FFA3)
+                : const Color(0xFF00FFA3).withValues(alpha: .1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(
+                0xFF00FFA3,
+              ).withValues(alpha: _isHovered ? 1.0 : 0.3),
+            ),
+            boxShadow: _isHovered
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF00FFA3).withValues(alpha: .3),
+                      blurRadius: 20,
+                      spreadRadius: -5,
+                    ),
+                  ]
+                : [],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                FontAwesomeIcons.github,
+                color: _isHovered
+                    ? const Color(0xFF0A0A0F)
+                    : const Color(0xFF00FFA3),
+                size: 18,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                "VIEW CODE",
+                style: GoogleFonts.inter(
+                  color: _isHovered
+                      ? Theme.of(context).scaffoldBackgroundColor
+                      : const Color(0xFF00FFA3),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                  letterSpacing: 2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// === Back Button ===
+class _BackButton extends StatefulWidget {
+  final VoidCallback onTap;
+  const _BackButton({required this.onTap});
+
+  @override
+  State<_BackButton> createState() => _BackButtonState();
+}
+
+class _BackButtonState extends State<_BackButton> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: _isHovered
+                ? (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withValues(alpha: .1)
+                      : Colors.black.withValues(alpha: .05))
+                : Theme.of(
+                    context,
+                  ).scaffoldBackgroundColor.withValues(alpha: .6),
+            border: Border.all(
+              color: _isHovered
+                  ? (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withValues(alpha: .2)
+                        : Colors.black.withValues(alpha: .2))
+                  : (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withValues(alpha: .08)
+                        : Colors.black.withValues(alpha: .1)),
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            Icons.arrow_back,
+            color: _isHovered
+                ? (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black)
+                : (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white70
+                      : Colors.black54),
+            size: 22,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// === Video Player Widget ===
 class _VideoPlayerWidget extends StatefulWidget {
   final String videoUrl;
   const _VideoPlayerWidget({required this.videoUrl});
@@ -436,6 +647,7 @@ class _VideoPlayerWidget extends StatefulWidget {
 class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -443,10 +655,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     _initializePlayer();
   }
 
-  bool _isInitialized = false;
-
   Future<void> _initializePlayer() async {
-    // ✅ Prevent re-initialization (THIS IS THE KEY FIX)
     if (_isInitialized) return;
 
     if (widget.videoUrl.startsWith('assets') ||
@@ -460,7 +669,6 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
 
     await _videoPlayerController.initialize();
 
-    // ✅ PRELOAD VIDEO (buffer once, no loading on replay)
     await _videoPlayerController.play();
     await Future.delayed(const Duration(milliseconds: 300));
     await _videoPlayerController.pause();
@@ -473,20 +681,20 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
       allowFullScreen: true,
       aspectRatio: _videoPlayerController.value.aspectRatio,
       materialProgressColors: ChewieProgressColors(
-        playedColor: const Color(0xFF00D2FF),
-        handleColor: const Color(0xFF00D2FF),
+        playedColor: const Color(0xFF00FFA3),
+        handleColor: const Color(0xFF00FFA3),
         bufferedColor: Colors.white38,
         backgroundColor: Colors.white24,
       ),
       placeholder: Container(
-        color: Colors.black12,
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: const Center(
-          child: CircularProgressIndicator(color: Color(0xFF00D2FF)),
+          child: CircularProgressIndicator(color: Color(0xFF00FFA3)),
         ),
       ),
       errorBuilder: (context, errorMessage) {
         return Container(
-          color: Colors.black12,
+          color: Theme.of(context).scaffoldBackgroundColor,
           child: const Center(
             child: Icon(Icons.error, color: Colors.white, size: 40),
           ),
@@ -495,13 +703,12 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
     );
 
     _isInitialized = true;
-
     if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
-    _chewieController?.pause(); // keep buffer
+    _chewieController?.pause();
     super.dispose();
   }
 
@@ -512,23 +719,34 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
         height: 300,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: .3),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white10),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: .02)
+              : Colors.black.withValues(alpha: .03),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withValues(alpha: .05)
+                : Colors.black.withValues(alpha: .08),
+          ),
         ),
         child: const Center(
-          child: CircularProgressIndicator(color: Color(0xFF00D2FF)),
+          child: CircularProgressIndicator(color: Color(0xFF00FFA3)),
         ),
       );
     }
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        height: 300, // Fixed height or aspect ratio based
+        height: 300,
         decoration: BoxDecoration(
-          color: Colors.black,
-          border: Border.all(color: Colors.white10),
+          color: Theme.of(context).scaffoldBackgroundColor,
+          border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withValues(alpha: .05)
+                : Colors.black.withValues(alpha: .08),
+          ),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Chewie(controller: _chewieController!),
       ),
