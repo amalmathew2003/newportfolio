@@ -14,6 +14,7 @@ class ProjectDetailsScreen extends StatelessWidget {
   final List<String> imageUrls;
   final String githubUrl;
   final String? videoUrl;
+  final List<String> techStack;
 
   const ProjectDetailsScreen({
     super.key,
@@ -23,6 +24,7 @@ class ProjectDetailsScreen extends StatelessWidget {
     required this.imageUrls,
     required this.githubUrl,
     this.videoUrl,
+    this.techStack = const ['Flutter', 'Dart', 'Firebase', 'UI/UX'],
   });
 
   Future<void> _launchUrl() async {
@@ -430,6 +432,14 @@ class ProjectDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildTechStack(BuildContext context) {
+    final colors = [
+      const Color(0xFF00FFA3),
+      const Color(0xFF8B5CF6),
+      const Color(0xFFFF006E),
+      const Color(0xFF00D4FF),
+      const Color(0xFFFFC107),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -448,12 +458,10 @@ class ProjectDetailsScreen extends StatelessWidget {
         Wrap(
           spacing: 10,
           runSpacing: 10,
-          children: [
-            _TechChip(label: "Flutter", color: const Color(0xFF00FFA3)),
-            _TechChip(label: "Dart", color: const Color(0xFF8B5CF6)),
-            _TechChip(label: "Firebase", color: const Color(0xFFFF006E)),
-            _TechChip(label: "UI/UX", color: const Color(0xFF00D4FF)),
-          ],
+          children: techStack.asMap().entries.map((entry) {
+            final color = colors[entry.key % colors.length];
+            return _TechChip(label: entry.value, color: color);
+          }).toList(),
         ),
       ],
     );
@@ -708,7 +716,8 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
 
   @override
   void dispose() {
-    _chewieController?.pause();
+    _chewieController?.dispose();
+    _videoPlayerController.dispose();
     super.dispose();
   }
 

@@ -158,71 +158,152 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
     );
   }
 
+  Offset _targetMousePosition = Offset.zero;
+
   Widget _buildProfileOrb(bool isMobile) {
     final imageSize = isMobile ? 200.0 : 280.0;
 
-    return FadeInLeft(
-      duration: const Duration(milliseconds: 800),
-      child: AnimatedBuilder(
-        animation: _orbController,
-        builder: (context, child) {
-          return Container(
-            width: imageSize + 20,
-            height: imageSize + 20,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Color.lerp(
-                  (Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF00FFA3)
-                          : const Color(0xFF3B82F6))
-                      .withValues(alpha: .2),
-                  (Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF8B5CF6)
-                          : const Color(0xFFEC4899))
-                      .withValues(alpha: .4),
-                  _orbController.value,
-                )!,
-                width: 1,
+    return MouseRegion(
+      onHover: (event) {
+        if (isMobile) return;
+        final renderBox = context.findRenderObject() as RenderBox;
+        final size = renderBox.size;
+        final center = Offset(size.width / 2, size.height / 2);
+        setState(() {
+          _targetMousePosition = Offset(
+            (event.localPosition.dx - center.dx) / (size.width / 2),
+            (event.localPosition.dy - center.dy) / (size.height / 2),
+          );
+        });
+      },
+      onExit: (_) => setState(() => _targetMousePosition = Offset.zero),
+      child: FadeInLeft(
+        duration: const Duration(milliseconds: 800),
+        child: AnimatedBuilder(
+          animation: _orbController,
+          builder: (context, child) {
+            return TweenAnimationBuilder<Offset>(
+              tween: Tween<Offset>(
+                begin: Offset.zero,
+                end: _targetMousePosition,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Color.lerp(
-                    const Color(0xFF00FFA3).withValues(alpha: .1),
-                    const Color(0xFF8B5CF6).withValues(alpha: .2),
-                    _orbController.value,
-                  )!,
-                  blurRadius: 40,
-                  spreadRadius: 5,
-                ),
-              ],
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Rotating dashed border effect
-                Transform.rotate(
-                  angle: _orbController.value * math.pi * 2,
-                  child: CustomPaint(
-                    size: Size(imageSize + 20, imageSize + 20),
-                    painter: _DashedCirclePainter(
-                      color: const Color(0xFF00FFA3).withValues(alpha: .15),
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeOutCubic,
+              builder: (context, mousePos, child) {
+                return Transform(
+                  transform: Matrix4.identity()
+                    ..setEntry(3, 2, 0.001)
+                    ..rotateX(-mousePos.dy * 0.15)
+                    ..rotateY(mousePos.dx * 0.15),
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: imageSize + 20,
+                    height: imageSize + 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Color.lerp(
+                          (Theme.of(context).brightness == Brightness.dark
+                                  ? const Color(0xFF00FFA3)
+                                  : const Color(0xFF3B82F6))
+                              .withValues(alpha: .2),
+                          (Theme.of(context).brightness == Brightness.dark
+                                  ? const Color(0xFF8B5CF6)
+                                  : const Color(0xFFEC4899))
+                              .withValues(alpha: .4),
+                          _orbController.value,
+                        )!,
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color.lerp(
+                            const Color(0xFF00FFA3).withValues(alpha: .1),
+                            const Color(0xFF8B5CF6).withValues(alpha: .2),
+                            _orbController.value,
+                          )!,
+                          blurRadius: 40,
+                          spreadRadius: 5,
+                          offset: Offset(mousePos.dx * 10, mousePos.dy * 10),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Moving background glass effect
+                        Transform.translate(
+                          offset: Offset(mousePos.dx * -15, mousePos.dy * -15),
+                          child: Container(
+                            width: imageSize - 20,
+                            height: imageSize - 20,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  (Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? const Color(0xFF00FFA3)
+                                          : const Color(0xFF3B82F6))
+                                      .withValues(alpha: .1),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Rotating dashed border effect
+                        Transform.rotate(
+                          angle: _orbController.value * math.pi * 2,
+                          child: CustomPaint(
+                            size: Size(imageSize + 20, imageSize + 20),
+                            painter: _DashedCirclePainter(
+                              color:
+                                  (Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? const Color(0xFF00FFA3)
+                                          : const Color(0xFF3B82F6))
+                                      .withValues(alpha: .15),
+                            ),
+                          ),
+                        ),
+                        // Image
+                        Transform.translate(
+                          offset: Offset(mousePos.dx * 10, mousePos.dy * 10),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/portfolio.png',
+                              width: imageSize,
+                              height: imageSize,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: imageSize,
+                                  height: imageSize,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: const Color(
+                                      0xFF00FFA3,
+                                    ).withValues(alpha: .1),
+                                  ),
+                                  child: const Icon(
+                                    Icons.person,
+                                    size: 80,
+                                    color: Color(0xFF00FFA3),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                // Image
-                ClipOval(
-                  child: Image.asset(
-                    'assests/images/portfolio.png',
-                    width: imageSize,
-                    height: imageSize,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -295,47 +376,81 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
       _TechItem('Firebase', const Color(0xFFFF006E)),
       _TechItem('Provider', const Color(0xFF00D4FF)),
       _TechItem('Bloc', const Color(0xFFFFC107)),
-      _TechItem('UI/UX', const Color(0xFF00FFA3)),
+      _TechItem('UI/UX', const Color(0xFF00D4FF)),
     ];
 
     return Wrap(
-      spacing: 10,
-      runSpacing: 10,
+      spacing: 12,
+      runSpacing: 12,
       alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
-      children: techs.map((tech) => _buildTechChip(tech)).toList(),
+      children: techs.map((tech) => _TechChip(tech: tech)).toList(),
     );
   }
+}
 
-  Widget _buildTechChip(_TechItem tech) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: tech.color.withValues(alpha: .05),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: tech.color.withValues(alpha: .15)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(
-              color: tech.color,
-              shape: BoxShape.circle,
-            ),
+class _TechChip extends StatefulWidget {
+  final _TechItem tech;
+  const _TechChip({required this.tech});
+
+  @override
+  State<_TechChip> createState() => _TechChipState();
+}
+
+class _TechChipState extends State<_TechChip> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        transform: Matrix4.identity()
+          ..scale(_isHovered ? 1.05 : 1.0, _isHovered ? 1.05 : 1.0),
+        decoration: BoxDecoration(
+          color: widget.tech.color.withValues(alpha: _isHovered ? .12 : .05),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: widget.tech.color.withValues(alpha: _isHovered ? .4 : .15),
           ),
-          const SizedBox(width: 8),
-          Text(
-            tech.name,
-            style: GoogleFonts.jetBrainsMono(
-              fontSize: 12,
-              color: tech.color,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 1,
+          boxShadow: _isHovered
+              ? [
+                  BoxShadow(
+                    color: widget.tech.color.withValues(alpha: .15),
+                    blurRadius: 10,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : [],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: widget.tech.color,
+                shape: BoxShape.circle,
+                boxShadow: _isHovered
+                    ? [BoxShadow(color: widget.tech.color, blurRadius: 4)]
+                    : [],
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+            Text(
+              widget.tech.name,
+              style: GoogleFonts.jetBrainsMono(
+                fontSize: 12,
+                color: widget.tech.color,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

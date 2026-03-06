@@ -299,7 +299,11 @@ class _SkillChipState extends State<_SkillChip> {
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 20),
-        margin: const EdgeInsets.symmetric(horizontal: 2),
+        margin: const EdgeInsets.symmetric(horizontal: 6),
+        transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001)
+          ..scale(_isHovered ? 1.08 : 1.0, _isHovered ? 1.08 : 1.0)
+          ..rotateZ(_isHovered ? 0.05 : 0),
         decoration: BoxDecoration(
           color: _isHovered
               ? widget.accentColor.withValues(alpha: .15)
@@ -314,6 +318,15 @@ class _SkillChipState extends State<_SkillChip> {
                       : Colors.black.withValues(alpha: .08)),
           ),
           borderRadius: BorderRadius.circular(12),
+          boxShadow: _isHovered
+              ? [
+                  BoxShadow(
+                    color: widget.accentColor.withValues(alpha: .2),
+                    blurRadius: 15,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : [],
         ),
         child: Center(
           child: Text(

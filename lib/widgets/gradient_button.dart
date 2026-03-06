@@ -47,8 +47,8 @@ class _GradientButtonState extends State<GradientButton> {
             ),
             boxShadow: [
               BoxShadow(
-                color: widget.gradientColors.first.withOpacity(
-                  _isHovered ? 0.6 : 0.3,
+                color: widget.gradientColors.first.withValues(
+                  alpha: _isHovered ? 0.6 : 0.3,
                 ),
                 blurRadius: _isHovered ? 25 : 15,
                 spreadRadius: _isHovered ? 2 : 0,
@@ -119,14 +119,14 @@ class _GlowingIconButtonState extends State<GlowingIconButton> {
             height: widget.size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: widget.color.withOpacity(0.1),
+              color: widget.color.withValues(alpha: 0.1),
               border: Border.all(
-                color: widget.color.withOpacity(_isHovered ? 1.0 : 0.5),
+                color: widget.color.withValues(alpha: _isHovered ? 1.0 : 0.5),
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: widget.color.withOpacity(_isHovered ? 0.5 : 0.2),
+                  color: widget.color.withValues(alpha: _isHovered ? 0.5 : 0.2),
                   blurRadius: _isHovered ? 20 : 10,
                   spreadRadius: _isHovered ? 2 : 0,
                 ),

@@ -333,6 +333,7 @@ class _GlowingEmailButton extends StatefulWidget {
 
 class _GlowingEmailButtonState extends State<_GlowingEmailButton> {
   bool _isHovered = false;
+  Offset _targetTilt = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -343,56 +344,91 @@ class _GlowingEmailButtonState extends State<_GlowingEmailButton> {
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onExit: (_) => setState(() {
+        _isHovered = false;
+        _targetTilt = Offset.zero;
+      }),
+      onHover: (event) {
+        final box = context.findRenderObject() as RenderBox;
+        final size = box.size;
+        setState(() {
+          _targetTilt = Offset(
+            (event.localPosition.dx - size.width / 2) / (size.width / 2),
+            (event.localPosition.dy - size.height / 2) / (size.height / 2),
+          );
+        });
+      },
       cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-          decoration: BoxDecoration(
-            color: _isHovered ? accentColor : accentColor.withValues(alpha: .1),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: accentColor.withValues(
-                alpha: 0.3 + (widget.pulseValue * 0.3),
+      child: TweenAnimationBuilder<Offset>(
+        tween: Tween<Offset>(begin: Offset.zero, end: _targetTilt),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        builder: (context, tilt, child) {
+          return GestureDetector(
+            onTap: widget.onTap,
+            child: Transform(
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.002)
+                ..rotateX(-tilt.dy * 0.2)
+                ..rotateY(tilt.dx * 0.2),
+              alignment: Alignment.center,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 20,
+                ),
+                decoration: BoxDecoration(
+                  color: _isHovered
+                      ? accentColor
+                      : accentColor.withValues(alpha: .1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: accentColor.withValues(
+                      alpha: 0.3 + (widget.pulseValue * 0.3),
+                    ),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: accentColor.withValues(
+                        alpha: _isHovered
+                            ? 0.3
+                            : (0.05 + widget.pulseValue * 0.1),
+                      ),
+                      blurRadius: _isHovered ? 30 : 20,
+                      spreadRadius: _isHovered ? 0 : -5,
+                      offset: Offset(tilt.dx * 5, tilt.dy * 5),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.email_outlined,
+                      color: _isHovered
+                          ? Theme.of(context).scaffoldBackgroundColor
+                          : accentColor,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      "SEND EMAIL",
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: _isHovered
+                            ? Theme.of(context).scaffoldBackgroundColor
+                            : accentColor,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: accentColor.withValues(
-                  alpha: _isHovered ? 0.3 : (0.05 + widget.pulseValue * 0.1),
-                ),
-                blurRadius: _isHovered ? 30 : 20,
-                spreadRadius: _isHovered ? 0 : -5,
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.email_outlined,
-                color: _isHovered
-                    ? Theme.of(context).scaffoldBackgroundColor
-                    : accentColor,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                "SEND EMAIL",
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: _isHovered
-                      ? Theme.of(context).scaffoldBackgroundColor
-                      : accentColor,
-                  letterSpacing: 2,
-                ),
-              ),
-            ],
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -420,61 +456,95 @@ class _SocialButton extends StatefulWidget {
 
 class _SocialButtonState extends State<_SocialButton> {
   bool _isHovered = false;
+  Offset _targetOffset = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onExit: (_) => setState(() {
+        _isHovered = false;
+        _targetOffset = Offset.zero;
+      }),
+      onHover: (event) {
+        final box = context.findRenderObject() as RenderBox;
+        final size = box.size;
+        setState(() {
+          _targetOffset = Offset(
+            (event.localPosition.dx - size.width / 2) / (size.width / 2),
+            (event.localPosition.dy - size.height / 2) / (size.height / 2),
+          );
+        });
+      },
       cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () => widget.onTap(widget.url),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          decoration: BoxDecoration(
-            color: _isHovered
-                ? widget.color.withValues(alpha: .1)
-                : (Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white.withValues(alpha: .03)
-                      : Colors.black.withValues(alpha: .04)),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: _isHovered
-                  ? widget.color.withValues(alpha: .3)
-                  : (Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white.withValues(alpha: .06)
-                        : Colors.black.withValues(alpha: .1)),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                widget.icon,
-                color: _isHovered
-                    ? widget.color
-                    : (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white54
-                          : Colors.black54),
-                size: 18,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                widget.label,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0, end: _isHovered ? 1.0 : 0.0),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        builder: (context, hoverValue, child) {
+          return GestureDetector(
+            onTap: () => widget.onTap(widget.url),
+            child: Transform(
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.005)
+                ..translate(
+                  _targetOffset.dx * 5 * hoverValue,
+                  _targetOffset.dy * 5 * hoverValue,
+                )
+                ..scale(1.0 + (0.05 * hoverValue)),
+              alignment: Alignment.center,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
                   color: _isHovered
-                      ? widget.color
+                      ? widget.color.withValues(alpha: .1)
                       : (Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white54
-                            : Colors.black54),
-                  fontWeight: FontWeight.w500,
+                            ? Colors.white.withValues(alpha: .03)
+                            : Colors.black.withValues(alpha: .04)),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _isHovered
+                        ? widget.color.withValues(alpha: .3)
+                        : (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white.withValues(alpha: .06)
+                              : Colors.black.withValues(alpha: .1)),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      widget.icon,
+                      color: _isHovered
+                          ? widget.color
+                          : (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white54
+                                : Colors.black54),
+                      size: 18,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      widget.label,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: _isHovered
+                            ? widget.color
+                            : (Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white54
+                                  : Colors.black54),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

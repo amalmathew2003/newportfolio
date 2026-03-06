@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:my_portfolio/service/downloadcv.dart';
+import 'package:my_portfolio/widgets/particle_field.dart';
+import 'package:my_portfolio/widgets/wireframe_shape.dart';
 
 class DesktopScreen extends StatefulWidget {
   final VoidCallback? onContactTap;
@@ -16,6 +18,7 @@ class _DesktopScreenState extends State<DesktopScreen>
     with TickerProviderStateMixin {
   late AnimationController _glowController;
   late AnimationController _floatController;
+  Offset _targetMousePosition = Offset.zero;
 
   @override
   void initState() {
@@ -24,6 +27,7 @@ class _DesktopScreenState extends State<DesktopScreen>
       vsync: this,
       duration: const Duration(seconds: 4),
     )..repeat(reverse: true);
+
     _floatController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
@@ -42,81 +46,161 @@ class _DesktopScreenState extends State<DesktopScreen>
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
 
-    return Container(
-      height: size.height,
-      width: double.infinity,
-      padding: EdgeInsets.only(
-        left: isMobile ? 24 : 100,
-        right: isMobile ? 24 : 100,
-        top: 70, // clear the nav bar
-      ),
-      child: Stack(
-        children: [
-          // Floating geometric shapes
-          ..._buildFloatingShapes(size),
-
-          // Main Content
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: isMobile
-                ? CrossAxisAlignment.center
-                : CrossAxisAlignment.start,
-            children: [
-              // Status badge
-              FadeInDown(
-                duration: const Duration(milliseconds: 800),
-                child: _buildStatusBadge(),
-              ),
-
-              SizedBox(height: isMobile ? 20 : 30),
-
-              // Main heading with unique design
-              FadeInUp(
-                duration: const Duration(milliseconds: 1000),
-                delay: const Duration(milliseconds: 200),
-                child: _buildMainHeading(isMobile),
-              ),
-
-              const SizedBox(height: 30),
-
-              // Animated subtitle line
-              FadeInUp(
-                duration: const Duration(milliseconds: 1000),
-                delay: const Duration(milliseconds: 500),
-                child: _buildSubtitle(isMobile),
-              ),
-
-              const SizedBox(height: 40),
-
-              // CTA Buttons
-              FadeInUp(
-                duration: const Duration(milliseconds: 1000),
-                delay: const Duration(milliseconds: 700),
-                child: _buildCTAButtons(isMobile),
-              ),
-
-              const SizedBox(height: 40),
-
-              // Stats row
-              FadeInUp(
-                duration: const Duration(milliseconds: 1000),
-                delay: const Duration(milliseconds: 900),
-                child: _buildStatsRow(isMobile),
-              ),
-            ],
-          ),
-
-          // Scroll indicator at bottom
-          Positioned(
-            bottom: 40,
-            left: 0,
-            right: 0,
-            child: FadeInUp(
-              delay: const Duration(milliseconds: 1500),
-              child: _buildScrollIndicator(),
+    return MouseRegion(
+      onHover: (event) {
+        if (isMobile) return;
+        final center = size / 2;
+        setState(() {
+          _targetMousePosition = Offset(
+            (event.localPosition.dx - center.width) / center.width,
+            (event.localPosition.dy - center.height) / center.height,
+          );
+        });
+      },
+      onExit: (_) {
+        setState(() {
+          _targetMousePosition = Offset.zero;
+        });
+      },
+      child: TweenAnimationBuilder<Offset>(
+        tween: Tween<Offset>(begin: Offset.zero, end: _targetMousePosition),
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeOutCubic,
+        builder: (context, mousePos, child) {
+          return Container(
+            height: size.height,
+            width: double.infinity,
+            padding: EdgeInsets.only(
+              left: isMobile ? 24 : 100,
+              right: isMobile ? 24 : 100,
+              top: 70, // clear the nav bar
             ),
-          ),
-        ],
+            child: Stack(
+              children: [
+                // === INTERACTIVE PARTICLE FIELD (WebGL-style) ===
+                Positioned.fill(
+                  child: ParticleField(
+                    particleCount: isMobile ? 40 : 80,
+                    particleColor:
+                        Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF00FFA3)
+                        : const Color(0xFF3B82F6),
+                    lineColor: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF00FFA3)
+                        : const Color(0xFF3B82F6),
+                    connectionDistance: isMobile ? 100 : 150,
+                  ),
+                ),
+
+                // === 3D WIREFRAME SHAPE (Three.js-style) ===
+                if (!isMobile)
+                  Positioned(
+                    right: size.width * 0.05,
+                    top: size.height * 0.15,
+                    child: FadeInRight(
+                      duration: const Duration(milliseconds: 1500),
+                      delay: const Duration(milliseconds: 100),
+                      child: Opacity(
+                        opacity: Theme.of(context).brightness == Brightness.dark
+                            ? 0.6
+                            : 0.35,
+                        child: Transform(
+                          transform: Matrix4.identity()
+                            ..translate(mousePos.dx * 60, mousePos.dy * 40)
+                            ..rotateZ(mousePos.dx * 0.1),
+                          child: WireframeShape(
+                            size: size.width * 0.3,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF00FFA3)
+                                : const Color(0xFF3B82F6),
+                            glowColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF8B5CF6)
+                                : const Color(0xFFEC4899),
+                            shapeType: ShapeType.icosahedron,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Parallax background layer
+                ..._buildParallaxShapes(size, mousePos),
+
+                // Main Content with Parallax
+                Transform(
+                  transform: Matrix4.identity()
+                    ..translate(mousePos.dx * 20, mousePos.dy * 20)
+                    ..setEntry(3, 2, 0.001) // Perspective
+                    ..rotateX(-mousePos.dy * 0.05)
+                    ..rotateY(mousePos.dx * 0.05),
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: isMobile
+                        ? CrossAxisAlignment.center
+                        : CrossAxisAlignment.start,
+                    children: [
+                      // Status badge
+                      FadeInDown(
+                        duration: const Duration(milliseconds: 800),
+                        child: _buildStatusBadge(),
+                      ),
+
+                      SizedBox(height: isMobile ? 20 : 30),
+
+                      // Main heading with unique design
+                      FadeInUp(
+                        duration: const Duration(milliseconds: 1000),
+                        delay: const Duration(milliseconds: 200),
+                        child: _buildMainHeading(isMobile),
+                      ),
+
+                      const SizedBox(height: 30),
+
+                      // Animated subtitle line
+                      FadeInUp(
+                        duration: const Duration(milliseconds: 1000),
+                        delay: const Duration(milliseconds: 400),
+                        child: _buildSubtitle(isMobile),
+                      ),
+
+                      const SizedBox(height: 40),
+
+                      // CTA Buttons
+                      FadeInUp(
+                        duration: const Duration(milliseconds: 1000),
+                        delay: const Duration(milliseconds: 600),
+                        child: _buildCTAButtons(isMobile),
+                      ),
+
+                      const SizedBox(height: 40),
+
+                      // Stats row
+                      FadeInUp(
+                        duration: const Duration(milliseconds: 1000),
+                        delay: const Duration(milliseconds: 800),
+                        child: _buildStatsRow(isMobile),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Scroll indicator at bottom
+                Positioned(
+                  bottom: 40,
+                  left: 0,
+                  right: 0,
+                  child: FadeInUp(
+                    delay: const Duration(milliseconds: 1200),
+                    child: _buildScrollIndicator(),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -267,6 +351,9 @@ class _DesktopScreenState extends State<DesktopScreen>
             final showCursor = (_glowController.value * 6).floor() % 2 == 0;
             return Row(
               mainAxisSize: isMobile ? MainAxisSize.min : MainAxisSize.max,
+              mainAxisAlignment: isMobile
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.start,
               children: [
                 Container(
                   width: 24,
@@ -412,196 +499,61 @@ class _DesktopScreenState extends State<DesktopScreen>
     );
   }
 
-  List<Widget> _buildFloatingShapes(Size size) {
+  List<Widget> _buildParallaxShapes(Size size, Offset mousePos) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return [
-      // Rotating ring
-      AnimatedBuilder(
-        animation: _floatController,
-        builder: (context, child) {
-          return Positioned(
-            right: size.width * 0.1,
-            top: size.height * 0.2,
-            child: Transform.rotate(
-              angle: _floatController.value * math.pi * 2,
-              child: Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFF00FFA3).withValues(alpha: .15),
-                    width: 1,
-                  ),
-                ),
+      // Interactive floating glass orb
+      Positioned(
+        left: size.width * 0.1,
+        bottom: size.height * 0.1,
+        child: Transform.translate(
+          offset: Offset(mousePos.dx * -50, mousePos.dy * -50),
+          child: Container(
+            width: 150,
+            height: 150,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  (isDark ? const Color(0xFF00FFA3) : const Color(0xFF3B82F6))
+                      .withValues(alpha: .15),
+                  Colors.transparent,
+                ],
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
-      AnimatedBuilder(
-        animation: _floatController,
-        builder: (context, child) {
-          return Positioned(
-            right: size.width * 0.5,
-            top: size.height * 0.2,
-            child: Transform.rotate(
-              angle: _floatController.value * math.pi * 2,
-              child: Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color:
-                        (Theme.of(context).brightness == Brightness.dark
-                                ? const Color(0xFF00FFA3)
-                                : const Color(0xFF96805D))
-                            .withValues(alpha: .15),
-                    width: 1,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-
-      // Floating diamond
-      AnimatedBuilder(
-        animation: _floatController,
-        builder: (context, child) {
-          return Positioned(
-            right: size.width * 0.25,
-            bottom: size.height * 0.25,
-            child: Transform.translate(
-              offset: Offset(
-                0,
-                math.sin(_floatController.value * math.pi * 2) * 20,
-              ),
-              child: Transform.rotate(
-                angle: math.pi / 4,
+      // Floating glass ring
+      Positioned(
+        right: size.width * 0.2,
+        top: size.height * 0.2,
+        child: Transform.translate(
+          offset: Offset(mousePos.dx * 30, mousePos.dy * 30),
+          child: AnimatedBuilder(
+            animation: _floatController,
+            builder: (context, child) {
+              return Transform.rotate(
+                angle: _floatController.value * math.pi * 2,
                 child: Container(
-                  width: 16,
-                  height: 16,
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
+                    shape: BoxShape.circle,
                     border: Border.all(
                       color:
-                          (Theme.of(context).brightness == Brightness.dark
+                          (isDark
                                   ? const Color(0xFF8B5CF6)
-                                  : const Color(0xFF96805D))
-                              .withValues(alpha: .3),
+                                  : const Color(0xFFEC4899))
+                              .withValues(alpha: .25),
                       width: 1,
                     ),
                   ),
                 ),
-              ),
-            ),
-          );
-        },
-      ),
-
-      // Small dot cluster
-      AnimatedBuilder(
-        animation: _floatController,
-        builder: (context, child) {
-          return Positioned(
-            left: size.width * 0.2,
-            top: size.height * 0.15,
-            child: Transform.translate(
-              offset: Offset(
-                math.cos(_floatController.value * math.pi * 2) * 10,
-                math.sin(_floatController.value * math.pi * 2) * 15,
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 4,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color:
-                          (Theme.of(context).brightness == Brightness.dark
-                                  ? const Color(0xFFFF006E)
-                                  : const Color(0xFF96805D))
-                              .withValues(alpha: .4),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color:
-                          (Theme.of(context).brightness == Brightness.dark
-                                  ? const Color(0xFF00FFA3)
-                                  : const Color(0xFF111111))
-                              .withValues(alpha: .3),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    width: 3,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color:
-                          (Theme.of(context).brightness == Brightness.dark
-                                  ? const Color(0xFF8B5CF6)
-                                  : const Color(0xFF96805D))
-                              .withValues(alpha: .4),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-      AnimatedBuilder(
-        animation: _floatController,
-        builder: (context, child) {
-          return Positioned(
-            left: size.width * 0.6,
-            top: size.height * 0.15,
-            child: Transform.translate(
-              offset: Offset(
-                math.cos(_floatController.value * math.pi * 2) * 10,
-                math.sin(_floatController.value * math.pi * 2) * 15,
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 4,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFF006E).withValues(alpha: .4),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF00FFA3).withValues(alpha: .3),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    width: 3,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF8B5CF6).withValues(alpha: .4),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
+              );
+            },
+          ),
+        ),
       ),
     ];
   }
@@ -664,6 +616,7 @@ class _NeonButton extends StatefulWidget {
 
 class _NeonButtonState extends State<_NeonButton> {
   bool _isHovered = false;
+  Offset _magneticOffset = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -674,13 +627,36 @@ class _NeonButtonState extends State<_NeonButton> {
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onExit: (_) => setState(() {
+        _isHovered = false;
+        _magneticOffset = Offset.zero;
+      }),
+      onHover: (event) {
+        final renderBox = context.findRenderObject() as RenderBox;
+        final size = renderBox.size;
+        final center = Offset(size.width / 2, size.height / 2);
+
+        // Calculate relative offset from center (-1 to 1)
+        final relativeOffset = Offset(
+          (event.localPosition.dx - center.dx) / (size.width / 2),
+          (event.localPosition.dy - center.dy) / (size.height / 2),
+        );
+
+        setState(() {
+          _magneticOffset = relativeOffset;
+        });
+      },
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 200),
           curve: Curves.easeOut,
+          transform: Matrix4.identity()
+            ..translate(_magneticOffset.dx * 8, _magneticOffset.dy * 8)
+            ..setEntry(3, 2, 0.002) // Perspective
+            ..rotateX(-_magneticOffset.dy * 0.1)
+            ..rotateY(_magneticOffset.dx * 0.1),
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
           decoration: BoxDecoration(
             color: widget.isPrimary
@@ -702,10 +678,13 @@ class _NeonButtonState extends State<_NeonButton> {
             boxShadow: _isHovered && widget.isPrimary
                 ? [
                     BoxShadow(
-                      color: accentColor.withValues(alpha: .3),
-                      blurRadius: 20,
-                      spreadRadius: -5,
-                      offset: const Offset(0, 5),
+                      color: accentColor.withValues(alpha: .4),
+                      blurRadius: 25,
+                      spreadRadius: -2,
+                      offset: Offset(
+                        _magneticOffset.dx * 5,
+                        5 + _magneticOffset.dy * 5,
+                      ),
                     ),
                   ]
                 : [],

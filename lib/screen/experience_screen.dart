@@ -187,6 +187,7 @@ class _ExperienceCard extends StatefulWidget {
 
 class _ExperienceCardState extends State<_ExperienceCard> {
   bool _isHovered = false;
+  Offset _targetTiltOffset = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -200,199 +201,237 @@ class _ExperienceCardState extends State<_ExperienceCard> {
       duration: const Duration(milliseconds: 800),
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Timeline
-              Column(
+        onExit: (_) => setState(() {
+          _isHovered = false;
+          _targetTiltOffset = Offset.zero;
+        }),
+        onHover: (event) {
+          if (widget.isMobile) return;
+          final renderBox = context.findRenderObject() as RenderBox;
+          final size = renderBox.size;
+          final center = Offset(size.width / 2, size.height / 2);
+          setState(() {
+            _targetTiltOffset = Offset(
+              (event.localPosition.dx - center.dx) / (size.width / 2),
+              (event.localPosition.dy - center.dy) / (size.height / 2),
+            );
+          });
+        },
+        child: TweenAnimationBuilder<Offset>(
+          tween: Tween<Offset>(begin: Offset.zero, end: _targetTiltOffset),
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutCubic,
+          builder: (context, tilt, child) {
+            return IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Dot with glow
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    width: 14,
-                    height: 14,
-                    decoration: BoxDecoration(
-                      color: widget.data.isCurrent || _isHovered
-                          ? accentColor
-                          : (Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white.withValues(alpha: .15)
-                                : Colors.black.withValues(alpha: .15)),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: accentColor.withValues(alpha: .3),
-                        width: 2,
-                      ),
-                      boxShadow: widget.data.isCurrent || _isHovered
-                          ? [
-                              BoxShadow(
-                                color: accentColor.withValues(alpha: .4),
-                                blurRadius: 12,
-                                spreadRadius: 2,
-                              ),
-                            ]
-                          : [],
-                    ),
-                  ),
-                  // Line
-                  if (!widget.isLast)
-                    Expanded(
-                      child: Container(
-                        width: 1,
+                  // Timeline
+                  Column(
+                    children: [
+                      // Dot with glow
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        width: 14,
+                        height: 14,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              accentColor.withValues(alpha: .3),
-                              isDark
-                                  ? Colors.white.withValues(alpha: .05)
-                                  : Colors.black.withValues(alpha: .05),
-                            ],
+                          color: widget.data.isCurrent || _isHovered
+                              ? accentColor
+                              : (Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white.withValues(alpha: .15)
+                                    : Colors.black.withValues(alpha: .15)),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: accentColor.withValues(alpha: .3),
+                            width: 2,
                           ),
+                          boxShadow: widget.data.isCurrent || _isHovered
+                              ? [
+                                  BoxShadow(
+                                    color: accentColor.withValues(alpha: .4),
+                                    blurRadius: 12,
+                                    spreadRadius: 2,
+                                  ),
+                                ]
+                              : [],
                         ),
                       ),
-                    ),
-                ],
-              ),
-              const SizedBox(width: 30),
-
-              // Card Content
-              Expanded(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  padding: EdgeInsets.all(widget.isMobile ? 24 : 32),
-                  margin: const EdgeInsets.only(bottom: 40),
-                  decoration: BoxDecoration(
-                    color: _isHovered
-                        ? accentColor.withValues(alpha: .03)
-                        : (Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white.withValues(alpha: .02)
-                              : Colors.black.withValues(alpha: .02)),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: _isHovered
-                          ? accentColor.withValues(alpha: .2)
-                          : (Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white.withValues(alpha: .05)
-                                : Colors.black.withValues(alpha: .08)),
-                    ),
+                      // Line
+                      if (!widget.isLast)
+                        Expanded(
+                          child: Container(
+                            width: 1,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  accentColor.withValues(alpha: .3),
+                                  isDark
+                                      ? Colors.white.withValues(alpha: .05)
+                                      : Colors.black.withValues(alpha: .05),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Top row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  const SizedBox(width: 30),
+
+                  // Card Content
+                  Expanded(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      padding: EdgeInsets.all(widget.isMobile ? 24 : 32),
+                      margin: const EdgeInsets.only(bottom: 40),
+                      transform: Matrix4.identity()
+                        ..setEntry(3, 2, 0.001)
+                        ..rotateX(-tilt.dy * 0.05)
+                        ..rotateY(tilt.dx * 0.05),
+                      decoration: BoxDecoration(
+                        color: _isHovered
+                            ? accentColor.withValues(alpha: .04)
+                            : (Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white.withValues(alpha: .02)
+                                  : Colors.black.withValues(alpha: .02)),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: _isHovered
+                              ? accentColor.withValues(alpha: .2)
+                              : (Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white.withValues(alpha: .05)
+                                    : Colors.black.withValues(alpha: .08)),
+                        ),
+                        boxShadow: _isHovered
+                            ? [
+                                BoxShadow(
+                                  color: accentColor.withValues(alpha: .1),
+                                  blurRadius: 20,
+                                  offset: Offset(tilt.dx * 5, 10 + tilt.dy * 5),
+                                ),
+                              ]
+                            : [],
+                      ),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Text(
-                              widget.data.company,
-                              style: GoogleFonts.spaceGrotesk(
-                                fontSize: widget.isMobile ? 22 : 28,
-                                fontWeight: FontWeight.w700,
+                          // Top row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  widget.data.company,
+                                  style: GoogleFonts.spaceGrotesk(
+                                    fontSize: widget.isMobile ? 22 : 28,
+                                    fontWeight: FontWeight.w700,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black87,
+                                  ),
+                                ),
+                              ),
+                              // Period badge
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: accentColor.withValues(alpha: .1),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: accentColor.withValues(alpha: .2),
+                                  ),
+                                ),
+                                child: Text(
+                                  widget.data.period,
+                                  style: GoogleFonts.jetBrainsMono(
+                                    fontSize: 11,
+                                    color: accentColor,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Role
+                          Row(
+                            children: [
+                              Container(
+                                width: 16,
+                                height: 2,
+                                color: accentColor.withValues(alpha: .5),
+                                margin: const EdgeInsets.only(right: 10),
+                              ),
+                              Text(
+                                widget.data.role,
+                                style: GoogleFonts.inter(
+                                  fontSize: 15,
+                                  color: accentColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+
+                          // Location
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 14,
                                 color:
                                     Theme.of(context).brightness ==
                                         Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black87,
+                                    ? Colors.white.withValues(alpha: .3)
+                                    : Colors.black.withValues(alpha: .4),
                               ),
-                            ),
+                              const SizedBox(width: 6),
+                              Text(
+                                widget.data.location,
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white.withValues(alpha: .3)
+                                      : Colors.black.withValues(alpha: .6),
+                                ),
+                              ),
+                            ],
                           ),
-                          // Period badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: accentColor.withValues(alpha: .1),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: accentColor.withValues(alpha: .2),
-                              ),
-                            ),
-                            child: Text(
-                              widget.data.period,
-                              style: GoogleFonts.jetBrainsMono(
-                                fontSize: 11,
-                                color: accentColor,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 1,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
+                          const SizedBox(height: 20),
 
-                      // Role
-                      Row(
-                        children: [
-                          Container(
-                            width: 16,
-                            height: 2,
-                            color: accentColor.withValues(alpha: .5),
-                            margin: const EdgeInsets.only(right: 10),
-                          ),
+                          // Description
                           Text(
-                            widget.data.role,
+                            widget.data.description,
                             style: GoogleFonts.inter(
-                              fontSize: 15,
-                              color: accentColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-
-                      // Location
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.location_on_outlined,
-                            size: 14,
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white.withValues(alpha: .3)
-                                : Colors.black.withValues(alpha: .4),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            widget.data.location,
-                            style: GoogleFonts.inter(
-                              fontSize: 13,
+                              fontSize: 14,
                               color:
                                   Theme.of(context).brightness ==
                                       Brightness.dark
-                                  ? Colors.white.withValues(alpha: .3)
-                                  : Colors.black.withValues(alpha: .6),
+                                  ? Colors.white.withValues(alpha: .5)
+                                  : Colors.black.withValues(alpha: .75),
+                              height: 1.7,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-
-                      // Description
-                      Text(
-                        widget.data.description,
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white.withValues(alpha: .5)
-                              : Colors.black.withValues(alpha: .75),
-                          height: 1.7,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
