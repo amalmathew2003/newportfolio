@@ -157,12 +157,16 @@ class _ExperienceRow extends StatelessWidget {
                 height: 12,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: data.isCurrent ? accentColor : Colors.white12,
+                  color: data.isCurrent ? accentColor : (isDark ? Colors.white12 : Colors.black12),
                   border: Border.all(color: accentColor.withValues(alpha: 0.3), width: 4),
                 ),
               ),
               const SizedBox(height: 10),
-              Container(width: 1, height: 150, color: Colors.white.withValues(alpha: 0.05)),
+              Container(
+                width: 1,
+                height: 150,
+                color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+              ),
             ],
           ),
           

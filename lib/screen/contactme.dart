@@ -141,18 +141,32 @@ class _ContactMeState extends State<ContactMe> {
   Widget _buildFooter(bool isDark, Color accentColor) {
     return Column(
       children: [
-        Container(width: double.infinity, height: 1, color: Colors.white.withValues(alpha: 0.05)),
+        Container(
+          width: double.infinity,
+          height: 1,
+          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+        ),
         const SizedBox(height: 40),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               '© 2026 AMAL MATHEW',
-              style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.white24, letterSpacing: 2),
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                color: isDark ? Colors.white24 : Colors.black26,
+                letterSpacing: 2,
+              ),
             ),
             Text(
               'ENGINEERED BY AMAL',
-              style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w900, color: accentColor, letterSpacing: 2),
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                color: accentColor,
+                letterSpacing: 2,
+              ),
             ),
           ],
         ),
@@ -170,6 +184,7 @@ class _SocialIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () async {
         final Uri uri = Uri.parse(url);
@@ -177,7 +192,11 @@ class _SocialIcon extends StatelessWidget {
       },
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: Icon(icon, color: Colors.white38, size: 24),
+        child: Icon(
+          icon,
+          color: isDark ? Colors.white38 : Colors.black38,
+          size: 24,
+        ),
       ),
     );
   }

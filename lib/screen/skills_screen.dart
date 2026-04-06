@@ -6,14 +6,10 @@ import 'package:my_portfolio/constants/app_colors.dart';
 
 class SkillDetail {
   final String title;
-  final String version;
-  final String status;
   final String performance;
 
   SkillDetail({
     required this.title,
-    required this.version,
-    required this.status,
     required this.performance,
   });
 }
@@ -27,14 +23,18 @@ class SkillsScreen extends StatefulWidget {
 
 class _SkillsScreenState extends State<SkillsScreen> {
   final List<SkillDetail> skills = [
-    SkillDetail(title: "FLUTTER SDK", version: "V3.24.0", status: "CORE", performance: "OPTIMIZED"),
-    SkillDetail(title: "DART LANG", version: "V3.5.0", status: "STABLE", performance: "PEAK"),
-    SkillDetail(title: "FIREBASE", version: "CLOUD", status: "READY", performance: "REALTIME"),
-    SkillDetail(title: "SUPABASE", version: "BaaS", status: "STABLE", performance: "SCALABLE"),
-    SkillDetail(title: "ANDROID SDK", version: "API 34", status: "NATIVE", performance: "HIGH"),
-    SkillDetail(title: "iOS SDK", version: "V17.0", status: "NATIVE", performance: "FLUID"),
-    SkillDetail(title: "REST APIs", version: "JSON", status: "ACTIVE", performance: "SYNC"),
-    SkillDetail(title: "GIT / VCS", version: "CLI", status: "VERIFIED", performance: "SECURE"),
+    SkillDetail(title: "FLUTTER SDK", performance: "OPTIMIZED"),
+    SkillDetail(title: "DART LANG", performance: "PEAK"),
+    SkillDetail(title: "STATE MGMT (BLoC/GETX)", performance: "ARCHITECTED"),
+    SkillDetail(title: "FIREBASE", performance: "REALTIME"),
+    SkillDetail(title: "SUPABASE", performance: "SCALABLE"),
+    SkillDetail(title: "NODE.JS / EXPRESS", performance: "BACKEND"),
+    SkillDetail(title: "POSTGRESQL / MONGODB", performance: "DATA"),
+    SkillDetail(title: "REST APIs / GRAPHQL", performance: "SYNC"),
+    SkillDetail(title: "ANDROID / iOS SDK", performance: "NATIVE"),
+    SkillDetail(title: "GIT / VCS / CI-CD", performance: "SECURE"),
+    SkillDetail(title: "UI DESIGN / FIGMA", performance: "VISUAL"),
+    SkillDetail(title: "UNIT TESTING", performance: "RELIABLE"),
   ];
 
   bool _visible = false;
@@ -162,7 +162,7 @@ class _SkillCardState extends State<_SkillCard> {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: _isHovered 
-            ? widget.accentColor.withValues(alpha: 0.03) 
+            ? widget.accentColor.withValues(alpha: 0.08) 
             : Colors.transparent,
           border: Border.all(
             color: widget.isDark 
@@ -174,34 +174,7 @@ class _SkillCardState extends State<_SkillCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  widget.skill.version,
-                  style: GoogleFonts.jetBrainsMono(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: widget.accentColor.withValues(alpha: 0.5),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: widget.accentColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                  child: Text(
-                    widget.skill.status,
-                    style: GoogleFonts.inter(
-                      fontSize: 8,
-                      fontWeight: FontWeight.w900,
-                      color: widget.accentColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            const SizedBox.shrink(),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

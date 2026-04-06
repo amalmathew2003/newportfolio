@@ -37,24 +37,23 @@ class _DesktopScreenState extends State<DesktopScreen>
       child: Container(
         height: size.height,
         width: double.infinity,
-        color: isDark ? AppColors.charcoal : const Color(0xFFF5F5F5),
+        color: isDark ? AppColors.charcoal : AppColors.techWhite,
         child: Stack(
           children: [
-            // === BACKDROP TEXT (VANITY STYLE) ===
-            Positioned(
-              left: -100,
-              top: size.height * 0.1,
-              child: RotatedBox(
-                quarterTurns: 1,
+            // === BACKDROP TEXT (EDITORIAL STYLE) ===
+            Positioned.fill(
+              child: Padding(
+                padding: EdgeInsets.only(top: size.height * 0.22),
                 child: Opacity(
-                  opacity: 0.03,
+                  opacity: isDark ? 0.03 : 0.08,
                   child: Text(
-                    "VANITY",
+                    "AMAL MATHEW",
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.libreBodoni(
-                      fontSize: size.height * 0.6,
+                      fontSize: isMobile ? 60 : size.width * 0.12,
                       fontWeight: FontWeight.w900,
                       color: isDark ? Colors.white : Colors.black,
-                      letterSpacing: 20,
+                      letterSpacing: 2,
                     ),
                   ),
                 ),
@@ -81,12 +80,12 @@ class _DesktopScreenState extends State<DesktopScreen>
                     ),
                     const SizedBox(height: 40),
                     Text(
-                      "THE LITTLE",
+                      "HI, I AM",
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 10,
-                        color: isDark ? Colors.white38 : Colors.black38,
+                        color: isDark ? Colors.white38 : Colors.black54,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -133,9 +132,15 @@ class _DesktopScreenState extends State<DesktopScreen>
                                 color: accentColor.withValues(alpha: 0.1),
                                 blurRadius: 100,
                                 spreadRadius: -20,
-                              )
+                              ),
                             ]
-                          : [],
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 60,
+                                offset: const Offset(0, 30),
+                              ),
+                            ],
                     ),
                   ),
                 ),
@@ -151,11 +156,21 @@ class _DesktopScreenState extends State<DesktopScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      _MetaItem("STATUS", "AVAILABLE FOR HIRE", accentColor),
+                      _MetaItem(
+                        "STATUS",
+                        "AVAILABLE FOR HIRE",
+                        accentColor,
+                        isDark,
+                      ),
                       const SizedBox(height: 30),
-                      _MetaItem("ROLE", "FLUTTER DEVELOPER", accentColor),
+                      _MetaItem(
+                        "ROLE",
+                        "FLUTTER DEVELOPER",
+                        accentColor,
+                        isDark,
+                      ),
                       const SizedBox(height: 30),
-                      _MetaItem("BASE", "KERALA, INDIA", accentColor),
+                      _MetaItem("BASE", "KERALA, INDIA", accentColor, isDark),
                     ],
                   ),
                 ),
@@ -185,7 +200,8 @@ class _MetaItem extends StatelessWidget {
   final String label;
   final String value;
   final Color accentColor;
-  const _MetaItem(this.label, this.value, this.accentColor);
+  final bool isDark;
+  const _MetaItem(this.label, this.value, this.accentColor, this.isDark);
 
   @override
   Widget build(BuildContext context) {
@@ -194,12 +210,22 @@ class _MetaItem extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: GoogleFonts.inter(fontSize: 8, fontWeight: FontWeight.w900, letterSpacing: 3, color: Colors.white24),
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 9,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 2,
+            color: accentColor.withValues(alpha: 0.6), // Using brand red/charcoal
+          ),
         ),
         const SizedBox(height: 5),
         Text(
           value,
-          style: GoogleFonts.jetBrainsMono(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white70),
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1,
+            color: isDark ? Colors.white : AppColors.charcoal,
+          ),
         ),
       ],
     );
@@ -210,7 +236,11 @@ class _IndustrialButton extends StatefulWidget {
   final String text;
   final VoidCallback onTap;
   final Color accentColor;
-  const _IndustrialButton({required this.text, required this.onTap, required this.accentColor});
+  const _IndustrialButton({
+    required this.text,
+    required this.onTap,
+    required this.accentColor,
+  });
 
   @override
   State<_IndustrialButton> createState() => _IndustrialButtonState();
@@ -221,6 +251,7 @@ class _IndustrialButtonState extends State<_IndustrialButton> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: widget.onTap,
       child: MouseRegion(
@@ -232,7 +263,11 @@ class _IndustrialButtonState extends State<_IndustrialButton> {
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
           decoration: BoxDecoration(
             color: _isHovered ? widget.accentColor : Colors.transparent,
-            border: Border.all(color: _isHovered ? widget.accentColor : Colors.white10),
+            border: Border.all(
+              color: _isHovered
+                  ? widget.accentColor
+                  : (isDark ? Colors.white10 : Colors.black12),
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -243,11 +278,19 @@ class _IndustrialButtonState extends State<_IndustrialButton> {
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 4,
-                  color: _isHovered ? Colors.white : Colors.white54,
+                  color: _isHovered
+                      ? Colors.white
+                      : (isDark ? Colors.white54 : Colors.black54),
                 ),
               ),
               const SizedBox(width: 15),
-              Icon(Icons.arrow_right_alt, color: _isHovered ? Colors.white : Colors.white24, size: 16),
+              Icon(
+                Icons.arrow_right_alt,
+                color: _isHovered
+                    ? Colors.white
+                    : (isDark ? Colors.white24 : Colors.black26),
+                size: 16,
+              ),
             ],
           ),
         ),

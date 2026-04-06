@@ -33,24 +33,23 @@ class ThemeService extends ChangeNotifier {
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.light,
-      scaffoldBackgroundColor: const Color(0xFFF9F7F2), // Linen
+      scaffoldBackgroundColor: const Color(0xFFFBFBFB), // Clinical off-white
       primaryColor: AppColors.charcoal,
       colorScheme: const ColorScheme.light(
         primary: AppColors.charcoal,
-        secondary: Color(0xFF96805D), // Muted Bronze
+        secondary: AppColors.primaryRed, // Use red as accent in light mode too
         surface: Colors.white,
       ),
-      textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme)
-          .copyWith(
-            displayLarge: GoogleFonts.playfairDisplay(
-              color: AppColors.charcoal,
-              fontWeight: FontWeight.w700,
-            ),
-            displayMedium: GoogleFonts.playfairDisplay(
-              color: AppColors.charcoal,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+      textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme).copyWith(
+        displayLarge: GoogleFonts.libreBodoni(
+          color: AppColors.charcoal,
+          fontWeight: FontWeight.w900,
+        ),
+        displayMedium: GoogleFonts.libreBodoni(
+          color: AppColors.charcoal,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
     );
   }
 }

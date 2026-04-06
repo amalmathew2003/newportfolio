@@ -163,7 +163,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
                             height: isActive ? 12 : 6,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: isActive ? accentColor : Colors.white24,
+                              color: isActive ? accentColor : (isDark ? Colors.white24 : Colors.black26),
                               boxShadow: isActive ? [
                                 BoxShadow(
                                   color: accentColor.withValues(alpha: 0.5),

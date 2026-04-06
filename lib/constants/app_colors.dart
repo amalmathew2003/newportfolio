@@ -8,7 +8,7 @@ class AppColors {
   static const primaryRed = Color(0xFFE31837);
   static const charcoal = Color(0xFF111111);
   static const deepGrey = Color(0xFF1A1A1A);
-  static const techWhite = Color(0xFFF5F5F5);
+  static const techWhite = Color(0xFFFBFBFB);
 
   // ─── Dark Theme Backgrounds ───
   static const darkBg = charcoal;
