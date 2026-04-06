@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:my_portfolio/constants/app_colors.dart';
@@ -89,13 +90,16 @@ class _DesktopScreenState extends State<DesktopScreen>
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text(
-                      "AMAL\nMATHEW",
-                      style: GoogleFonts.libreBodoni(
-                        fontSize: isMobile ? 50 : 120,
-                        fontWeight: FontWeight.w900,
-                        height: 0.85,
-                        color: isDark ? Colors.white : Colors.black,
+                    GestureDetector(
+                      onTap: widget.onContactTap,
+                      child: _ShimmerHeader(
+                        text: "AMAL\nMATHEW",
+                        style: GoogleFonts.libreBodoni(
+                          fontSize: isMobile ? 50 : 120,
+                          fontWeight: FontWeight.w900,
+                          height: 0.85,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 60),
@@ -180,11 +184,11 @@ class _DesktopScreenState extends State<DesktopScreen>
             Positioned.fill(
               child: IgnorePointer(
                 child: Opacity(
-                  opacity: 0.02,
-                  child: Image.asset(
-                    'assets/images/noise.png',
-                    repeat: ImageRepeat.repeat,
-                    fit: BoxFit.none,
+                  opacity: 0.03,
+                  child: CustomPaint(
+                    painter: _NoisePainter(
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                   ),
                 ),
               ),
@@ -306,4 +310,84 @@ class _IndustrialButtonState extends State<_IndustrialButton> {
       ),
     );
   }
+}
+class _ShimmerHeader extends StatefulWidget {
+  final String text;
+  final TextStyle style;
+
+  const _ShimmerHeader({required this.text, required this.style});
+
+  @override
+  _ShimmerHeaderState createState() => _ShimmerHeaderState();
+}
+
+class _ShimmerHeaderState extends State<_ShimmerHeader>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return ShaderMask(
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                widget.style.color!,
+                isDark ? Colors.white.withValues(alpha: 0.8) : Colors.black.withValues(alpha: 0.4),
+                widget.style.color!,
+              ],
+              stops: [
+                (_controller.value - 0.3).clamp(0.0, 1.0),
+                _controller.value.clamp(0.0, 1.0),
+                (_controller.value + 0.3).clamp(0.0, 1.0),
+              ],
+            ).createShader(bounds);
+          },
+          child: Text(
+            widget.text,
+            style: widget.style.copyWith(color: Colors.white),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _NoisePainter extends CustomPainter {
+  final Color color;
+  _NoisePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final random = Random(42);
+    final paint = Paint()..color = color.withValues(alpha: 0.1);
+    for (int i = 0; i < 1500; i++) {
+      final x = random.nextDouble() * size.width;
+      final y = random.nextDouble() * size.height;
+      canvas.drawCircle(Offset(x, y), 0.5, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

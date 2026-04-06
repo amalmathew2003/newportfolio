@@ -182,6 +182,7 @@ class _ExperienceRowState extends State<_ExperienceRow> {
                   isCurrent: widget.data.isCurrent,
                   accentColor: widget.accentColor,
                   isDark: widget.isDark,
+                  isHovered: _isHovered, // Linked hover
                 ),
                 const SizedBox(height: 10),
                 Container(
@@ -259,52 +260,43 @@ class _ExperienceRowState extends State<_ExperienceRow> {
   }
 }
 
-class _TimelineDot extends StatefulWidget {
+class _TimelineDot extends StatelessWidget {
   final bool isCurrent;
   final Color accentColor;
   final bool isDark;
+  final bool isHovered;
 
   const _TimelineDot({
     required this.isCurrent,
     required this.accentColor,
     required this.isDark,
+    required this.isHovered,
   });
 
   @override
-  State<_TimelineDot> createState() => _TimelineDotState();
-}
-
-class _TimelineDotState extends State<_TimelineDot> {
-  bool _isHovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        width: _isHovered ? 20 : 12,
-        height: _isHovered ? 20 : 12,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: widget.isCurrent || _isHovered
-              ? widget.accentColor
-              : (widget.isDark ? Colors.white12 : Colors.black12),
-          border: Border.all(
-            color: widget.accentColor.withValues(alpha: _isHovered ? 0.6 : 0.3),
-            width: _isHovered ? 2 : 4,
-          ),
-          boxShadow: _isHovered
-              ? [
-                  BoxShadow(
-                    color: widget.accentColor.withValues(alpha: 0.4),
-                    blurRadius: 15,
-                    spreadRadius: 2,
-                  ),
-                ]
-              : [],
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      width: isHovered ? 18 : 12,
+      height: isHovered ? 18 : 12,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isCurrent || isHovered
+            ? accentColor
+            : (isDark ? Colors.white12 : Colors.black12),
+        border: Border.all(
+          color: accentColor.withValues(alpha: isHovered ? 0.6 : 0.3),
+          width: isHovered ? 2 : 4,
         ),
+        boxShadow: isHovered
+            ? [
+                BoxShadow(
+                  color: accentColor.withValues(alpha: 0.4),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                ),
+              ]
+            : [],
       ),
     );
   }

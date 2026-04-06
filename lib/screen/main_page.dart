@@ -124,24 +124,54 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
           // === CONTENT ===
           MouseRegion(
             onHover: (event) => setState(() => _mousePos = event.localPosition),
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  Container(
-                    key: _sectionKeys[0],
-                    child: DesktopScreen(
-                      onContactTap: () => _scrollToSection(5),
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      Container(
+                        key: _sectionKeys[0],
+                        child: DesktopScreen(
+                          onContactTap: () => _scrollToSection(5),
+                        ),
+                      ),
+                      Container(key: _sectionKeys[1], child: const AboutMe()),
+                      Container(key: _sectionKeys[2], child: const SkillsScreen()),
+                      Container(key: _sectionKeys[3], child: const ExperienceScreen()),
+                      Container(key: _sectionKeys[4], child: const ProjectsScreen()),
+                      Container(key: _sectionKeys[5], child: const ContactMe()),
+                    ],
+                  ),
+                ),
+
+                // === ATMOSPHERIC INTERACTIVE LIGHTING (OVER CONTENT) ===
+                if (!isMobile)
+                  Positioned(
+                    left: _mousePos.dx - 400,
+                    top: _mousePos.dy - 400,
+                    child: IgnorePointer(
+                      child: Container(
+                        width: 800,
+                        height: 800,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            center: Alignment.center,
+                            radius: 0.5,
+                            colors: [
+                              accentColor.withValues(alpha: isDark ? 0.15 : 0.25),
+                              accentColor.withValues(alpha: 0.05),
+                              accentColor.withValues(alpha: 0),
+                            ],
+                            stops: const [0.0, 0.5, 1.0],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  Container(key: _sectionKeys[1], child: const AboutMe()),
-                  Container(key: _sectionKeys[2], child: const SkillsScreen()),
-                  Container(key: _sectionKeys[3], child: const ExperienceScreen()),
-                  Container(key: _sectionKeys[4], child: const ProjectsScreen()),
-                  Container(key: _sectionKeys[5], child: const ContactMe()),
-                ],
-              ),
+              ],
             ),
           ),
 
@@ -192,10 +222,6 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
             right: 0,
             child: _buildTopNav(isMobile, accentColor, isDark),
           ),
-
-          // === GLOBAL MOUSE FOLLOWER (DESKTOP) ===
-          if (!isMobile)
-            _MouseFollower(mousePos: _mousePos, accentColor: accentColor),
         ],
       ),
     );
@@ -436,57 +462,4 @@ class _NoisePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _MouseFollower extends StatelessWidget {
-  final Offset mousePos;
-  final Color accentColor;
-
-  const _MouseFollower({
-    required this.mousePos,
-    required this.accentColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // Lagged Outer Ring (Lagged Circle)
-        AnimatedPositioned(
-          duration: const Duration(milliseconds: 600),
-          curve: Curves.easeOutCubic,
-          left: mousePos.dx - 25,
-          top: mousePos.dy - 25,
-          child: IgnorePointer(
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: accentColor.withValues(alpha: 0.15),
-                  width: 1.5,
-                ),
-              ),
-            ),
-          ),
-        ),
-        // Precise Inner Dot
-        Positioned(
-          left: mousePos.dx - 3,
-          top: mousePos.dy - 3,
-          child: IgnorePointer(
-            child: Container(
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: accentColor.withValues(alpha: 0.4),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
