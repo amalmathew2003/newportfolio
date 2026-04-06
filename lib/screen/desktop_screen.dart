@@ -21,7 +21,7 @@ class _DesktopScreenState extends State<DesktopScreen>
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.charcoal;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
 
     return MouseRegion(
       onHover: (event) {
@@ -221,10 +221,19 @@ class _MetaItem extends StatelessWidget {
         Text(
           value,
           style: GoogleFonts.inter(
-            fontSize: 13,
-            fontWeight: FontWeight.w800,
+            fontSize: 14,
+            fontWeight: FontWeight.w900,
             letterSpacing: 1,
-            color: isDark ? Colors.white : AppColors.charcoal,
+            color: isDark ? Colors.white : Colors.black,
+            shadows: isDark 
+              ? null 
+              : [
+                  Shadow(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    blurRadius: 4,
+                    offset: const Offset(1, 1),
+                  )
+                ],
           ),
         ),
       ],

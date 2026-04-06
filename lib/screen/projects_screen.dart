@@ -46,7 +46,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.charcoal;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
 
     return VisibilityDetector(
       key: const Key('Project-section'),
@@ -116,12 +116,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               child: Column(
                 children: [
                   if (_visible)
-                    ...portfolioProjects.map((project) {
-                      return _ProjectRow(
-                        project: project,
-                        accentColor: accentColor,
-                        isDark: isDark,
-                        onTap: () => _navigateToDetails(context, project),
+                    ...portfolioProjects.asMap().entries.map((entry) {
+                      final project = entry.value;
+                      final index = entry.key;
+                      return FadeInUp(
+                        duration: const Duration(milliseconds: 1000),
+                        delay: Duration(milliseconds: 400 + (index * 150)),
+                        child: _ProjectRow(
+                          project: project,
+                          accentColor: accentColor,
+                          isDark: isDark,
+                          onTap: () => _navigateToDetails(context, project),
+                        ),
                       );
                     }),
                 ],
@@ -156,19 +162,19 @@ class _ProjectRowState extends State<_ProjectRow> {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 900;
+    final size = MediaQuery.of(context).size;
+    final isMobile = size.width < 900;
 
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
-        cursor: SystemMouseCursors.click,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-          margin: const EdgeInsets.only(bottom: 2),
-          padding: EdgeInsets.symmetric(vertical: isMobile ? 20 : 40, horizontal: 0),
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutCubic,
+          padding: EdgeInsets.symmetric(vertical: isMobile ? 25 : 50, horizontal: 0),
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
@@ -176,72 +182,83 @@ class _ProjectRowState extends State<_ProjectRow> {
               ),
             ),
             color: _isHovered 
-              ? widget.accentColor.withValues(alpha: 0.02) 
+              ? widget.accentColor.withValues(alpha: 0.015) 
               : Colors.transparent,
           ),
           child: Row(
             children: [
               // Index
-              Text(
-                widget.project.index,
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  color: _isHovered ? widget.accentColor : Colors.white12,
+              SizedBox(
+                width: isMobile ? 30 : 60,
+                child: Text(
+                  widget.project.index.toString().padLeft(2, '0'),
+                  style: GoogleFonts.spectral( // Using a serif for technical indicators
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    fontStyle: FontStyle.italic,
+                    color: _isHovered ? widget.accentColor : (widget.isDark ? Colors.white24 : Colors.black26),
+                  ),
                 ),
               ),
-              const SizedBox(width: 40),
+              const SizedBox(width: 20),
               
-              // Info
+              // Project Info
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.project.title.toUpperCase(),
-                      style: GoogleFonts.inter(
-                        fontSize: isMobile ? 20 : 40,
-                        fontWeight: FontWeight.w900,
-                        color: _isHovered ? widget.accentColor : (widget.isDark ? Colors.white : Colors.black87),
-                        letterSpacing: -1,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      widget.project.category,
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white24,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                  ],
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 300),
+                  child: Text(
+                    widget.project.title.toUpperCase(),
+                  ),
+                  style: GoogleFonts.libreBodoni(
+                    fontSize: isMobile ? 24 : 48,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                    letterSpacing: _isHovered ? 2 : -1,
+                    color: _isHovered ? widget.accentColor : (widget.isDark ? Colors.white : Colors.black87),
+                  ),
                 ),
               ),
 
+              // Dynamic Preview Image
               if (!isMobile)
-                FadeIn(
-                  duration: const Duration(milliseconds: 300),
-                  animate: _isHovered,
-                  child: Container(
-                    width: 250,
-                    height: 140,
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 400),
+                  opacity: _isHovered ? 1.0 : 0.0,
+                  curve: Curves.easeInOut,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeOutQuint,
+                    width: _isHovered ? 300 : 250,
+                    height: 160,
+                    margin: EdgeInsets.only(right: _isHovered ? 20 : 40),
                     decoration: BoxDecoration(
                       image: widget.project.thumbnailUrls.isNotEmpty 
-                        ? DecorationImage(image: AssetImage(widget.project.thumbnailUrls[0]), fit: BoxFit.cover)
+                        ? DecorationImage(
+                            image: AssetImage(widget.project.thumbnailUrls[0]), 
+                            fit: BoxFit.cover,
+                          )
                         : null,
-                      color: widget.isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black12,
-                      border: Border.all(color: Colors.white10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 30,
+                          offset: const Offset(0, 15),
+                        )
+                      ],
                     ),
                   ),
                 ),
 
-              const SizedBox(width: 40),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 16,
-                color: _isHovered ? widget.accentColor : Colors.white12,
+              // Custom Interaction Marker
+              const SizedBox(width: 20),
+              AnimatedRotation(
+                duration: const Duration(milliseconds: 300),
+                turns: _isHovered ? -0.125 : 0,
+                child: Icon(
+                  Icons.arrow_outward_rounded,
+                  size: 24,
+                  color: _isHovered ? widget.accentColor : (widget.isDark ? Colors.white12 : Colors.black26),
+                ),
               ),
             ],
           ),

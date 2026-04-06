@@ -9,6 +9,8 @@ class AppColors {
   static const charcoal = Color(0xFF111111);
   static const deepGrey = Color(0xFF1A1A1A);
   static const techWhite = Color(0xFFFBFBFB);
+  static const woodBrown = Color(0xFF745131); // Premium Oak
+  static const creamWhite = Color(0xFFF9F7F5); // Warm luxury white
 
   // ─── Dark Theme Backgrounds ───
   static const darkBg = charcoal;
@@ -16,11 +18,11 @@ class AppColors {
 
   // ─── Helpers ───
   static Color accent(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? primaryRed : charcoal;
+    return Theme.of(context).brightness == Brightness.dark ? primaryRed : woodBrown;
   }
 
   static Color headingColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? Colors.white : charcoal;
+    return Theme.of(context).brightness == Brightness.dark ? Colors.white : woodBrown;
   }
 
   static Color mutedText(BuildContext context, {double alpha = 0.5}) {

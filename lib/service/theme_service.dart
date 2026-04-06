@@ -33,20 +33,20 @@ class ThemeService extends ChangeNotifier {
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.light,
-      scaffoldBackgroundColor: const Color(0xFFFBFBFB), // Clinical off-white
-      primaryColor: AppColors.charcoal,
+      scaffoldBackgroundColor: AppColors.creamWhite,
+      primaryColor: AppColors.woodBrown,
       colorScheme: const ColorScheme.light(
-        primary: AppColors.charcoal,
-        secondary: AppColors.primaryRed, // Use red as accent in light mode too
+        primary: AppColors.woodBrown,
+        secondary: AppColors.woodBrown,
         surface: Colors.white,
       ),
       textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme).copyWith(
         displayLarge: GoogleFonts.libreBodoni(
-          color: AppColors.charcoal,
+          color: AppColors.woodBrown,
           fontWeight: FontWeight.w900,
         ),
         displayMedium: GoogleFonts.libreBodoni(
-          color: AppColors.charcoal,
+          color: AppColors.woodBrown,
           fontWeight: FontWeight.w900,
         ),
       ),

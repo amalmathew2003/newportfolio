@@ -40,7 +40,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.charcoal;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
 
     return VisibilityDetector(
       key: const Key('experience-section'),
@@ -98,12 +98,18 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
             const SizedBox(height: 80),
 
             if (_isVisible)
-              ...experiences.map((exp) {
-                return _ExperienceRow(
-                  data: exp,
-                  accentColor: accentColor,
-                  isDark: isDark,
-                  isMobile: isMobile,
+              ...experiences.asMap().entries.map((entry) {
+                final int index = entry.key;
+                final ExperienceData exp = entry.value;
+                return FadeInUp(
+                  duration: const Duration(milliseconds: 1000),
+                  delay: Duration(milliseconds: 300 + (index * 200)),
+                  child: _ExperienceRow(
+                    data: exp,
+                    accentColor: accentColor,
+                    isDark: isDark,
+                    isMobile: isMobile,
+                  ),
                 );
               }),
           ],
@@ -113,7 +119,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
   }
 }
 
-class _ExperienceRow extends StatelessWidget {
+class _ExperienceRow extends StatefulWidget {
   final ExperienceData data;
   final Color accentColor;
   final bool isDark;
@@ -127,92 +133,170 @@ class _ExperienceRow extends StatelessWidget {
   });
 
   @override
+  State<_ExperienceRow> createState() => _ExperienceRowState();
+}
+
+class _ExperienceRowState extends State<_ExperienceRow> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 50),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Year Indicator
-          if (!isMobile)
-            Container(
-              width: 150,
-              padding: const EdgeInsets.only(top: 5),
-              child: Text(
-                data.period,
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  color: accentColor,
-                  letterSpacing: 2,
-                ),
-              ),
-            ),
-          
-          // Bullet & Line
-          Column(
-            children: [
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 400),
+        margin: const EdgeInsets.only(bottom: 50),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: _isHovered 
+            ? widget.accentColor.withValues(alpha: 0.015) 
+            : Colors.transparent,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Year Indicator
+            if (!widget.isMobile)
               Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: data.isCurrent ? accentColor : (isDark ? Colors.white12 : Colors.black12),
-                  border: Border.all(color: accentColor.withValues(alpha: 0.3), width: 4),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                width: 1,
-                height: 150,
-                color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
-              ),
-            ],
-          ),
-          
-          const SizedBox(width: 40),
-          
-          // Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (isMobile)
-                  Text(
-                    data.period,
-                    style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w900, color: accentColor, letterSpacing: 2),
-                  ),
-                const SizedBox(height: 4),
-                Text(
-                  data.company.toUpperCase(),
+                width: 150,
+                padding: const EdgeInsets.only(top: 5),
+                child: Text(
+                  widget.data.period,
                   style: GoogleFonts.inter(
-                    fontSize: isMobile ? 24 : 32,
+                    fontSize: 12,
                     fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : Colors.black87,
-                    letterSpacing: -1,
+                    color: _isHovered ? widget.accentColor : widget.accentColor.withValues(alpha: 0.6),
+                    letterSpacing: 2,
                   ),
                 ),
-                Text(
-                  data.role,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white38 : Colors.black38,
-                  ),
+              ),
+            
+            // Bullet & Line
+            Column(
+              children: [
+                _TimelineDot(
+                  isCurrent: widget.data.isCurrent,
+                  accentColor: widget.accentColor,
+                  isDark: widget.isDark,
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  data.description,
-                  style: GoogleFonts.inter(
-                    fontSize: 15,
-                    color: isDark ? Colors.white54 : Colors.black54,
-                    height: 1.7,
+                const SizedBox(height: 10),
+                Container(
+                  width: 1,
+                  height: widget.isMobile ? 120 : 180,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        widget.accentColor.withValues(alpha: 0.2),
+                        widget.isDark ? Colors.white.withValues(alpha: 0.02) : Colors.black.withValues(alpha: 0.02),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
+            
+            const SizedBox(width: 40),
+            
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.isMobile)
+                    Text(
+                      widget.data.period,
+                      style: GoogleFonts.inter(
+                        fontSize: 10, 
+                        fontWeight: FontWeight.w900, 
+                        color: widget.accentColor, 
+                        letterSpacing: 2
+                      ),
+                    ),
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.data.company.toUpperCase(),
+                    style: GoogleFonts.libreBodoni(
+                      fontSize: widget.isMobile ? 24 : 32,
+                      fontWeight: FontWeight.w900,
+                      color: _isHovered ? widget.accentColor : (widget.isDark ? Colors.white : Colors.black87),
+                      letterSpacing: -1,
+                    ),
+                  ),
+                  Text(
+                    widget.data.role,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: widget.isDark ? Colors.white38 : Colors.black38,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    widget.data.description,
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      color: widget.isDark ? Colors.white54 : Colors.black54,
+                      height: 1.7,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TimelineDot extends StatefulWidget {
+  final bool isCurrent;
+  final Color accentColor;
+  final bool isDark;
+
+  const _TimelineDot({
+    required this.isCurrent,
+    required this.accentColor,
+    required this.isDark,
+  });
+
+  @override
+  State<_TimelineDot> createState() => _TimelineDotState();
+}
+
+class _TimelineDotState extends State<_TimelineDot> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: _isHovered ? 20 : 12,
+        height: _isHovered ? 20 : 12,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: widget.isCurrent || _isHovered 
+            ? widget.accentColor 
+            : (widget.isDark ? Colors.white12 : Colors.black12),
+          border: Border.all(
+            color: widget.accentColor.withValues(alpha: _isHovered ? 0.6 : 0.3), 
+            width: _isHovered ? 2 : 4,
           ),
-        ],
+          boxShadow: _isHovered ? [
+            BoxShadow(
+              color: widget.accentColor.withValues(alpha: 0.4),
+              blurRadius: 15,
+              spreadRadius: 2,
+            )
+          ] : [],
+        ),
       ),
     );
   }

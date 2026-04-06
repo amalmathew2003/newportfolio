@@ -31,7 +31,7 @@ class _ContactMeState extends State<ContactMe> {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.charcoal;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
 
     return VisibilityDetector(
       key: const Key('Contact-me-section'),
@@ -129,11 +129,23 @@ class _ContactMeState extends State<ContactMe> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _SocialIcon(icon: FontAwesomeIcons.linkedin, url: 'https://linkedin.com/in/amal-mathew-1-/', accentColor: accentColor),
+        ZoomIn(
+          duration: const Duration(milliseconds: 600),
+          delay: const Duration(milliseconds: 600),
+          child: _SocialIcon(icon: FontAwesomeIcons.linkedin, url: 'https://linkedin.com/in/amal-mathew-1-/', accentColor: accentColor),
+        ),
         const SizedBox(width: 30),
-        _SocialIcon(icon: FontAwesomeIcons.github, url: 'https://github.com/amalmathew2003', accentColor: accentColor),
+        ZoomIn(
+          duration: const Duration(milliseconds: 600),
+          delay: const Duration(milliseconds: 800),
+          child: _SocialIcon(icon: FontAwesomeIcons.github, url: 'https://github.com/amalmathew2003', accentColor: accentColor),
+        ),
         const SizedBox(width: 30),
-        _SocialIcon(icon: FontAwesomeIcons.instagram, url: 'https://instagram.com/', accentColor: accentColor),
+        ZoomIn(
+          duration: const Duration(milliseconds: 600),
+          delay: const Duration(milliseconds: 1000),
+          child: _SocialIcon(icon: FontAwesomeIcons.instagram, url: 'https://instagram.com/', accentColor: accentColor),
+        ),
       ],
     );
   }

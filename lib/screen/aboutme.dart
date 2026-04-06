@@ -19,7 +19,7 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.charcoal;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
 
     return VisibilityDetector(
       key: const Key('about-me-section'),
@@ -113,7 +113,7 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
         width: isMobile ? 250 : 350,
         height: isMobile ? 300 : 450,
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+          color: isDark ? const Color(0xFF1A1A1A) : AppColors.creamWhite,
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           boxShadow: [
             BoxShadow(

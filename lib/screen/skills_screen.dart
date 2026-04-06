@@ -6,11 +6,11 @@ import 'package:my_portfolio/constants/app_colors.dart';
 
 class SkillDetail {
   final String title;
-  final String performance;
+  final String category;
 
   SkillDetail({
     required this.title,
-    required this.performance,
+    required this.category,
   });
 }
 
@@ -22,20 +22,31 @@ class SkillsScreen extends StatefulWidget {
 }
 
 class _SkillsScreenState extends State<SkillsScreen> {
-  final List<SkillDetail> skills = [
-    SkillDetail(title: "FLUTTER SDK", performance: "OPTIMIZED"),
-    SkillDetail(title: "DART LANG", performance: "PEAK"),
-    SkillDetail(title: "STATE MGMT (BLoC/GETX)", performance: "ARCHITECTED"),
-    SkillDetail(title: "FIREBASE", performance: "REALTIME"),
-    SkillDetail(title: "SUPABASE", performance: "SCALABLE"),
-    SkillDetail(title: "NODE.JS / EXPRESS", performance: "BACKEND"),
-    SkillDetail(title: "POSTGRESQL / MONGODB", performance: "DATA"),
-    SkillDetail(title: "REST APIs / GRAPHQL", performance: "SYNC"),
-    SkillDetail(title: "ANDROID / iOS SDK", performance: "NATIVE"),
-    SkillDetail(title: "GIT / VCS / CI-CD", performance: "SECURE"),
-    SkillDetail(title: "UI DESIGN / FIGMA", performance: "VISUAL"),
-    SkillDetail(title: "UNIT TESTING", performance: "RELIABLE"),
-  ];
+  final Map<String, List<SkillDetail>> categorizedSkills = {
+    "CORE PLATFORMS": [
+      SkillDetail(title: "FLUTTER", category: "MOBILE / WEB SDK"),
+      SkillDetail(title: "DART", category: "PRIMARY LANGUAGE"),
+      SkillDetail(title: "ANDROID", category: "NATIVE STACK"),
+      SkillDetail(title: "iOS", category: "NATIVE STACK"),
+      SkillDetail(title: "WEB", category: "RESPONSIVE DESKTOP"),
+    ],
+    "STATE MANAGEMENT": [
+      SkillDetail(title: "PROVIDER", category: "CORE PATTERN"),
+      SkillDetail(title: "BLoC", category: "ENTERPRISE PATTERN"),
+      SkillDetail(title: "GETX", category: "FAST-TRACK PATTERN"),
+      SkillDetail(title: "RIVERPOD", category: "MODERN PATTERN"),
+    ],
+    "BACKEND & INFRA": [
+      SkillDetail(title: "FIREBASE", category: "BaaS ECOSYSTEM"),
+      SkillDetail(title: "SUPABASE", category: "POSTGRES ECOSYSTEM"),
+      SkillDetail(title: "REST API", category: "CLIENT-SERVER SYNC"),
+    ],
+    "DESIGN & TOOLS": [
+      SkillDetail(title: "FIGMA", category: "PROTOTYPING"),
+      SkillDetail(title: "UI/UX", category: "USER CENTRIC DESIGN"),
+      SkillDetail(title: "GIT", category: "VERSION CONTROL"),
+    ],
+  };
 
   bool _visible = false;
 
@@ -44,7 +55,7 @@ class _SkillsScreenState extends State<SkillsScreen> {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.charcoal;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
 
     return VisibilityDetector(
       key: const Key('skills-section'),
@@ -104,29 +115,56 @@ class _SkillsScreenState extends State<SkillsScreen> {
 
             const SizedBox(height: 80),
 
-            // Skills Grid
             if (_visible)
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: isMobile ? 1 : 4,
-                  crossAxisSpacing: 1,
-                  mainAxisSpacing: 1,
-                  childAspectRatio: isMobile ? 2.5 : 1.5,
-                ),
-                itemCount: skills.length,
-                itemBuilder: (context, index) {
-                  return FadeInUp(
-                    delay: Duration(milliseconds: 100 * index),
-                    child: _SkillCard(
-                      skill: skills[index],
-                      accentColor: accentColor,
-                      isDark: isDark,
-                    ),
-                  );
-                },
-              ),
+              ...categorizedSkills.entries.map((entry) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 60),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            entry.key,
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 3,
+                              color: accentColor.withValues(alpha: 0.8),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 30),
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: isMobile ? 1 : 4,
+                          crossAxisSpacing: 1,
+                          mainAxisSpacing: 1,
+                          childAspectRatio: isMobile ? 3 : 1.8,
+                        ),
+                        itemCount: entry.value.length,
+                        itemBuilder: (context, index) {
+                          return _SkillCard(
+                            skill: entry.value[index],
+                            accentColor: accentColor,
+                            isDark: isDark,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }),
           ],
         ),
       ),
@@ -189,10 +227,12 @@ class _SkillCardState extends State<_SkillCard> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  "PERFORMANCE: ${widget.skill.performance}",
+                  widget.skill.category.toUpperCase(),
                   style: GoogleFonts.jetBrainsMono(
                     fontSize: 9,
-                    color: widget.isDark ? Colors.white24 : Colors.black26,
+                    fontWeight: FontWeight.w500,
+                    color: widget.accentColor.withValues(alpha: 0.6),
+                    letterSpacing: 1,
                   ),
                 ),
               ],
