@@ -42,7 +42,10 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
                 child: _buildSectionHeader(isMobile, accentColor, isDark),
               ),
             SizedBox(height: isMobile ? 60 : 100),
-            if (isMobile) _buildMobileLayout(accentColor, isDark) else _buildDesktopLayout(size, accentColor, isDark),
+            if (isMobile)
+              _buildMobileLayout(accentColor, isDark)
+            else
+              _buildDesktopLayout(size, accentColor, isDark),
           ],
         ),
       ),
@@ -55,7 +58,11 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(width: 40, height: 1, color: accentColor.withValues(alpha: 0.3)),
+            Container(
+              width: 40,
+              height: 1,
+              color: accentColor.withValues(alpha: 0.3),
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -68,12 +75,16 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
                 ),
               ),
             ),
-            Container(width: 40, height: 1, color: accentColor.withValues(alpha: 0.3)),
+            Container(
+              width: 40,
+              height: 1,
+              color: accentColor.withValues(alpha: 0.3),
+            ),
           ],
         ),
         const SizedBox(height: 20),
         Text(
-          'PROFESSIONAL PROFILE',
+          'PROFESSIONAL   PROFILE',
           style: GoogleFonts.libreBodoni(
             fontSize: isMobile ? 32 : 60,
             fontWeight: FontWeight.w900,
@@ -101,7 +112,8 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
       children: [
         if (_visible) _buildProfileImage(accentColor, isDark, false),
         SizedBox(width: size.width * 0.1),
-        if (_visible) Expanded(child: _buildInfoContent(accentColor, isDark, false)),
+        if (_visible)
+          Expanded(child: _buildInfoContent(accentColor, isDark, false)),
       ],
     );
   }
@@ -120,7 +132,7 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
               color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 40,
               offset: const Offset(10, 10),
-            )
+            ),
           ],
         ),
         child: Stack(
@@ -136,7 +148,10 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
               left: 0,
               top: 20,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 color: accentColor,
                 child: Text(
                   'ENGINEERED',
@@ -159,7 +174,9 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
     return FadeInRight(
       duration: const Duration(milliseconds: 1000),
       child: Column(
-        crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+        crossAxisAlignment: isMobile
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -220,22 +237,35 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
       spacing: 40,
       runSpacing: 20,
       alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
-      children: techs.map((t) => Column(
-        crossAxisAlignment: isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-        children: [
-          Container(width: 4, height: 4, decoration: BoxDecoration(shape: BoxShape.circle, color: accentColor)),
-          const SizedBox(height: 8),
-          Text(
-            t,
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2,
-              color: isDark ? Colors.white24 : Colors.black26,
+      children: techs
+          .map(
+            (t) => Column(
+              crossAxisAlignment: isMobile
+                  ? CrossAxisAlignment.center
+                  : CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 4,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: accentColor,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  t,
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2,
+                    color: isDark ? Colors.white24 : Colors.black26,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      )).toList(),
+          )
+          .toList(),
     );
   }
 }

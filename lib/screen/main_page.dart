@@ -38,6 +38,8 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
   ];
   final List<GlobalKey> _sectionKeys = List.generate(6, (_) => GlobalKey());
 
+  Offset _mousePos = Offset.zero;
+
   @override
   void initState() {
     super.initState();
@@ -93,7 +95,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.charcoal;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -120,23 +122,26 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
           ),
 
           // === CONTENT ===
-          SingleChildScrollView(
-            controller: _scrollController,
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                Container(
-                  key: _sectionKeys[0],
-                  child: DesktopScreen(
-                    onContactTap: () => _scrollToSection(5),
+          MouseRegion(
+            onHover: (event) => setState(() => _mousePos = event.localPosition),
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  Container(
+                    key: _sectionKeys[0],
+                    child: DesktopScreen(
+                      onContactTap: () => _scrollToSection(5),
+                    ),
                   ),
-                ),
-                Container(key: _sectionKeys[1], child: const AboutMe()),
-                Container(key: _sectionKeys[2], child: const SkillsScreen()),
-                Container(key: _sectionKeys[3], child: const ExperienceScreen()),
-                Container(key: _sectionKeys[4], child: const ProjectsScreen()),
-                Container(key: _sectionKeys[5], child: const ContactMe()),
-              ],
+                  Container(key: _sectionKeys[1], child: const AboutMe()),
+                  Container(key: _sectionKeys[2], child: const SkillsScreen()),
+                  Container(key: _sectionKeys[3], child: const ExperienceScreen()),
+                  Container(key: _sectionKeys[4], child: const ProjectsScreen()),
+                  Container(key: _sectionKeys[5], child: const ContactMe()),
+                ],
+              ),
             ),
           ),
 
@@ -187,6 +192,10 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
             right: 0,
             child: _buildTopNav(isMobile, accentColor, isDark),
           ),
+
+          // === GLOBAL MOUSE FOLLOWER (DESKTOP) ===
+          if (!isMobile)
+            _MouseFollower(mousePos: _mousePos, accentColor: accentColor),
         ],
       ),
     );
@@ -271,7 +280,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
 
   void _showMobileMenu(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.charcoal;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
     
     showModalBottomSheet(
       context: context,
@@ -379,7 +388,7 @@ class _ThemeToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeService = Provider.of<ThemeService>(context);
     final isDark = themeService.isDarkMode;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.charcoal;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
 
     return GestureDetector(
       onTap: themeService.toggleTheme,
@@ -402,7 +411,7 @@ class _MobileMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.charcoal;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
     return GestureDetector(
       onTap: onTap,
       child: Icon(Icons.menu_rounded, color: accentColor),
@@ -427,4 +436,57 @@ class _NoisePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _MouseFollower extends StatelessWidget {
+  final Offset mousePos;
+  final Color accentColor;
+
+  const _MouseFollower({
+    required this.mousePos,
+    required this.accentColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Lagged Outer Ring (Lagged Circle)
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOutCubic,
+          left: mousePos.dx - 25,
+          top: mousePos.dy - 25,
+          child: IgnorePointer(
+            child: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: accentColor.withValues(alpha: 0.15),
+                  width: 1.5,
+                ),
+              ),
+            ),
+          ),
+        ),
+        // Precise Inner Dot
+        Positioned(
+          left: mousePos.dx - 3,
+          top: mousePos.dy - 3,
+          child: IgnorePointer(
+            child: Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: accentColor.withValues(alpha: 0.4),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

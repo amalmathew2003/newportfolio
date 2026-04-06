@@ -25,7 +25,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
       isCurrent: true,
     ),
     ExperienceData(
-      company: "Luminar Technolab",
+      company: "Luminar  Technolab",
       location: "Kochi, Kerala",
       role: "Flutter Developer Intern",
       period: "2023 - 2024",
@@ -149,9 +149,9 @@ class _ExperienceRowState extends State<_ExperienceRow> {
         margin: const EdgeInsets.only(bottom: 50),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: _isHovered 
-            ? widget.accentColor.withValues(alpha: 0.015) 
-            : Colors.transparent,
+          color: _isHovered
+              ? widget.accentColor.withValues(alpha: 0.015)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Row(
@@ -167,12 +167,14 @@ class _ExperienceRowState extends State<_ExperienceRow> {
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
-                    color: _isHovered ? widget.accentColor : widget.accentColor.withValues(alpha: 0.6),
+                    color: _isHovered
+                        ? widget.accentColor
+                        : widget.accentColor.withValues(alpha: 0.6),
                     letterSpacing: 2,
                   ),
                 ),
               ),
-            
+
             // Bullet & Line
             Column(
               children: [
@@ -191,16 +193,18 @@ class _ExperienceRowState extends State<_ExperienceRow> {
                       end: Alignment.bottomCenter,
                       colors: [
                         widget.accentColor.withValues(alpha: 0.2),
-                        widget.isDark ? Colors.white.withValues(alpha: 0.02) : Colors.black.withValues(alpha: 0.02),
+                        widget.isDark
+                            ? Colors.white.withValues(alpha: 0.02)
+                            : Colors.black.withValues(alpha: 0.02),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
-            
+
             const SizedBox(width: 40),
-            
+
             // Content
             Expanded(
               child: Column(
@@ -210,10 +214,10 @@ class _ExperienceRowState extends State<_ExperienceRow> {
                     Text(
                       widget.data.period,
                       style: GoogleFonts.inter(
-                        fontSize: 10, 
-                        fontWeight: FontWeight.w900, 
-                        color: widget.accentColor, 
-                        letterSpacing: 2
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        color: widget.accentColor,
+                        letterSpacing: 2,
                       ),
                     ),
                   const SizedBox(height: 4),
@@ -222,7 +226,9 @@ class _ExperienceRowState extends State<_ExperienceRow> {
                     style: GoogleFonts.libreBodoni(
                       fontSize: widget.isMobile ? 24 : 32,
                       fontWeight: FontWeight.w900,
-                      color: _isHovered ? widget.accentColor : (widget.isDark ? Colors.white : Colors.black87),
+                      color: _isHovered
+                          ? widget.accentColor
+                          : (widget.isDark ? Colors.white : Colors.black87),
                       letterSpacing: -1,
                     ),
                   ),
@@ -282,20 +288,22 @@ class _TimelineDotState extends State<_TimelineDot> {
         height: _isHovered ? 20 : 12,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: widget.isCurrent || _isHovered 
-            ? widget.accentColor 
-            : (widget.isDark ? Colors.white12 : Colors.black12),
+          color: widget.isCurrent || _isHovered
+              ? widget.accentColor
+              : (widget.isDark ? Colors.white12 : Colors.black12),
           border: Border.all(
-            color: widget.accentColor.withValues(alpha: _isHovered ? 0.6 : 0.3), 
+            color: widget.accentColor.withValues(alpha: _isHovered ? 0.6 : 0.3),
             width: _isHovered ? 2 : 4,
           ),
-          boxShadow: _isHovered ? [
-            BoxShadow(
-              color: widget.accentColor.withValues(alpha: 0.4),
-              blurRadius: 15,
-              spreadRadius: 2,
-            )
-          ] : [],
+          boxShadow: _isHovered
+              ? [
+                  BoxShadow(
+                    color: widget.accentColor.withValues(alpha: 0.4),
+                    blurRadius: 15,
+                    spreadRadius: 2,
+                  ),
+                ]
+              : [],
         ),
       ),
     );
