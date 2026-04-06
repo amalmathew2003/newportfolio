@@ -16,7 +16,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
 
   final List<ExperienceData> experiences = [
     ExperienceData(
-      company: "Avanzo Cyber Security Solutions",
+      company: "Avanzo  Cyber  Security  Solutions",
       location: "Thrissur, Kerala",
       role: "Flutter Developer",
       period: "2024 - PRESENT",

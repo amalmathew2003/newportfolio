@@ -21,7 +21,9 @@ class _ContactMeState extends State<ContactMe> {
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Could not open $url")));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Could not open $url")));
       }
     }
   }
@@ -132,19 +134,31 @@ class _ContactMeState extends State<ContactMe> {
         ZoomIn(
           duration: const Duration(milliseconds: 600),
           delay: const Duration(milliseconds: 600),
-          child: _SocialIcon(icon: FontAwesomeIcons.linkedin, url: 'https://linkedin.com/in/amal-mathew-1-/', accentColor: accentColor),
+          child: _SocialIcon(
+            icon: FontAwesomeIcons.linkedin,
+            url: 'https://linkedin.com/in/amal-mathew-1-/',
+            accentColor: accentColor,
+          ),
         ),
         const SizedBox(width: 30),
         ZoomIn(
           duration: const Duration(milliseconds: 600),
           delay: const Duration(milliseconds: 800),
-          child: _SocialIcon(icon: FontAwesomeIcons.github, url: 'https://github.com/amalmathew2003', accentColor: accentColor),
+          child: _SocialIcon(
+            icon: FontAwesomeIcons.github,
+            url: 'https://github.com/amalmathew2003',
+            accentColor: accentColor,
+          ),
         ),
         const SizedBox(width: 30),
         ZoomIn(
           duration: const Duration(milliseconds: 600),
           delay: const Duration(milliseconds: 1000),
-          child: _SocialIcon(icon: FontAwesomeIcons.instagram, url: 'https://instagram.com/', accentColor: accentColor),
+          child: _SocialIcon(
+            icon: FontAwesomeIcons.instagram,
+            url: 'https://instagram.com/',
+            accentColor: accentColor,
+          ),
         ),
       ],
     );
@@ -156,14 +170,16 @@ class _ContactMeState extends State<ContactMe> {
         Container(
           width: double.infinity,
           height: 1,
-          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.black.withValues(alpha: 0.05),
         ),
         const SizedBox(height: 40),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '© 2026 AMAL MATHEW',
+              '© ${DateTime.now().year} AMAL MATHEW',
               style: GoogleFonts.inter(
                 fontSize: 10,
                 fontWeight: FontWeight.w900,
@@ -172,7 +188,7 @@ class _ContactMeState extends State<ContactMe> {
               ),
             ),
             Text(
-              'ENGINEERED BY AMAL',
+              'DEVELOPED BY AMAL MATHEW',
               style: GoogleFonts.inter(
                 fontSize: 10,
                 fontWeight: FontWeight.w900,
@@ -192,7 +208,11 @@ class _SocialIcon extends StatelessWidget {
   final String url;
   final Color accentColor;
 
-  const _SocialIcon({required this.icon, required this.url, required this.accentColor});
+  const _SocialIcon({
+    required this.icon,
+    required this.url,
+    required this.accentColor,
+  });
 
   @override
   Widget build(BuildContext context) {

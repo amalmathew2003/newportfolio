@@ -127,7 +127,7 @@ class _DesktopScreenState extends State<DesktopScreen>
                     height: size.height * 0.7,
                     decoration: BoxDecoration(
                       image: const DecorationImage(
-                        image: AssetImage('assets/images/portfolio1.png'),
+                        image: AssetImage('assets/images/portfolio2.png'),
                         fit: BoxFit.contain,
                       ),
                       boxShadow: isDark

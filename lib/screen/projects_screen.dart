@@ -71,7 +71,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                           Container(width: 30, height: 2, color: accentColor),
                           const SizedBox(width: 15),
                           Text(
-                            'ENGINEERING PORTFOLIO',
+                            'CRAFTED PROJECTS',
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w900,
@@ -95,7 +95,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       duration: const Duration(milliseconds: 1000),
                       delay: const Duration(milliseconds: 200),
                       child: Text(
-                        "PROJECT\nCOLLECTION / 24",
+                        "PROJECT\nCOLLECTION ",
                         style: GoogleFonts.libreBodoni(
                           fontSize: isMobile ? 40 : 80,
                           fontWeight: FontWeight.w900,
@@ -174,16 +174,21 @@ class _ProjectRowState extends State<_ProjectRow> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 400),
           curve: Curves.easeOutCubic,
-          padding: EdgeInsets.symmetric(vertical: isMobile ? 25 : 50, horizontal: 0),
+          padding: EdgeInsets.symmetric(
+            vertical: isMobile ? 25 : 50,
+            horizontal: 0,
+          ),
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: widget.isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+                color: widget.isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.05),
               ),
             ),
-            color: _isHovered 
-              ? widget.accentColor.withValues(alpha: 0.015) 
-              : Colors.transparent,
+            color: _isHovered
+                ? widget.accentColor.withValues(alpha: 0.015)
+                : Colors.transparent,
           ),
           child: Row(
             children: [
@@ -192,29 +197,32 @@ class _ProjectRowState extends State<_ProjectRow> {
                 width: isMobile ? 30 : 60,
                 child: Text(
                   widget.project.index.toString().padLeft(2, '0'),
-                  style: GoogleFonts.spectral( // Using a serif for technical indicators
+                  style: GoogleFonts.spectral(
+                    // Using a serif for technical indicators
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                     fontStyle: FontStyle.italic,
-                    color: _isHovered ? widget.accentColor : (widget.isDark ? Colors.white24 : Colors.black26),
+                    color: _isHovered
+                        ? widget.accentColor
+                        : (widget.isDark ? Colors.white24 : Colors.black26),
                   ),
                 ),
               ),
               const SizedBox(width: 20),
-              
+
               // Project Info
               Expanded(
                 child: AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 300),
-                  child: Text(
-                    widget.project.title.toUpperCase(),
-                  ),
+                  child: Text(widget.project.title.toUpperCase()),
                   style: GoogleFonts.libreBodoni(
                     fontSize: isMobile ? 24 : 48,
                     fontWeight: FontWeight.w900,
                     height: 1,
                     letterSpacing: _isHovered ? 2 : -1,
-                    color: _isHovered ? widget.accentColor : (widget.isDark ? Colors.white : Colors.black87),
+                    color: _isHovered
+                        ? widget.accentColor
+                        : (widget.isDark ? Colors.white : Colors.black87),
                   ),
                 ),
               ),
@@ -232,18 +240,20 @@ class _ProjectRowState extends State<_ProjectRow> {
                     height: 160,
                     margin: EdgeInsets.only(right: _isHovered ? 20 : 40),
                     decoration: BoxDecoration(
-                      image: widget.project.thumbnailUrls.isNotEmpty 
-                        ? DecorationImage(
-                            image: AssetImage(widget.project.thumbnailUrls[0]), 
-                            fit: BoxFit.cover,
-                          )
-                        : null,
+                      image: widget.project.thumbnailUrls.isNotEmpty
+                          ? DecorationImage(
+                              image: AssetImage(
+                                widget.project.thumbnailUrls[0],
+                              ),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.2),
                           blurRadius: 30,
                           offset: const Offset(0, 15),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -257,7 +267,9 @@ class _ProjectRowState extends State<_ProjectRow> {
                 child: Icon(
                   Icons.arrow_outward_rounded,
                   size: 24,
-                  color: _isHovered ? widget.accentColor : (widget.isDark ? Colors.white12 : Colors.black26),
+                  color: _isHovered
+                      ? widget.accentColor
+                      : (widget.isDark ? Colors.white12 : Colors.black26),
                 ),
               ),
             ],

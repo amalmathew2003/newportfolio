@@ -139,7 +139,7 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
           children: [
             Positioned.fill(
               child: Image.asset(
-                'assets/images/portfolio.png', // Reusing the asset
+                'assets/images/portfolio4.png', // Reusing the asset
                 fit: BoxFit.cover,
                 opacity: const AlwaysStoppedAnimation(0.9),
               ),
@@ -154,7 +154,7 @@ class _AboutMeState extends State<AboutMe> with SingleTickerProviderStateMixin {
                 ),
                 color: accentColor,
                 child: Text(
-                  'ENGINEERED',
+                  'DEVELOPER',
                   style: GoogleFonts.inter(
                     fontSize: 8,
                     fontWeight: FontWeight.w900,
