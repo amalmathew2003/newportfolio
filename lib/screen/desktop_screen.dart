@@ -127,7 +127,7 @@ class _DesktopScreenState extends State<DesktopScreen>
                     height: size.height * 0.7,
                     decoration: BoxDecoration(
                       image: const DecorationImage(
-                        image: AssetImage('assets/images/portfolio.png'),
+                        image: AssetImage('assets/images/portfolio1.png'),
                         fit: BoxFit.contain,
                       ),
                       boxShadow: isDark
@@ -218,7 +218,9 @@ class _MetaItem extends StatelessWidget {
             fontSize: 9,
             fontWeight: FontWeight.w900,
             letterSpacing: 2,
-            color: accentColor.withValues(alpha: 0.6), // Using brand red/charcoal
+            color: accentColor.withValues(
+              alpha: 0.6,
+            ), // Using brand red/charcoal
           ),
         ),
         const SizedBox(height: 5),
@@ -229,15 +231,15 @@ class _MetaItem extends StatelessWidget {
             fontWeight: FontWeight.w900,
             letterSpacing: 1,
             color: isDark ? Colors.white : Colors.black,
-            shadows: isDark 
-              ? null 
-              : [
-                  Shadow(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    blurRadius: 4,
-                    offset: const Offset(1, 1),
-                  )
-                ],
+            shadows: isDark
+                ? null
+                : [
+                    Shadow(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      blurRadius: 4,
+                      offset: const Offset(1, 1),
+                    ),
+                  ],
           ),
         ),
       ],
@@ -311,6 +313,7 @@ class _IndustrialButtonState extends State<_IndustrialButton> {
     );
   }
 }
+
 class _ShimmerHeader extends StatefulWidget {
   final String text;
   final TextStyle style;
@@ -353,7 +356,9 @@ class _ShimmerHeaderState extends State<_ShimmerHeader>
               end: Alignment.bottomRight,
               colors: [
                 widget.style.color!,
-                isDark ? Colors.white.withValues(alpha: 0.8) : Colors.black.withValues(alpha: 0.4),
+                isDark
+                    ? Colors.white.withValues(alpha: 0.8)
+                    : Colors.black.withValues(alpha: 0.4),
                 widget.style.color!,
               ],
               stops: [
