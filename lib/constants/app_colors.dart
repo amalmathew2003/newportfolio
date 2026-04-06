@@ -1,60 +1,34 @@
 import 'package:flutter/material.dart';
 
-/// Centralized color tokens for the portfolio.
-/// Prevents 50+ hardcoded color literals scattered across files.
+/// Centralized color tokens for the luxury portfolio.
 class AppColors {
   AppColors._();
 
-  // ─── Dark Theme Accent Colors ───
-  static const neonGreen = Color(0xFF00FFA3);
-  static const violet = Color(0xFF8B5CF6);
-  static const pink = Color(0xFFFF006E);
-  static const cyan = Color(0xFF00D4FF);
-  static const amber = Color(0xFFFFC107);
+  // ─── Luxury Theme Colors (Ducati/Bugatti Inspired) ───
+  static const primaryRed = Color(0xFFE31837);
+  static const charcoal = Color(0xFF111111);
+  static const deepGrey = Color(0xFF1A1A1A);
+  static const techWhite = Color(0xFFF5F5F5);
 
   // ─── Dark Theme Backgrounds ───
-  static const darkBg = Color(0xFF0A0A0F);
-  static const darkSurface = Color(0xFF12121A);
-
-  // ─── Light Theme Accent Colors ───
-  static const bronze = Color(0xFF96805D);
-  static const charcoal = Color(0xFF111111);
-  static const blue = Color(0xFF3B82F6);
-  static const lightPink = Color(0xFFEC4899);
-
-  // ─── Light Theme Backgrounds ───
-  static const linen = Color(0xFFF9F7F2);
-
-  // ─── Social Colors ───
-  static const linkedin = Color(0xFF0A66C2);
+  static const darkBg = charcoal;
+  static const darkSurface = deepGrey;
 
   // ─── Helpers ───
-
-  /// Returns the primary accent for the current brightness.
   static Color accent(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? neonGreen : blue;
+    return Theme.of(context).brightness == Brightness.dark ? primaryRed : charcoal;
   }
 
-  /// Returns the secondary accent for the current brightness.
-  static Color secondaryAccent(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? violet : bronze;
-  }
-
-  /// Returns the heading text color for the current brightness.
   static Color headingColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : charcoal;
+    return Theme.of(context).brightness == Brightness.dark ? Colors.white : charcoal;
   }
 
-  /// Returns muted text color for the current brightness.
   static Color mutedText(BuildContext context, {double alpha = 0.5}) {
     return Theme.of(context).brightness == Brightness.dark
         ? Colors.white.withValues(alpha: alpha)
         : Colors.black.withValues(alpha: alpha);
   }
 
-  /// Returns a subtle border color for the current brightness.
   static Color subtleBorder(BuildContext context, {double alpha = 0.08}) {
     return Theme.of(context).brightness == Brightness.dark
         ? Colors.white.withValues(alpha: alpha)

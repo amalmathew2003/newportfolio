@@ -2,6 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:my_portfolio/constants/app_colors.dart';
+
+class SkillDetail {
+  final String title;
+  final String version;
+  final String status;
+  final String performance;
+
+  SkillDetail({
+    required this.title,
+    required this.version,
+    required this.status,
+    required this.performance,
+  });
+}
 
 class SkillsScreen extends StatefulWidget {
   const SkillsScreen({super.key});
@@ -11,25 +26,15 @@ class SkillsScreen extends StatefulWidget {
 }
 
 class _SkillsScreenState extends State<SkillsScreen> {
-  final List<String> row1 = [
-    "FLUTTER",
-    "DART",
-    "FIREBASE",
-    "SUPABASE",
-    "ANDROID",
-    "IOS",
-    "WEB",
-    "UI/UX",
-  ];
-
-  final List<String> row2 = [
-    "PROVIDER",
-    "BLOC",
-    "GETX",
-    "RIVERPOD",
-    "FIGMA",
-    "GIT",
-    "REST API",
+  final List<SkillDetail> skills = [
+    SkillDetail(title: "FLUTTER SDK", version: "V3.24.0", status: "CORE", performance: "OPTIMIZED"),
+    SkillDetail(title: "DART LANG", version: "V3.5.0", status: "STABLE", performance: "PEAK"),
+    SkillDetail(title: "FIREBASE", version: "CLOUD", status: "READY", performance: "REALTIME"),
+    SkillDetail(title: "SUPABASE", version: "BaaS", status: "STABLE", performance: "SCALABLE"),
+    SkillDetail(title: "ANDROID SDK", version: "API 34", status: "NATIVE", performance: "HIGH"),
+    SkillDetail(title: "iOS SDK", version: "V17.0", status: "NATIVE", performance: "FLUID"),
+    SkillDetail(title: "REST APIs", version: "JSON", status: "ACTIVE", performance: "SYNC"),
+    SkillDetail(title: "GIT / VCS", version: "CLI", status: "VERIFIED", performance: "SECURE"),
   ];
 
   bool _visible = false;
@@ -38,256 +43,113 @@ class _SkillsScreenState extends State<SkillsScreen> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.charcoal;
 
     return VisibilityDetector(
       key: const Key('skills-section'),
       onVisibilityChanged: (info) {
         if (info.visibleFraction > 0.1 && !_visible) {
-          setState(() {
-            _visible = true;
-          });
+          setState(() => _visible = true);
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 120),
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 24 : 100,
+          vertical: isMobile ? 80 : 150,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Section Header
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: isMobile ? 24 : 100),
-              child: _visible
-                  ? FadeInUp(
-                      duration: const Duration(milliseconds: 800),
-                      child: _buildSectionHeader(isMobile),
-                    )
-                  : const SizedBox.shrink(),
-            ),
+            if (_visible)
+              FadeInUp(
+                duration: const Duration(milliseconds: 800),
+                child: Row(
+                  children: [
+                    Container(width: 30, height: 2, color: accentColor),
+                    const SizedBox(width: 15),
+                    Text(
+                      'CORE COMPETENCIES',
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 4,
+                        color: isDark ? Colors.white38 : Colors.black38,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
 
             // Big title
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: isMobile ? 24 : 100),
-              child: _visible
-                  ? FadeInUp(
-                      duration: const Duration(milliseconds: 1000),
-                      delay: const Duration(milliseconds: 200),
-                      child: Text(
-                        "MY\nSKILLS",
-                        style: Theme.of(context).brightness == Brightness.dark
-                            ? GoogleFonts.spaceGrotesk(
-                                fontSize: isMobile ? 50 : 100,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                height: 0.9,
-                                letterSpacing: -3,
-                              )
-                            : GoogleFonts.playfairDisplay(
-                                fontSize: isMobile ? 50 : 100,
-                                fontWeight: FontWeight.w900,
-                                color: const Color(0xFF111111),
-                                height: 0.95,
-                                letterSpacing: -2,
-                              ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
+            if (_visible)
+              FadeInUp(
+                duration: const Duration(milliseconds: 1000),
+                delay: const Duration(milliseconds: 200),
+                child: Text(
+                  "TECHNICAL\nSTACK",
+                  style: GoogleFonts.libreBodoni(
+                    fontSize: isMobile ? 40 : 80,
+                    fontWeight: FontWeight.w900,
+                    color: isDark ? Colors.white : Colors.black87,
+                    height: 0.9,
+                    letterSpacing: -4,
+                  ),
+                ),
+              ),
 
             const SizedBox(height: 80),
 
-            // Scrolling marquee rows
-            if (_visible) ...[
-              _InfiniteScrollBand(
-                items: row1,
-                speed: 30,
-                isReverse: false,
-                accentColor: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFF00FFA3)
-                    : const Color(0xFF111111).withValues(alpha: .7),
+            // Skills Grid
+            if (_visible)
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: isMobile ? 1 : 4,
+                  crossAxisSpacing: 1,
+                  mainAxisSpacing: 1,
+                  childAspectRatio: isMobile ? 2.5 : 1.5,
+                ),
+                itemCount: skills.length,
+                itemBuilder: (context, index) {
+                  return FadeInUp(
+                    delay: Duration(milliseconds: 100 * index),
+                    child: _SkillCard(
+                      skill: skills[index],
+                      accentColor: accentColor,
+                      isDark: isDark,
+                    ),
+                  );
+                },
               ),
-              const SizedBox(height: 4),
-              _InfiniteScrollBand(
-                items: row2,
-                speed: 30,
-                isReverse: true,
-                accentColor: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFF8B5CF6)
-                    : const Color(0xFF96805D).withValues(alpha: .8),
-              ),
-            ],
           ],
         ),
       ),
     );
   }
-
-  Widget _buildSectionHeader(bool isMobile) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color:
-                  (Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF8B5CF6)
-                          : const Color(0xFF96805D))
-                      .withValues(alpha: .3),
-            ),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Text(
-            '02',
-            style: GoogleFonts.jetBrainsMono(
-              fontSize: 12,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF8B5CF6)
-                  : const Color(0xFF96805D),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Container(
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  (Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF8B5CF6)
-                          : const Color(0xFFEC4899))
-                      .withValues(alpha: .3),
-                  Colors.transparent,
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Text(
-          'SKILLS',
-          style: GoogleFonts.spaceGrotesk(
-            fontSize: isMobile ? 12 : 14,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white54
-                : Colors.black54,
-            letterSpacing: 4,
-          ),
-        ),
-      ],
-    );
-  }
 }
 
-// === Infinite Scrolling Band ===
-class _InfiniteScrollBand extends StatefulWidget {
-  final List<String> items;
-  final double speed;
-  final bool isReverse;
+class _SkillCard extends StatefulWidget {
+  final SkillDetail skill;
   final Color accentColor;
+  final bool isDark;
 
-  const _InfiniteScrollBand({
-    required this.items,
-    this.speed = 50,
-    this.isReverse = false,
+  const _SkillCard({
+    required this.skill,
     required this.accentColor,
+    required this.isDark,
   });
 
   @override
-  State<_InfiniteScrollBand> createState() => _InfiniteScrollBandState();
+  State<_SkillCard> createState() => _SkillCardState();
 }
 
-class _InfiniteScrollBandState extends State<_InfiniteScrollBand>
-    with SingleTickerProviderStateMixin {
-  late ScrollController _scrollController;
-  late AnimationController _animController;
-  double _offset = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1), // placeholder, runs forever
-    )..addListener(_tick);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.isReverse && _scrollController.hasClients) {
-        _offset = _scrollController.position.maxScrollExtent;
-        _scrollController.jumpTo(_offset);
-      }
-      _animController.repeat();
-    });
-  }
-
-  void _tick() {
-    if (!_scrollController.hasClients) return;
-
-    if (widget.isReverse) {
-      _offset -= 0.8;
-      if (_offset <= 0) {
-        _offset = _scrollController.position.maxScrollExtent;
-      }
-    } else {
-      _offset += 0.8;
-      if (_offset >= _scrollController.position.maxScrollExtent) {
-        _offset = 0;
-      }
-    }
-    _scrollController.jumpTo(_offset);
-  }
-
-  @override
-  void dispose() {
-    _animController.dispose();
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final displayList = [
-      ...widget.items,
-      ...widget.items,
-      ...widget.items,
-      ...widget.items,
-      ...widget.items,
-    ];
-
-    return SizedBox(
-      height: 80,
-      child: ListView.builder(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: displayList.length,
-        itemBuilder: (context, index) {
-          return _SkillChip(
-            text: displayList[index],
-            accentColor: widget.accentColor,
-          );
-        },
-      ),
-    );
-  }
-}
-
-// === Skill Chip ===
-class _SkillChip extends StatefulWidget {
-  final String text;
-  final Color accentColor;
-  const _SkillChip({required this.text, required this.accentColor});
-
-  @override
-  State<_SkillChip> createState() => _SkillChipState();
-}
-
-class _SkillChipState extends State<_SkillChip> {
+class _SkillCardState extends State<_SkillCard> {
   bool _isHovered = false;
 
   @override
@@ -296,52 +158,73 @@ class _SkillChipState extends State<_SkillChip> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 20),
-        margin: const EdgeInsets.symmetric(horizontal: 6),
-        transform: Matrix4.identity()
-          ..setEntry(3, 2, 0.001)
-          ..scale(_isHovered ? 1.08 : 1.0, _isHovered ? 1.08 : 1.0)
-          ..rotateZ(_isHovered ? 0.05 : 0),
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: _isHovered
-              ? widget.accentColor.withValues(alpha: .15)
-              : (Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white.withValues(alpha: .02)
-                    : Colors.black.withValues(alpha: .03)),
+          color: _isHovered 
+            ? widget.accentColor.withValues(alpha: 0.03) 
+            : Colors.transparent,
           border: Border.all(
-            color: _isHovered
-                ? widget.accentColor.withValues(alpha: .4)
-                : (Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white.withValues(alpha: .06)
-                      : Colors.black.withValues(alpha: .08)),
+            color: widget.isDark 
+              ? Colors.white.withValues(alpha: 0.05) 
+              : Colors.black.withValues(alpha: 0.05),
           ),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: _isHovered
-              ? [
-                  BoxShadow(
-                    color: widget.accentColor.withValues(alpha: .2),
-                    blurRadius: 15,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : [],
         ),
-        child: Center(
-          child: Text(
-            widget.text,
-            style: GoogleFonts.spaceGrotesk(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: _isHovered
-                  ? widget.accentColor
-                  : (Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white.withValues(alpha: .4)
-                        : Colors.black.withValues(alpha: .75)),
-              letterSpacing: 2,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.skill.version,
+                  style: GoogleFonts.jetBrainsMono(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: widget.accentColor.withValues(alpha: 0.5),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: widget.accentColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                  child: Text(
+                    widget.skill.status,
+                    style: GoogleFonts.inter(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w900,
+                      color: widget.accentColor,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.skill.title,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    color: widget.isDark ? Colors.white70 : Colors.black87,
+                    letterSpacing: 1,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  "PERFORMANCE: ${widget.skill.performance}",
+                  style: GoogleFonts.jetBrainsMono(
+                    fontSize: 9,
+                    color: widget.isDark ? Colors.white24 : Colors.black26,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
