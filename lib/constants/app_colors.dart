@@ -1,38 +1,54 @@
 import 'package:flutter/material.dart';
 
-/// Centralized color tokens for the luxury portfolio.
+/// Centralized color tokens for the portfolio.
+/// Dark Mode: Amber & Charcoal (New)
+/// Light Mode: White & Wood (Original)
 class AppColors {
   AppColors._();
 
-  // ─── Luxury Theme Colors (Ducati/Bugatti Inspired) ───
-  static const primaryRed = Color(0xFFE31837);
-  static const charcoal = Color(0xFF111111);
-  static const deepGrey = Color(0xFF1A1A1A);
-  static const techWhite = Color(0xFFFBFBFB);
-  static const woodBrown = Color(0xFF745131); // Premium Oak
-  static const creamWhite = Color(0xFFF9F7F5); // Warm luxury white
+  // ─── Reference Palette (Amber & Black - DARK ONLY) ───
+  static const primaryAmber = Color(0xFFF39C12); 
+  static const deepBlack = Color(0xFF0F0F0F);    
+  static const charcoal = Color(0xFF171717);    
+  
+  // ─── Reference Palette (White & Wood - LIGHT ONLY) ───
+  static const woodBrown = Color(0xFF745131); 
+  static const creamWhite = Color(0xFFF9F7F5); 
+  static const techWhite = Color(0xFFFFFFFF);
 
-  // ─── Dark Theme Backgrounds ───
-  static const darkBg = charcoal;
-  static const darkSurface = deepGrey;
+  // ─── Logic Adapters ───
+  static Color background(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+      ? deepBlack 
+      : creamWhite;
+  }
 
-  // ─── Helpers ───
   static Color accent(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? primaryRed : woodBrown;
+    return Theme.of(context).brightness == Brightness.dark 
+      ? primaryAmber 
+      : woodBrown;
   }
 
   static Color headingColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? Colors.white : woodBrown;
+    return Theme.of(context).brightness == Brightness.dark 
+      ? Colors.white 
+      : woodBrown;
   }
 
+  // ─── Legacy Aliases ───
+  static const primaryRed = primaryAmber; // Dark Mode Red is now Amber
+  static const deepGrey = charcoal;
+
   static Color mutedText(BuildContext context, {double alpha = 0.5}) {
-    return Theme.of(context).brightness == Brightness.dark
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark
         ? Colors.white.withValues(alpha: alpha)
         : Colors.black.withValues(alpha: alpha);
   }
 
   static Color subtleBorder(BuildContext context, {double alpha = 0.08}) {
-    return Theme.of(context).brightness == Brightness.dark
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark
         ? Colors.white.withValues(alpha: alpha)
         : Colors.black.withValues(alpha: alpha);
   }
