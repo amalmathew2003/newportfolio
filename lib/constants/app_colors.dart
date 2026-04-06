@@ -1,62 +1,54 @@
 import 'package:flutter/material.dart';
 
 /// Centralized color tokens for the portfolio.
-/// Prevents 50+ hardcoded color literals scattered across files.
+/// Dark Mode: Amber & Charcoal (New)
+/// Light Mode: White & Wood (Original)
 class AppColors {
   AppColors._();
 
-  // ─── Dark Theme Accent Colors ───
-  static const neonGreen = Color(0xFF00FFA3);
-  static const violet = Color(0xFF8B5CF6);
-  static const pink = Color(0xFFFF006E);
-  static const cyan = Color(0xFF00D4FF);
-  static const amber = Color(0xFFFFC107);
+  // ─── Reference Palette (Amber & Black - DARK ONLY) ───
+  static const primaryAmber = Color(0xFFF39C12); 
+  static const deepBlack = Color(0xFF0F0F0F);    
+  static const charcoal = Color(0xFF171717);    
+  
+  // ─── Reference Palette (White & Wood - LIGHT ONLY) ───
+  static const woodBrown = Color(0xFF745131); 
+  static const creamWhite = Color(0xFFF9F7F5); 
+  static const techWhite = Color(0xFFFFFFFF);
 
-  // ─── Dark Theme Backgrounds ───
-  static const darkBg = Color(0xFF0A0A0F);
-  static const darkSurface = Color(0xFF12121A);
+  // ─── Logic Adapters ───
+  static Color background(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark 
+      ? deepBlack 
+      : creamWhite;
+  }
 
-  // ─── Light Theme Accent Colors ───
-  static const bronze = Color(0xFF96805D);
-  static const charcoal = Color(0xFF111111);
-  static const blue = Color(0xFF3B82F6);
-  static const lightPink = Color(0xFFEC4899);
-
-  // ─── Light Theme Backgrounds ───
-  static const linen = Color(0xFFF9F7F2);
-
-  // ─── Social Colors ───
-  static const linkedin = Color(0xFF0A66C2);
-
-  // ─── Helpers ───
-
-  /// Returns the primary accent for the current brightness.
   static Color accent(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? neonGreen : blue;
+    return Theme.of(context).brightness == Brightness.dark 
+      ? primaryAmber 
+      : woodBrown;
   }
 
-  /// Returns the secondary accent for the current brightness.
-  static Color secondaryAccent(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? violet : bronze;
-  }
-
-  /// Returns the heading text color for the current brightness.
   static Color headingColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : charcoal;
+    return Theme.of(context).brightness == Brightness.dark 
+      ? Colors.white 
+      : woodBrown;
   }
 
-  /// Returns muted text color for the current brightness.
+  // ─── Legacy Aliases ───
+  static const primaryRed = primaryAmber; // Dark Mode Red is now Amber
+  static const deepGrey = charcoal;
+
   static Color mutedText(BuildContext context, {double alpha = 0.5}) {
-    return Theme.of(context).brightness == Brightness.dark
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark
         ? Colors.white.withValues(alpha: alpha)
         : Colors.black.withValues(alpha: alpha);
   }
 
-  /// Returns a subtle border color for the current brightness.
   static Color subtleBorder(BuildContext context, {double alpha = 0.08}) {
-    return Theme.of(context).brightness == Brightness.dark
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark
         ? Colors.white.withValues(alpha: alpha)
         : Colors.black.withValues(alpha: alpha);
   }

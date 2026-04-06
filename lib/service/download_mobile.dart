@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:my_portfolio/constants/app_colors.dart';
 import 'package:my_portfolio/data/social_links.dart';
 
 Future<void> downloadCVPlatform(BuildContext context) async {
@@ -10,7 +11,7 @@ Future<void> downloadCVPlatform(BuildContext context) async {
     barrierDismissible: false,
     builder: (context) => const Center(
       child: CircularProgressIndicator(
-        color: Color(0xFF00FFA3),
+        color: AppColors.primaryRed,
         strokeWidth: 4,
       ),
     ),

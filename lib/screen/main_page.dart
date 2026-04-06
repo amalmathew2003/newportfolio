@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 import 'package:provider/provider.dart';
+import 'package:my_portfolio/constants/app_colors.dart';
 import 'package:my_portfolio/service/theme_service.dart';
 import 'package:my_portfolio/screen/aboutme.dart';
 import 'package:my_portfolio/screen/contactme.dart';
 import 'package:my_portfolio/screen/projects_screen.dart';
 import 'package:my_portfolio/screen/skills_screen.dart';
 import 'package:my_portfolio/screen/experience_screen.dart';
-import 'package:my_portfolio/widgets/aurora_waves.dart';
 import 'desktop_screen.dart';
 
 class PortfolioScrollablePage extends StatefulWidget {
@@ -25,12 +25,8 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // Single animation controller for subtle background motion
-  late AnimationController _meshController;
-  // Separate lightweight controller for nav pulse
   late AnimationController _pulseController;
 
-  // Navigation
   int _activeSection = 0;
   final List<String> _sectionLabels = [
     'HOME',
@@ -42,15 +38,11 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
   ];
   final List<GlobalKey> _sectionKeys = List.generate(6, (_) => GlobalKey());
 
+  Offset _mousePos = Offset.zero;
+
   @override
   void initState() {
     super.initState();
-    // Single slow controller instead of 3 fast ones
-    _meshController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 30),
-    )..repeat(reverse: true);
-
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -94,319 +86,161 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
   @override
   void dispose() {
     _scrollController.dispose();
-    _meshController.dispose();
     _pulseController.dispose();
     super.dispose();
   }
-
-  Offset _bgMousePos = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: MouseRegion(
-        onHover: (event) {
-          if (isMobile) return;
-          setState(() {
-            _bgMousePos = Offset(
-              (event.position.dx - size.width / 2) / (size.width / 2),
-              (event.position.dy - size.height / 2) / (size.height / 2),
-            );
-          });
-        },
-        child: Stack(
-          children: [
-            // === STATIC MESH GRADIENT BACKGROUND (no per-frame rebuild) ===
-            _buildMeshBackground(size),
-
-            // === AURORA WAVES (flowing northern-light effect) ===
-            Positioned.fill(
-              child: AuroraWaves(
-                colors: Theme.of(context).brightness == Brightness.dark
-                    ? const [
-                        Color(0xFF00FFA3),
-                        Color(0xFF8B5CF6),
-                        Color(0xFFFF006E),
-                        Color(0xFF00D4FF),
-                      ]
-                    : const [
-                        Color(0xFF3B82F6),
-                        Color(0xFFEC4899),
-                        Color(0xFF96805D),
-                        Color(0xFF10B981),
-                      ],
-              ),
+      body: Stack(
+        children: [
+          // === SOLID BACKGROUND ===
+          Positioned.fill(
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
             ),
-
-            // === NOISE TEXTURE OVERLAY (cached, never repaints) ===
-            Positioned.fill(
-              child: RepaintBoundary(
-                child: Opacity(
-                  opacity: 0.03,
-                  child: CustomPaint(
-                    painter: _NoisePainter(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black,
-                    ),
-                    isComplex: true,
-                    willChange: false,
-                  ),
-                ),
-              ),
-            ),
-
-            // === SCAN LINE EFFECT (cached, never repaints) ===
-            Positioned.fill(
-              child: RepaintBoundary(
-                child: Opacity(
-                  opacity: 0.015,
-                  child: CustomPaint(
-                    painter: _ScanLinePainter(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black,
-                    ),
-                    isComplex: true,
-                    willChange: false,
-                  ),
-                ),
-              ),
-            ),
-
-            // === MAIN SCROLLABLE CONTENT ===
-            SingleChildScrollView(
-              controller: _scrollController,
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  Container(
-                    key: _sectionKeys[0],
-                    child: DesktopScreen(
-                      onContactTap: () => _scrollToSection(5),
-                    ),
-                  ),
-                  Container(key: _sectionKeys[1], child: const AboutMe()),
-                  Container(key: _sectionKeys[2], child: const SkillsScreen()),
-                  Container(
-                    key: _sectionKeys[3],
-                    child: const ExperienceScreen(),
-                  ),
-                  Container(
-                    key: _sectionKeys[4],
-                    child: const ProjectsScreen(),
-                  ),
-                  Container(key: _sectionKeys[5], child: const ContactMe()),
-                ],
-              ),
-            ),
-
-            // === FLOATING SIDE NAVIGATION ===
-            if (!isMobile)
-              Positioned(
-                right: 30,
-                top: 0,
-                bottom: 0,
-                child: Center(child: _buildSideNav()),
-              ),
-
-            // === TOP NAVIGATION BAR ===
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: _buildTopNav(isMobile),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMeshBackground(Size size) {
-    return TweenAnimationBuilder<Offset>(
-      tween: Tween<Offset>(begin: Offset.zero, end: _bgMousePos),
-      duration: const Duration(milliseconds: 800),
-      curve: Curves.easeOutCubic,
-      builder: (context, mouse, child) {
-        return RepaintBoundary(
-          child: AnimatedBuilder(
-            animation: _meshController,
-            builder: (context, child) {
-              final v = _meshController.value;
-              return Stack(
-                children: [
-                  Positioned.fill(
-                    child: Container(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                    ),
-                  ),
-
-                  // Blob 1 — Emerald (Follows mouse slightly)
-                  Positioned(
-                    top: -200 + (v * 80) + (mouse.dy * 40),
-                    left: -150 + (v * 60) + (mouse.dx * 60),
-                    child: _MeshBlob(
-                      size: size.width * 0.6,
-                      color: const Color(0xFF00FFA3),
-                      opacity: 0.08,
-                    ),
-                  ),
-
-                  // Blob 2 — Violet
-                  Positioned(
-                    bottom: -300 + ((1 - v) * 50) - (mouse.dy * 30),
-                    right: -200 + ((1 - v) * 80) - (mouse.dx * 50),
-                    child: _MeshBlob(
-                      size: size.width * 0.7,
-                      color: const Color(0xFF8B5CF6),
-                      opacity: 0.06,
-                    ),
-                  ),
-
-                  // Blob 3 — Pink
-                  Positioned(
-                    top: size.height * 0.3 + (mouse.dy * 50),
-                    right: size.width * 0.1 + (mouse.dx * 30),
-                    child: Transform.translate(
-                      offset: Offset(
-                        sin(v * 2 * pi) * 60,
-                        cos(v * 2 * pi) * 40,
-                      ),
-                      child: _MeshBlob(
-                        size: 400,
-                        color: const Color(0xFFFF006E),
-                        opacity: 0.04,
-                      ),
-                    ),
-                  ),
-
-                  // Blob 4 — Cyan
-                  Positioned(
-                    top: size.height * 0.6 - (mouse.dy * 40),
-                    left: size.width * 0.05 - (mouse.dx * 20),
-                    child: Transform.translate(
-                      offset: Offset(
-                        cos(v * 2 * pi) * 40,
-                        sin(v * 2 * pi) * 30,
-                      ),
-                      child: _MeshBlob(
-                        size: 350,
-                        color: const Color(0xFF00D4FF),
-                        opacity: 0.04,
-                      ),
-                    ),
-                  ),
-
-                  Positioned.fill(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
-                      child: Container(color: Colors.transparent),
-                    ),
-                  ),
-                ],
-              );
-            },
           ),
-        );
-      },
-    );
-  }
 
-  Widget _buildSideNav() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.white.withValues(alpha: .03)
-            : Colors.black.withValues(alpha: .03),
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white.withValues(alpha: .05)
-              : Colors.black.withValues(alpha: .05),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: List.generate(_sectionLabels.length, (index) {
-          final isActive = _activeSection == index;
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () => _scrollToSection(index),
-                child: isActive
-                    // Only the active dot animates with the pulse controller
-                    ? AnimatedBuilder(
-                        animation: _pulseController,
-                        builder: (context, child) {
-                          return Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? const Color(0xFF00FFA3)
-                                  : const Color(0xFF3B82F6),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF00FFA3).withValues(
-                                    alpha: 0.3 + (_pulseController.value * 0.3),
-                                  ),
-                                  blurRadius: 12,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      )
-                    // Inactive dots are completely static
-                    : Container(
-                        width: 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white.withValues(alpha: .3)
-                              : Colors.black.withValues(alpha: .3),
+          // === NOISE TEXTURE ===
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.02,
+              child: CustomPaint(
+                painter: _NoisePainter(
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
+            ),
+          ),
+
+          // === CONTENT ===
+          MouseRegion(
+            onHover: (event) => setState(() => _mousePos = event.localPosition),
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      Container(
+                        key: _sectionKeys[0],
+                        child: DesktopScreen(
+                          onContactTap: () => _scrollToSection(5),
                         ),
                       ),
+                      Container(key: _sectionKeys[1], child: const AboutMe()),
+                      Container(key: _sectionKeys[2], child: const SkillsScreen()),
+                      Container(key: _sectionKeys[3], child: const ExperienceScreen()),
+                      Container(key: _sectionKeys[4], child: const ProjectsScreen()),
+                      Container(key: _sectionKeys[5], child: const ContactMe()),
+                    ],
+                  ),
+                ),
+
+                // === ATMOSPHERIC INTERACTIVE LIGHTING (OVER CONTENT) ===
+                if (!isMobile)
+                  Positioned(
+                    left: _mousePos.dx - 400,
+                    top: _mousePos.dy - 400,
+                    child: IgnorePointer(
+                      child: Container(
+                        width: 800,
+                        height: 800,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            center: Alignment.center,
+                            radius: 0.5,
+                            colors: [
+                              accentColor.withValues(alpha: isDark ? 0.15 : 0.25),
+                              accentColor.withValues(alpha: 0.05),
+                              accentColor.withValues(alpha: 0),
+                            ],
+                            stops: const [0.0, 0.5, 1.0],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
+          // === SIDE NAV (DESKTOP) ===
+          if (!isMobile)
+            Positioned(
+              right: 30,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(_sectionLabels.length, (index) {
+                    final isActive = _activeSection == index;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: GestureDetector(
+                        onTap: () => _scrollToSection(index),
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            width: isActive ? 12 : 6,
+                            height: isActive ? 12 : 6,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isActive ? accentColor : (isDark ? Colors.white24 : Colors.black26),
+                              boxShadow: isActive ? [
+                                BoxShadow(
+                                  color: accentColor.withValues(alpha: 0.5),
+                                  blurRadius: 10,
+                                )
+                              ] : [],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
               ),
             ),
-          );
-        }),
+
+          // === TOP NAV ===
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: _buildTopNav(isMobile, accentColor, isDark),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildTopNav(bool isMobile) {
+  Widget _buildTopNav(bool isMobile, Color accentColor, bool isDark) {
     return ClipRRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           padding: EdgeInsets.symmetric(
             horizontal: isMobile ? 20 : 60,
-            vertical: 16,
+            vertical: 20,
           ),
           decoration: BoxDecoration(
-            color: Theme.of(
-              context,
-            ).scaffoldBackgroundColor.withValues(alpha: .7),
+            color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
             border: Border(
               bottom: BorderSide(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white.withValues(alpha: .05)
-                    : Colors.black.withValues(alpha: .05),
+                color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
               ),
             ),
           ),
@@ -417,69 +251,49 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
               Row(
                 children: [
                   Container(
-                    width: 8,
-                    height: 8,
+                    width: 10,
+                    height: 10,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF00FFA3)
-                          : const Color(0xFF96805D), // Bronze
+                      color: accentColor,
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color:
-                              (Theme.of(context).brightness == Brightness.dark
-                                      ? const Color(0xFF00FFA3)
-                                      : const Color(0xFF96805D))
-                                  .withValues(alpha: .5),
-                          blurRadius: 8,
-                        ),
-                      ],
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 12),
                   Text(
-                    'Amal Mathew',
-                    style: Theme.of(context).brightness == Brightness.dark
-                        ? TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 2,
-                          )
-                        : GoogleFonts.playfairDisplay(
-                            color: const Color(0xFF111111),
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.5,
-                          ),
+                    'AMAL MATHEW',
+                    style: GoogleFonts.inter(
+                      color: isDark ? Colors.white : Colors.black87,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 2,
+                    ),
                   ),
                 ],
               ),
-
-              // Nav Links (desktop only)
               if (!isMobile)
                 Row(
                   children: [
                     ...List.generate(_sectionLabels.length, (index) {
                       final isActive = _activeSection == index;
                       return Padding(
-                        padding: const EdgeInsets.only(left: 32),
+                        padding: const EdgeInsets.only(left: 35),
                         child: _NavItem(
                           label: _sectionLabels[index],
                           isActive: isActive,
+                          accentColor: accentColor,
                           onTap: () => _scrollToSection(index),
                         ),
                       );
                     }),
-                    const SizedBox(width: 32),
-                    _ThemeToggle(),
+                    const SizedBox(width: 35),
+                    const _ThemeToggle(),
                   ],
                 ),
               if (isMobile)
                 Row(
                   children: [
-                    _ThemeToggle(),
-                    const SizedBox(width: 8),
+                    const _ThemeToggle(),
+                    const SizedBox(width: 12),
                     _MobileMenuButton(onTap: () => _showMobileMenu(context)),
                   ],
                 ),
@@ -492,84 +306,43 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
 
   void _showMobileMenu(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      isScrollControlled: true,
       builder: (context) {
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF12121A) : const Color(0xFFF9F7F2),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            border: Border(
-              top: BorderSide(
-                color: isDark
-                    ? Colors.white.withValues(alpha: .08)
-                    : Colors.black.withValues(alpha: .08),
-              ),
-            ),
+            color: isDark ? const Color(0xFF111111) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
           ),
-          child: SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Handle bar
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(top: 12, bottom: 24),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: .15)
-                        : Colors.black.withValues(alpha: .15),
-                    borderRadius: BorderRadius.circular(2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white12, borderRadius: BorderRadius.circular(2))),
+              const SizedBox(height: 20),
+              ...List.generate(_sectionLabels.length, (index) {
+                final isActive = _activeSection == index;
+                return ListTile(
+                  title: Text(
+                    _sectionLabels[index],
+                    style: GoogleFonts.inter(
+                      color: isActive ? accentColor : (isDark ? Colors.white70 : Colors.black54),
+                      fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
+                      letterSpacing: 2,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                ...List.generate(_sectionLabels.length, (index) {
-                  final isActive = _activeSection == index;
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 4,
-                    ),
-                    leading: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isActive
-                            ? (isDark
-                                  ? const Color(0xFF00FFA3)
-                                  : const Color(0xFF3B82F6))
-                            : (isDark
-                                  ? Colors.white.withValues(alpha: .2)
-                                  : Colors.black.withValues(alpha: .2)),
-                      ),
-                    ),
-                    title: Text(
-                      _sectionLabels[index],
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 16,
-                        fontWeight: isActive
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                        color: isActive
-                            ? (isDark
-                                  ? const Color(0xFF00FFA3)
-                                  : const Color(0xFF111111))
-                            : (isDark ? Colors.white54 : Colors.black54),
-                        letterSpacing: 3,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _scrollToSection(index);
-                    },
-                  );
-                }),
-                const SizedBox(height: 16),
-              ],
-            ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _scrollToSection(index);
+                  },
+                );
+              }),
+              const SizedBox(height: 30),
+            ],
           ),
         );
       },
@@ -577,47 +350,16 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage>
   }
 }
 
-// === Mesh Blob Widget ===
-class _MeshBlob extends StatelessWidget {
-  final double size;
-  final Color color;
-  final double opacity;
-
-  const _MeshBlob({
-    required this.size,
-    required this.color,
-    required this.opacity,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            color.withValues(alpha: opacity),
-            Colors.transparent,
-          ],
-          center: Alignment.center,
-          radius: 0.7,
-        ),
-      ),
-    );
-  }
-}
-
-// === Nav Item ===
 class _NavItem extends StatefulWidget {
   final String label;
   final bool isActive;
+  final Color accentColor;
   final VoidCallback onTap;
 
   const _NavItem({
     required this.label,
     required this.isActive,
+    required this.accentColor,
     required this.onTap,
   });
 
@@ -626,173 +368,98 @@ class _NavItem extends StatefulWidget {
 }
 
 class _NavItemState extends State<_NavItem> {
-  bool _hovered = false;
+  bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedDefaultTextStyle(
-          duration: const Duration(milliseconds: 200),
-          style: TextStyle(
-            color: widget.isActive
-                ? (Theme.of(context).brightness == Brightness.dark
-                      ? const Color(0xFF00FFA3)
-                      : const Color(0xFF96805D))
-                : _hovered
-                ? (Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : const Color(0xFF111111))
-                : (Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white54
-                      : const Color(0xFF111111).withValues(alpha: .4)),
-            fontSize: 11,
-            fontWeight: widget.isActive ? FontWeight.w700 : FontWeight.w500,
-            letterSpacing: 2,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(widget.label),
-              const SizedBox(height: 4),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: widget.isActive ? 20 : 0,
-                height: 2,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF00FFA3),
-                  borderRadius: BorderRadius.circular(1),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF00FFA3).withValues(alpha: .5),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        cursor: SystemMouseCursors.click,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.label,
+              style: GoogleFonts.inter(
+                color: widget.isActive 
+                  ? widget.accentColor 
+                  : (_isHovered ? (isDark ? Colors.white : Colors.black) : (isDark ? Colors.white38 : Colors.black38)),
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.5,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 4),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: widget.isActive || _isHovered ? 15 : 0,
+              height: 2,
+              color: widget.accentColor,
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-// === Noise Painter (static, seeded) ===
+class _ThemeToggle extends StatelessWidget {
+  const _ThemeToggle();
+
+  @override
+  Widget build(BuildContext context) {
+    final themeService = Provider.of<ThemeService>(context);
+    final isDark = themeService.isDarkMode;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
+
+    return GestureDetector(
+      onTap: themeService.toggleTheme,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Icon(
+          isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+          color: accentColor,
+          size: 20,
+        ),
+      ),
+    );
+  }
+}
+
+class _MobileMenuButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _MobileMenuButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
+    return GestureDetector(
+      onTap: onTap,
+      child: Icon(Icons.menu_rounded, color: accentColor),
+    );
+  }
+}
+
 class _NoisePainter extends CustomPainter {
   final Color color;
   _NoisePainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final random = Random(42); // fixed seed = deterministic
-    final paint = Paint()..color = color;
-    for (int i = 0; i < 500; i++) {
+    final random = Random(42);
+    final paint = Paint()..color = color.withValues(alpha: 0.1);
+    for (int i = 0; i < 1000; i++) {
       final x = random.nextDouble() * size.width;
       final y = random.nextDouble() * size.height;
-      final radius = random.nextDouble() * 1.5;
-      canvas.drawCircle(Offset(x, y), radius, paint);
+      canvas.drawCircle(Offset(x, y), 0.5, paint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _NoisePainter oldDelegate) =>
-      oldDelegate.color != color;
-}
-
-// === Scan Line Painter (static) ===
-class _ScanLinePainter extends CustomPainter {
-  final Color color;
-  _ScanLinePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color.withValues(alpha: 0.5);
-    for (double y = 0; y < size.height; y += 4) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _ScanLinePainter oldDelegate) =>
-      oldDelegate.color != color;
-}
-
-class _ThemeToggle extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final themeService = Provider.of<ThemeService>(context);
-    final isDark = themeService.isDarkMode;
-
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: themeService.toggleTheme,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withValues(alpha: .05)
-                : Colors.black.withValues(alpha: .05),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-            color: isDark ? const Color(0xFF00FFA3) : const Color(0xFF96805D),
-            size: 20,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// === Mobile Menu Button ===
-class _MobileMenuButton extends StatefulWidget {
-  final VoidCallback onTap;
-  const _MobileMenuButton({required this.onTap});
-
-  @override
-  State<_MobileMenuButton> createState() => _MobileMenuButtonState();
-}
-
-class _MobileMenuButtonState extends State<_MobileMenuButton> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: _isHovered
-                ? (isDark
-                      ? Colors.white.withValues(alpha: .1)
-                      : Colors.black.withValues(alpha: .1))
-                : (isDark
-                      ? Colors.white.withValues(alpha: .05)
-                      : Colors.black.withValues(alpha: .05)),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.menu_rounded,
-            color: isDark ? const Color(0xFF00FFA3) : const Color(0xFF111111),
-            size: 20,
-          ),
-        ),
-      ),
-    );
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
