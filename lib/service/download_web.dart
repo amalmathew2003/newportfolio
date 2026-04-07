@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
+import 'package:my_portfolio/constants/app_colors.dart';
 import 'package:my_portfolio/data/social_links.dart';
 
 Future<void> downloadCVPlatform(BuildContext context) async {
@@ -8,7 +9,7 @@ Future<void> downloadCVPlatform(BuildContext context) async {
     context: context,
     barrierDismissible: false,
     builder: (context) => const Center(
-      child: CircularProgressIndicator(color: Color(0xFF00FFA3)),
+      child: CircularProgressIndicator(color: AppColors.primaryRed),
     ),
   );
 
