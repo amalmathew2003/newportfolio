@@ -3,10 +3,15 @@ import 'package:provider/provider.dart';
 import 'package:my_portfolio/screen/main_page.dart';
 import 'package:my_portfolio/service/theme_service.dart';
 
+import 'package:my_portfolio/service/cursor_service.dart';
+
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeService(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeService()),
+        ChangeNotifierProvider(create: (_) => CursorService()),
+      ],
       child: const PortfolioApp(),
     ),
   );

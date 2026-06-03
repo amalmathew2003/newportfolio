@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:my_portfolio/constants/app_colors.dart';
 
 class ThemeService extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.dark;
@@ -18,12 +19,12 @@ class ThemeService extends ChangeNotifier {
   static ThemeData get darkTheme {
     return ThemeData(
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: const Color(0xFF0A0A0F),
-      primaryColor: const Color(0xFF00FFA3),
+      scaffoldBackgroundColor: AppColors.charcoal,
+      primaryColor: AppColors.primaryRed,
       colorScheme: const ColorScheme.dark(
-        primary: Color(0xFF00FFA3),
-        secondary: Color(0xFF8B5CF6),
-        surface: Color(0xFF12121A),
+        primary: AppColors.primaryRed,
+        secondary: Color(0xFFFFFFFF),
+        surface: AppColors.deepGrey,
       ),
       textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
     );
@@ -32,24 +33,23 @@ class ThemeService extends ChangeNotifier {
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.light,
-      scaffoldBackgroundColor: const Color(0xFFF9F7F2), // Linen
-      primaryColor: const Color(0xFF111111), // Charcoal
+      scaffoldBackgroundColor: AppColors.creamWhite,
+      primaryColor: AppColors.woodBrown,
       colorScheme: const ColorScheme.light(
-        primary: Color(0xFF111111),
-        secondary: Color(0xFF96805D), // Muted Bronze
+        primary: AppColors.woodBrown,
+        secondary: AppColors.woodBrown,
         surface: Colors.white,
       ),
-      textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme)
-          .copyWith(
-            displayLarge: GoogleFonts.playfairDisplay(
-              color: const Color(0xFF111111),
-              fontWeight: FontWeight.w700,
-            ),
-            displayMedium: GoogleFonts.playfairDisplay(
-              color: const Color(0xFF111111),
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+      textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme).copyWith(
+        displayLarge: GoogleFonts.libreBodoni(
+          color: AppColors.woodBrown,
+          fontWeight: FontWeight.w900,
+        ),
+        displayMedium: GoogleFonts.libreBodoni(
+          color: AppColors.woodBrown,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
     );
   }
 }
