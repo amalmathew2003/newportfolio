@@ -7,5 +7,5 @@ class SocialLinks {
       'https://www.linkedin.com/in/amal-mathew-1-/';
   static const String githubUrl = 'https://github.com/amalmathew2003';
   static const String cvDownloadUrl =
-      'https://drive.google.com/uc?export=download&id=1KsdjZsEGs80qGyRYwWDUKo5bkkmOTUF0';
+      'https://drive.google.com/uc?export=download&id=1AlWNKivLKhe6ARUisE78amwfgH5cbBvb';
 }
