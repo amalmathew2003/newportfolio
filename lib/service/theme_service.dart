@@ -6,25 +6,25 @@ class ThemeService extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.dark;
 
   ThemeMode get themeMode => _themeMode;
-
   bool get isDarkMode => _themeMode == ThemeMode.dark;
 
   void toggleTheme() {
-    _themeMode = _themeMode == ThemeMode.dark
-        ? ThemeMode.light
-        : ThemeMode.dark;
+    _themeMode =
+        _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
     notifyListeners();
   }
 
   static ThemeData get darkTheme {
     return ThemeData(
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.charcoal,
-      primaryColor: AppColors.primaryRed,
+      scaffoldBackgroundColor: AppColors.pureBlack,
+      primaryColor: AppColors.pureWhite,
+      dividerColor: Colors.white.withValues(alpha: 0.07),
       colorScheme: const ColorScheme.dark(
-        primary: AppColors.primaryRed,
-        secondary: Color(0xFFFFFFFF),
-        surface: AppColors.deepGrey,
+        primary: AppColors.pureWhite,
+        secondary: AppColors.offWhite,
+        surface: AppColors.richBlack,
+        outline: AppColors.charcoal,
       ),
       textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
     );
@@ -33,20 +33,22 @@ class ThemeService extends ChangeNotifier {
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.light,
-      scaffoldBackgroundColor: AppColors.creamWhite,
-      primaryColor: AppColors.woodBrown,
+      scaffoldBackgroundColor: AppColors.nearWhite,
+      primaryColor: AppColors.pureBlack,
+      dividerColor: Colors.black.withValues(alpha: 0.07),
       colorScheme: const ColorScheme.light(
-        primary: AppColors.woodBrown,
-        secondary: AppColors.woodBrown,
-        surface: Colors.white,
+        primary: AppColors.pureBlack,
+        secondary: AppColors.charcoal,
+        surface: AppColors.pureWhite,
+        outline: AppColors.offWhite,
       ),
       textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme).copyWith(
         displayLarge: GoogleFonts.libreBodoni(
-          color: AppColors.woodBrown,
+          color: AppColors.pureBlack,
           fontWeight: FontWeight.w900,
         ),
         displayMedium: GoogleFonts.libreBodoni(
-          color: AppColors.woodBrown,
+          color: AppColors.pureBlack,
           fontWeight: FontWeight.w900,
         ),
       ),

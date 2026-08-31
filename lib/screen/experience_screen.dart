@@ -16,21 +16,21 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
 
   final List<ExperienceData> experiences = [
     ExperienceData(
-      company: "Avanzo  Cyber  Security  Solutions",
-      location: "Thrissur, Kerala",
-      role: "Flutter Developer",
-      period: "2024 - PRESENT",
+      company: 'Avanzo Cyber Security Solutions',
+      location: 'Thrissur, Kerala',
+      role: 'Flutter Developer',
+      period: '2024 — PRESENT',
       description:
-          "Currently leading mobile development for high-security applications. Implementing precision-engineered architectures with high-performance real-time data handling.",
+          'Currently leading mobile development for high-security applications. Implementing precision-engineered architectures with high-performance real-time data handling.',
       isCurrent: true,
     ),
     ExperienceData(
-      company: "Luminar  Technolab",
-      location: "Kochi, Kerala",
-      role: "Flutter Developer Intern",
-      period: "2023 - 2024",
+      company: 'Luminar Technolab',
+      location: 'Kochi, Kerala',
+      role: 'Flutter Developer Intern',
+      period: '2023 — 2024',
       description:
-          "Intensive specialization in high-performance Dart applications and industrial state management patterns including Bloc and Provider.",
+          'Intensive specialization in high-performance Dart applications and industrial state management patterns including Bloc and Provider.',
       isCurrent: false,
     ),
   ];
@@ -40,7 +40,7 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
+    final accentColor = AppColors.accent(context);
 
     return VisibilityDetector(
       key: const Key('experience-section'),
@@ -57,39 +57,41 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Section label
             if (_isVisible)
               FadeInUp(
-                duration: const Duration(milliseconds: 800),
+                duration: const Duration(milliseconds: 700),
                 child: Row(
                   children: [
-                    Container(width: 30, height: 2, color: accentColor),
-                    const SizedBox(width: 15),
+                    Container(width: 28, height: 1.5, color: accentColor.withValues(alpha: 0.5)),
+                    const SizedBox(width: 14),
                     Text(
                       'CAREER TIMELINE',
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 4,
-                        color: isDark ? Colors.white38 : Colors.black38,
+                        color: isDark ? Colors.white.withValues(alpha: 0.30) : Colors.black.withValues(alpha: 0.30),
                       ),
                     ),
                   ],
                 ),
               ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 28),
 
+            // Title
             if (_isVisible)
               FadeInUp(
-                duration: const Duration(milliseconds: 1000),
-                delay: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 900),
+                delay: const Duration(milliseconds: 150),
                 child: Text(
-                  "PROFESSIONAL\nSTAGES",
+                  'PROFESSIONAL\nSTAGES',
                   style: GoogleFonts.libreBodoni(
-                    fontSize: isMobile ? 40 : 80,
+                    fontSize: isMobile ? 42 : 84,
                     fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : Colors.black87,
-                    height: 0.9,
+                    color: isDark ? Colors.white : Colors.black,
+                    height: 0.88,
                     letterSpacing: -4,
                   ),
                 ),
@@ -97,18 +99,20 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
 
             const SizedBox(height: 80),
 
+            // Timeline entries
             if (_isVisible)
               ...experiences.asMap().entries.map((entry) {
-                final int index = entry.key;
-                final ExperienceData exp = entry.value;
+                final index = entry.key;
+                final exp = entry.value;
                 return FadeInUp(
-                  duration: const Duration(milliseconds: 1000),
+                  duration: const Duration(milliseconds: 900),
                   delay: Duration(milliseconds: 300 + (index * 200)),
-                  child: _ExperienceRow(
+                  child: _ExperienceCard(
                     data: exp,
                     accentColor: accentColor,
                     isDark: isDark,
                     isMobile: isMobile,
+                    isLast: index == experiences.length - 1,
                   ),
                 );
               }),
@@ -119,24 +123,28 @@ class _ExperienceScreenState extends State<ExperienceScreen> {
   }
 }
 
-class _ExperienceRow extends StatefulWidget {
+// ─── Experience Card ──────────────────────────────────────────────────────────
+
+class _ExperienceCard extends StatefulWidget {
   final ExperienceData data;
   final Color accentColor;
   final bool isDark;
   final bool isMobile;
+  final bool isLast;
 
-  const _ExperienceRow({
+  const _ExperienceCard({
     required this.data,
     required this.accentColor,
     required this.isDark,
     required this.isMobile,
+    required this.isLast,
   });
 
   @override
-  State<_ExperienceRow> createState() => _ExperienceRowState();
+  State<_ExperienceCard> createState() => _ExperienceCardState();
 }
 
-class _ExperienceRowState extends State<_ExperienceRow> {
+class _ExperienceCardState extends State<_ExperienceCard> {
   bool _isHovered = false;
 
   @override
@@ -144,163 +152,231 @@ class _ExperienceRowState extends State<_ExperienceRow> {
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 400),
-        margin: const EdgeInsets.only(bottom: 50),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: _isHovered
-              ? widget.accentColor.withValues(alpha: 0.015)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Year Indicator
-            if (!widget.isMobile)
-              Container(
-                width: 150,
-                padding: const EdgeInsets.only(top: 5),
-                child: Text(
-                  widget.data.period,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
-                    color: _isHovered
-                        ? widget.accentColor
-                        : widget.accentColor.withValues(alpha: 0.6),
-                    letterSpacing: 2,
-                  ),
-                ),
-              ),
-
-            // Bullet & Line
-            Column(
-              children: [
-                _TimelineDot(
-                  isCurrent: widget.data.isCurrent,
-                  accentColor: widget.accentColor,
-                  isDark: widget.isDark,
-                  isHovered: _isHovered, // Linked hover
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  width: 1,
-                  height: widget.isMobile ? 120 : 180,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        widget.accentColor.withValues(alpha: 0.2),
-                        widget.isDark
-                            ? Colors.white.withValues(alpha: 0.02)
-                            : Colors.black.withValues(alpha: 0.02),
-                      ],
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 0),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Timeline column
+              Column(
+                children: [
+                  // Dot
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: _isHovered ? 16 : 10,
+                    height: _isHovered ? 16 : 10,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: widget.data.isCurrent || _isHovered
+                          ? widget.accentColor
+                          : Colors.transparent,
+                      border: Border.all(
+                        color: _isHovered
+                            ? widget.accentColor
+                            : widget.accentColor.withValues(alpha: 0.35),
+                        width: 1.5,
+                      ),
+                      boxShadow: _isHovered
+                          ? [
+                              BoxShadow(
+                                color: widget.accentColor.withValues(alpha: 0.35),
+                                blurRadius: 14,
+                                spreadRadius: 2,
+                              ),
+                            ]
+                          : [],
                     ),
                   ),
-                ),
-              ],
-            ),
-
-            const SizedBox(width: 40),
-
-            // Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (widget.isMobile)
-                    Text(
-                      widget.data.period,
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        color: widget.accentColor,
-                        letterSpacing: 2,
+                  // Connecting line
+                  if (!widget.isLast)
+                    Expanded(
+                      child: Container(
+                        width: 1,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              widget.accentColor.withValues(alpha: 0.25),
+                              widget.isDark
+                                  ? Colors.white.withValues(alpha: 0.03)
+                                  : Colors.black.withValues(alpha: 0.03),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  const SizedBox(height: 4),
-                  Text(
-                    widget.data.company.toUpperCase(),
-                    style: GoogleFonts.libreBodoni(
-                      fontSize: widget.isMobile ? 24 : 32,
-                      fontWeight: FontWeight.w900,
-                      color: _isHovered
-                          ? widget.accentColor
-                          : (widget.isDark ? Colors.white : Colors.black87),
-                      letterSpacing: -1,
-                    ),
-                  ),
-                  Text(
-                    widget.data.role,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: widget.isDark ? Colors.white38 : Colors.black38,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    widget.data.description,
-                    style: GoogleFonts.inter(
-                      fontSize: 15,
-                      color: widget.isDark ? Colors.white54 : Colors.black54,
-                      height: 1.7,
-                    ),
-                  ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
-class _TimelineDot extends StatelessWidget {
-  final bool isCurrent;
-  final Color accentColor;
-  final bool isDark;
-  final bool isHovered;
+              const SizedBox(width: 36),
 
-  const _TimelineDot({
-    required this.isCurrent,
-    required this.accentColor,
-    required this.isDark,
-    required this.isHovered,
-  });
+              // Content
+              Expanded(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 350),
+                  margin: EdgeInsets.only(bottom: widget.isLast ? 0 : 48),
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: _isHovered
+                        ? AppColors.glassHover(context)
+                        : AppColors.glass(context),
+                    border: Border.all(
+                      color: _isHovered
+                          ? widget.accentColor.withValues(alpha: 0.25)
+                          : AppColors.subtleBorder(context, alpha: 0.08),
+                    ),
+                    boxShadow: _isHovered
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withValues(
+                                alpha: widget.isDark ? 0.25 : 0.06,
+                              ),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
+                            ),
+                          ]
+                        : [],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header row
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Current badge
+                                if (widget.data.isCurrent)
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: widget.accentColor,
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                    child: Text(
+                                      'CURRENT',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 7,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 2.5,
+                                        color: widget.isDark
+                                            ? Colors.black
+                                            : Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                Text(
+                                  widget.data.company,
+                                  style: GoogleFonts.libreBodoni(
+                                    fontSize: widget.isMobile ? 20 : 26,
+                                    fontWeight: FontWeight.w900,
+                                    color: _isHovered
+                                        ? widget.accentColor
+                                        : (widget.isDark
+                                            ? Colors.white
+                                            : Colors.black),
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  widget.data.role,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: widget.isDark
+                                        ? Colors.white.withValues(alpha: 0.35)
+                                        : Colors.black.withValues(alpha: 0.35),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          // Period
+                          Text(
+                            widget.data.period,
+                            style: GoogleFonts.jetBrainsMono(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: _isHovered
+                                  ? widget.accentColor
+                                  : widget.accentColor.withValues(alpha: 0.5),
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ],
+                      ),
 
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      width: isHovered ? 18 : 12,
-      height: isHovered ? 18 : 12,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: isCurrent || isHovered
-            ? accentColor
-            : (isDark ? Colors.white12 : Colors.black12),
-        border: Border.all(
-          color: accentColor.withValues(alpha: isHovered ? 0.6 : 0.3),
-          width: isHovered ? 2 : 4,
-        ),
-        boxShadow: isHovered
-            ? [
-                BoxShadow(
-                  color: accentColor.withValues(alpha: 0.4),
-                  blurRadius: 15,
-                  spreadRadius: 2,
+                      const SizedBox(height: 16),
+
+                      Container(
+                        height: 1,
+                        color: AppColors.subtleBorder(context, alpha: 0.07),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      Text(
+                        widget.data.description,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: widget.isDark
+                              ? Colors.white.withValues(alpha: 0.45)
+                              : Colors.black.withValues(alpha: 0.45),
+                          height: 1.75,
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // Location chip
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: 11,
+                            color: widget.isDark
+                                ? Colors.white.withValues(alpha: 0.25)
+                                : Colors.black.withValues(alpha: 0.25),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            widget.data.location,
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: widget.isDark
+                                  ? Colors.white.withValues(alpha: 0.25)
+                                  : Colors.black.withValues(alpha: 0.25),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ]
-            : [],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
+
+// ─── Data Model ───────────────────────────────────────────────────────────────
 
 class ExperienceData {
   final String company;

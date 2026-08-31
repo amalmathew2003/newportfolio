@@ -46,7 +46,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
+    final accentColor = AppColors.accent(context);
 
     return VisibilityDetector(
       key: const Key('Project-section'),
@@ -60,23 +60,23 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Section Header
+            // Section label
             Padding(
               padding: EdgeInsets.symmetric(horizontal: isMobile ? 24 : 100),
               child: _visible
                   ? FadeInUp(
-                      duration: const Duration(milliseconds: 800),
+                      duration: const Duration(milliseconds: 700),
                       child: Row(
                         children: [
-                          Container(width: 30, height: 2, color: accentColor),
-                          const SizedBox(width: 15),
+                          Container(width: 28, height: 1.5, color: accentColor.withValues(alpha: 0.5)),
+                          const SizedBox(width: 14),
                           Text(
                             'CRAFTED PROJECTS',
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 4,
-                              color: isDark ? Colors.white38 : Colors.black38,
+                              color: isDark ? Colors.white.withValues(alpha: 0.30) : Colors.black.withValues(alpha: 0.30),
                             ),
                           ),
                         ],
@@ -85,22 +85,22 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   : const SizedBox.shrink(),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 28),
 
-            // Main Title
+            // Title
             Padding(
               padding: EdgeInsets.symmetric(horizontal: isMobile ? 24 : 100),
               child: _visible
                   ? FadeInUp(
-                      duration: const Duration(milliseconds: 1000),
-                      delay: const Duration(milliseconds: 200),
+                      duration: const Duration(milliseconds: 900),
+                      delay: const Duration(milliseconds: 150),
                       child: Text(
-                        "PROJECT\nCOLLECTION ",
+                        'PROJECT\nCOLLECTION',
                         style: GoogleFonts.libreBodoni(
-                          fontSize: isMobile ? 40 : 80,
+                          fontSize: isMobile ? 42 : 84,
                           fontWeight: FontWeight.w900,
-                          color: isDark ? Colors.white : Colors.black87,
-                          height: 0.9,
+                          color: isDark ? Colors.white : Colors.black,
+                          height: 0.88,
                           letterSpacing: -4,
                         ),
                       ),
@@ -108,31 +108,25 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   : const SizedBox.shrink(),
             ),
 
-            const SizedBox(height: 80),
+            const SizedBox(height: 60),
 
-            // Projects List
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: isMobile ? 24 : 100),
-              child: Column(
-                children: [
-                  if (_visible)
-                    ...portfolioProjects.asMap().entries.map((entry) {
-                      final project = entry.value;
-                      final index = entry.key;
-                      return FadeInUp(
-                        duration: const Duration(milliseconds: 1000),
-                        delay: Duration(milliseconds: 400 + (index * 150)),
-                        child: _ProjectRow(
-                          project: project,
-                          accentColor: accentColor,
-                          isDark: isDark,
-                          onTap: () => _navigateToDetails(context, project),
-                        ),
-                      );
-                    }),
-                ],
-              ),
-            ),
+            // Project rows
+            if (_visible)
+              ...portfolioProjects.asMap().entries.map((entry) {
+                final project = entry.value;
+                final index = entry.key;
+                return FadeInUp(
+                  duration: const Duration(milliseconds: 800),
+                  delay: Duration(milliseconds: 300 + (index * 120)),
+                  child: _ProjectRow(
+                    project: project,
+                    accentColor: accentColor,
+                    isDark: isDark,
+                    isMobile: isMobile,
+                    onTap: () => _navigateToDetails(context, project),
+                  ),
+                );
+              }),
           ],
         ),
       ),
@@ -140,16 +134,20 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   }
 }
 
+// ─── Project Row ──────────────────────────────────────────────────────────────
+
 class _ProjectRow extends StatefulWidget {
   final ProjectData project;
   final Color accentColor;
   final bool isDark;
+  final bool isMobile;
   final VoidCallback onTap;
 
   const _ProjectRow({
     required this.project,
     required this.accentColor,
     required this.isDark,
+    required this.isMobile,
     required this.onTap,
   });
 
@@ -162,9 +160,6 @@ class _ProjectRowState extends State<_ProjectRow> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isMobile = size.width < 900;
-
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -172,104 +167,141 @@ class _ProjectRowState extends State<_ProjectRow> {
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 400),
+          duration: const Duration(milliseconds: 350),
           curve: Curves.easeOutCubic,
           padding: EdgeInsets.symmetric(
-            vertical: isMobile ? 25 : 50,
-            horizontal: 0,
+            vertical: widget.isMobile ? 24 : 42,
+            horizontal: widget.isMobile ? 24 : 100,
           ),
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: widget.isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.black.withValues(alpha: 0.05),
+                color: AppColors.subtleBorder(context, alpha: 0.08),
               ),
             ),
             color: _isHovered
-                ? widget.accentColor.withValues(alpha: 0.015)
+                ? AppColors.glass(context)
                 : Colors.transparent,
           ),
           child: Row(
             children: [
-              // Index
+              // Large index number
               SizedBox(
-                width: isMobile ? 30 : 60,
-                child: Text(
-                  widget.project.index.toString().padLeft(2, '0'),
-                  style: GoogleFonts.spectral(
-                    // Using a serif for technical indicators
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
+                width: widget.isMobile ? 36 : 70,
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 300),
+                  style: GoogleFonts.libreBodoni(
+                    fontSize: widget.isMobile ? 18 : 28,
+                    fontWeight: FontWeight.w900,
                     fontStyle: FontStyle.italic,
                     color: _isHovered
                         ? widget.accentColor
-                        : (widget.isDark ? Colors.white24 : Colors.black26),
+                        : (widget.isDark
+                            ? Colors.white.withValues(alpha: 0.12)
+                            : Colors.black.withValues(alpha: 0.12)),
+                    letterSpacing: -1,
                   ),
+                  child: Text(widget.project.index.toString().padLeft(2, '0')),
                 ),
               ),
-              const SizedBox(width: 20),
 
-              // Project Info
+              const SizedBox(width: 16),
+
+              // Project title
               Expanded(
-                child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 300),
-                  child: Text(widget.project.title.toUpperCase()),
-                  style: GoogleFonts.libreBodoni(
-                    fontSize: isMobile ? 24 : 48,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    letterSpacing: _isHovered ? 2 : -1,
-                    color: _isHovered
-                        ? widget.accentColor
-                        : (widget.isDark ? Colors.white : Colors.black87),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 300),
+                      style: GoogleFonts.libreBodoni(
+                        fontSize: widget.isMobile ? 22 : 46,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                        letterSpacing: _isHovered ? 1 : -1,
+                        color: _isHovered
+                            ? widget.accentColor
+                            : (widget.isDark ? Colors.white : Colors.black),
+                      ),
+                      child: Text(widget.project.title.toUpperCase()),
+                    ),
+                    const SizedBox(height: 4),
+                    AnimatedOpacity(
+                      duration: const Duration(milliseconds: 250),
+                      opacity: _isHovered ? 1.0 : 0.0,
+                      child: Text(
+                        widget.project.category.toUpperCase(),
+                        style: GoogleFonts.inter(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 2.5,
+                          color: widget.accentColor.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
-              // Dynamic Preview Image
-              if (!isMobile)
+              // Hover preview image
+              if (!widget.isMobile)
                 AnimatedOpacity(
-                  duration: const Duration(milliseconds: 400),
+                  duration: const Duration(milliseconds: 350),
                   opacity: _isHovered ? 1.0 : 0.0,
-                  curve: Curves.easeInOut,
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 500),
+                    duration: const Duration(milliseconds: 450),
                     curve: Curves.easeOutQuint,
-                    width: _isHovered ? 300 : 250,
-                    height: 160,
-                    margin: EdgeInsets.only(right: _isHovered ? 20 : 40),
+                    width: _isHovered ? 280 : 240,
+                    height: 150,
+                    margin: EdgeInsets.only(right: _isHovered ? 24 : 48),
                     decoration: BoxDecoration(
                       image: widget.project.thumbnailUrls.isNotEmpty
                           ? DecorationImage(
-                              image: AssetImage(
-                                widget.project.thumbnailUrls[0],
-                              ),
+                              image: AssetImage(widget.project.thumbnailUrls[0]),
                               fit: BoxFit.cover,
                             )
                           : null,
+                      border: Border.all(
+                        color: AppColors.subtleBorder(context, alpha: 0.12),
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 30,
-                          offset: const Offset(0, 15),
+                          color: Colors.black.withValues(alpha: 0.25),
+                          blurRadius: 28,
+                          offset: const Offset(0, 12),
                         ),
                       ],
                     ),
                   ),
                 ),
 
-              // Custom Interaction Marker
-              const SizedBox(width: 20),
+              // Arrow icon
+              const SizedBox(width: 16),
               AnimatedRotation(
                 duration: const Duration(milliseconds: 300),
                 turns: _isHovered ? -0.125 : 0,
-                child: Icon(
-                  Icons.arrow_outward_rounded,
-                  size: 24,
-                  color: _isHovered
-                      ? widget.accentColor
-                      : (widget.isDark ? Colors.white12 : Colors.black26),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _isHovered
+                        ? widget.accentColor
+                        : Colors.transparent,
+                    border: Border.all(
+                      color: _isHovered
+                          ? widget.accentColor
+                          : AppColors.subtleBorder(context, alpha: 0.15),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.arrow_outward_rounded,
+                    size: 16,
+                    color: _isHovered
+                        ? (widget.isDark ? Colors.black : Colors.white)
+                        : (widget.isDark ? Colors.white.withValues(alpha: 0.25) : Colors.black.withValues(alpha: 0.25)),
+                  ),
                 ),
               ),
             ],

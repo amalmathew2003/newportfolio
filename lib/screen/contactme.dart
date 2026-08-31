@@ -16,14 +16,15 @@ class ContactMe extends StatefulWidget {
 class _ContactMeState extends State<ContactMe> {
   final String email = 'mathewamalmathew@gmail.com';
   bool _visible = false;
+  bool _emailHovered = false;
 
   Future<void> _launchUrl(String url) async {
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Could not open $url")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not open $url')),
+        );
       }
     }
   }
@@ -33,7 +34,7 @@ class _ContactMeState extends State<ContactMe> {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
+    final accentColor = AppColors.accent(context);
 
     return VisibilityDetector(
       key: const Key('Contact-me-section'),
@@ -49,77 +50,160 @@ class _ContactMeState extends State<ContactMe> {
         ),
         child: Column(
           children: [
+            // Label
             if (_visible)
               FadeInUp(
-                duration: const Duration(milliseconds: 800),
+                duration: const Duration(milliseconds: 700),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(width: 30, height: 2, color: accentColor),
-                    const SizedBox(width: 15),
+                    Container(width: 28, height: 1.5, color: accentColor.withValues(alpha: 0.5)),
+                    const SizedBox(width: 14),
                     Text(
                       'GET IN TOUCH',
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 4,
-                        color: isDark ? Colors.white38 : Colors.black38,
+                        color: isDark ? Colors.white.withValues(alpha: 0.30) : Colors.black.withValues(alpha: 0.30),
                       ),
                     ),
+                    const SizedBox(width: 14),
+                    Container(width: 28, height: 1.5, color: accentColor.withValues(alpha: 0.5)),
                   ],
                 ),
               ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 28),
 
+            // Title
             if (_visible)
               FadeInUp(
-                duration: const Duration(milliseconds: 1000),
-                delay: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 900),
+                delay: const Duration(milliseconds: 150),
                 child: Text(
-                  "START A\nCOLLABORATION",
+                  'START A\nCOLLABORATION',
+                  textAlign: TextAlign.center,
                   style: GoogleFonts.libreBodoni(
-                    fontSize: isMobile ? 40 : 80,
+                    fontSize: isMobile ? 42 : 84,
                     fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : Colors.black87,
-                    height: 0.9,
+                    color: isDark ? Colors.white : Colors.black,
+                    height: 0.88,
                     letterSpacing: -4,
                   ),
+                ),
+              ),
+
+            const SizedBox(height: 24),
+
+            // Sub-description
+            if (_visible)
+              FadeInUp(
+                duration: const Duration(milliseconds: 900),
+                delay: const Duration(milliseconds: 250),
+                child: Text(
+                  'Open to freelance, collaborations & full-time opportunities.',
                   textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
+                    color: isDark ? Colors.white.withValues(alpha: 0.38) : Colors.black.withValues(alpha: 0.38),
+                    height: 1.6,
+                  ),
+                ),
+              ),
+
+            const SizedBox(height: 64),
+
+            // Email CTA
+            if (_visible)
+              FadeInUp(
+                duration: const Duration(milliseconds: 900),
+                delay: const Duration(milliseconds: 350),
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  onEnter: (_) => setState(() => _emailHovered = true),
+                  onExit: (_) => setState(() => _emailHovered = false),
+                  child: GestureDetector(
+                    onTap: () => _launchUrl('mailto:$email'),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: 22,
+                      ),
+                      transform: _emailHovered
+                          ? (Matrix4.identity()..translate(0, -3.0, 0))
+                          : Matrix4.identity(),
+                      decoration: BoxDecoration(
+                        color: _emailHovered
+                            ? accentColor
+                            : Colors.transparent,
+                        border: Border.all(
+                          color: _emailHovered
+                              ? accentColor
+                              : AppColors.mediumBorder(context, alpha: 0.15),
+                          width: 1.5,
+                        ),
+                        boxShadow: _emailHovered
+                            ? [
+                                BoxShadow(
+                                  color: accentColor.withValues(alpha: 0.2),
+                                  blurRadius: 30,
+                                  offset: const Offset(0, 12),
+                                ),
+                              ]
+                            : [],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.alternate_email_rounded,
+                            size: 16,
+                            color: _emailHovered
+                                ? (isDark ? Colors.black : Colors.white)
+                                : (isDark ? Colors.white.withValues(alpha: 0.50) : Colors.black.withValues(alpha: 0.50)),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            email,
+                            style: GoogleFonts.inter(
+                              fontSize: isMobile ? 13 : 18,
+                              fontWeight: FontWeight.w700,
+                              color: _emailHovered
+                                  ? (isDark ? Colors.black : Colors.white)
+                                  : accentColor,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Icon(
+                            Icons.arrow_outward_rounded,
+                            size: 16,
+                            color: _emailHovered
+                                ? (isDark ? Colors.black : Colors.white)
+                                : (isDark ? Colors.white.withValues(alpha: 0.30) : Colors.black.withValues(alpha: 0.30)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
 
             const SizedBox(height: 60),
 
+            // Social icons
             if (_visible)
               FadeInUp(
-                duration: const Duration(milliseconds: 1000),
-                delay: const Duration(milliseconds: 400),
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () => _launchUrl('mailto:$email'),
-                      child: MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: Text(
-                          email.toUpperCase(),
-                          style: GoogleFonts.inter(
-                            fontSize: isMobile ? 18 : 32,
-                            fontWeight: FontWeight.w900,
-                            color: accentColor,
-                            letterSpacing: -1,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 50),
-                    _buildSocialGrid(accentColor, isDark),
-                  ],
-                ),
+                duration: const Duration(milliseconds: 900),
+                delay: const Duration(milliseconds: 500),
+                child: _buildSocialGrid(accentColor, isDark),
               ),
 
-            const SizedBox(height: 150),
+            const SizedBox(height: 120),
+
+            // Footer
             _buildFooter(isDark, accentColor),
           ],
         ),
@@ -137,26 +221,29 @@ class _ContactMeState extends State<ContactMe> {
           child: _SocialIcon(
             icon: FontAwesomeIcons.linkedin,
             url: 'https://linkedin.com/in/amal-mathew-1-/',
+            label: 'LinkedIn',
             accentColor: accentColor,
           ),
         ),
-        const SizedBox(width: 30),
+        const SizedBox(width: 20),
         ZoomIn(
           duration: const Duration(milliseconds: 600),
-          delay: const Duration(milliseconds: 800),
+          delay: const Duration(milliseconds: 750),
           child: _SocialIcon(
             icon: FontAwesomeIcons.github,
             url: 'https://github.com/amalmathew2003',
+            label: 'GitHub',
             accentColor: accentColor,
           ),
         ),
-        const SizedBox(width: 30),
+        const SizedBox(width: 20),
         ZoomIn(
           duration: const Duration(milliseconds: 600),
-          delay: const Duration(milliseconds: 1000),
+          delay: const Duration(milliseconds: 900),
           child: _SocialIcon(
             icon: FontAwesomeIcons.instagram,
             url: 'https://instagram.com/',
+            label: 'Instagram',
             accentColor: accentColor,
           ),
         ),
@@ -170,11 +257,9 @@ class _ContactMeState extends State<ContactMe> {
         Container(
           width: double.infinity,
           height: 1,
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.black.withValues(alpha: 0.05),
+          color: AppColors.subtleBorder(context, alpha: 0.08),
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 36),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -182,17 +267,17 @@ class _ContactMeState extends State<ContactMe> {
               '© ${DateTime.now().year} AMAL MATHEW',
               style: GoogleFonts.inter(
                 fontSize: 10,
-                fontWeight: FontWeight.w900,
-                color: isDark ? Colors.white24 : Colors.black26,
+                fontWeight: FontWeight.w700,
+                color: isDark ? Colors.white.withValues(alpha: 0.20) : Colors.black.withValues(alpha: 0.20),
                 letterSpacing: 2,
               ),
             ),
             Text(
-              'DEVELOPED BY AMAL MATHEW',
-              style: GoogleFonts.inter(
+              'BUILT WITH FLUTTER',
+              style: GoogleFonts.jetBrainsMono(
                 fontSize: 10,
-                fontWeight: FontWeight.w900,
-                color: accentColor,
+                fontWeight: FontWeight.w700,
+                color: accentColor.withValues(alpha: 0.4),
                 letterSpacing: 2,
               ),
             ),
@@ -203,31 +288,74 @@ class _ContactMeState extends State<ContactMe> {
   }
 }
 
-class _SocialIcon extends StatelessWidget {
+// ─── Social Icon ──────────────────────────────────────────────────────────────
+
+class _SocialIcon extends StatefulWidget {
   final IconData icon;
   final String url;
+  final String label;
   final Color accentColor;
 
   const _SocialIcon({
     required this.icon,
     required this.url,
+    required this.label,
     required this.accentColor,
   });
+
+  @override
+  State<_SocialIcon> createState() => _SocialIconState();
+}
+
+class _SocialIconState extends State<_SocialIcon> {
+  bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () async {
-        final Uri uri = Uri.parse(url);
+        final Uri uri = Uri.parse(widget.url);
         await launchUrl(uri);
       },
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: Icon(
-          icon,
-          color: isDark ? Colors.white38 : Colors.black38,
-          size: 24,
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 280),
+          transform: _isHovered
+              ? (Matrix4.identity()..translate(0, -4.0, 0))
+              : Matrix4.identity(),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: _isHovered
+                ? widget.accentColor
+                : Colors.transparent,
+            border: Border.all(
+              color: _isHovered
+                  ? widget.accentColor
+                  : AppColors.subtleBorder(context, alpha: 0.15),
+              width: 1.5,
+            ),
+            boxShadow: _isHovered
+                ? [
+                    BoxShadow(
+                      color: widget.accentColor.withValues(alpha: 0.2),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                    ),
+                  ]
+                : [],
+          ),
+          child: FaIcon(
+            widget.icon,
+            color: _isHovered
+                ? (isDark ? Colors.black : Colors.white)
+                : (isDark ? Colors.white.withValues(alpha: 0.40) : Colors.black.withValues(alpha: 0.40)),
+            size: 20,
+          ),
         ),
       ),
     );
