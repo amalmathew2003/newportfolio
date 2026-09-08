@@ -17,41 +17,41 @@ class ThemeService extends ChangeNotifier {
   static ThemeData get darkTheme {
     return ThemeData(
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.pureBlack,
-      primaryColor: AppColors.pureWhite,
-      dividerColor: Colors.white.withValues(alpha: 0.07),
+      scaffoldBackgroundColor: AppColors.ink,
+      primaryColor: AppColors.mist,
+      cardColor: AppColors.surface,
+      dividerColor: AppColors.lineDark,
       colorScheme: const ColorScheme.dark(
-        primary: AppColors.pureWhite,
-        secondary: AppColors.offWhite,
-        surface: AppColors.richBlack,
-        outline: AppColors.charcoal,
+        primary: AppColors.mist,
+        secondary: AppColors.cyan,
+        surface: AppColors.surface,
+        outline: AppColors.lineDark,
       ),
-      textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+      textTheme: GoogleFonts.spaceGroteskTextTheme(ThemeData.dark().textTheme).apply(
+        bodyColor: AppColors.mist,
+        displayColor: AppColors.mist,
+      ),
     );
   }
 
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.light,
-      scaffoldBackgroundColor: AppColors.nearWhite,
-      primaryColor: AppColors.pureBlack,
-      dividerColor: Colors.black.withValues(alpha: 0.07),
+      scaffoldBackgroundColor: AppColors.paper,
+      primaryColor: AppColors.charcoal,
+      cardColor: AppColors.paperSurface,
+      dividerColor: AppColors.lineLight,
       colorScheme: const ColorScheme.light(
-        primary: AppColors.pureBlack,
-        secondary: AppColors.charcoal,
-        surface: AppColors.pureWhite,
-        outline: AppColors.offWhite,
+        primary: AppColors.charcoal,
+        secondary: AppColors.pink,
+        surface: AppColors.paperSurface,
+        outline: AppColors.lineLight,
       ),
-      textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme).copyWith(
-        displayLarge: GoogleFonts.libreBodoni(
-          color: AppColors.pureBlack,
-          fontWeight: FontWeight.w900,
-        ),
-        displayMedium: GoogleFonts.libreBodoni(
-          color: AppColors.pureBlack,
-          fontWeight: FontWeight.w900,
-        ),
+      textTheme: GoogleFonts.spaceGroteskTextTheme(ThemeData.light().textTheme).apply(
+        bodyColor: AppColors.charcoal,
+        displayColor: AppColors.charcoal,
       ),
     );
   }
 }
+

@@ -1,33 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:my_portfolio/constants/app_colors.dart';
 
-/// Thin scroll progress indicator bar pinned to the top of the screen.
+/// Thin hairline scroll progress indicator bar pinned to the top of the screen.
 class ScrollProgressBar extends StatelessWidget {
-  final ScrollController scrollController;
-  final Color color;
+  final ScrollController? controller;
+  final ScrollController? scrollController;
+  final Color? color;
 
   const ScrollProgressBar({
     super.key,
-    required this.scrollController,
-    required this.color,
+    this.controller,
+    this.scrollController,
+    this.color,
   });
+
+  ScrollController get _activeController => controller ?? scrollController ?? ScrollController();
 
   @override
   Widget build(BuildContext context) {
+    final activeColor = color ?? AppColors.cyan;
+
     return AnimatedBuilder(
-      animation: scrollController,
+      animation: _activeController,
       builder: (context, _) {
         double progress = 0.0;
 
-        // Guard: controller must have a client AND the position must be ready
-        if (scrollController.hasClients) {
+        if (_activeController.hasClients) {
           try {
-            final max = scrollController.position.maxScrollExtent;
+            final max = _activeController.position.maxScrollExtent;
             if (max > 0) {
-              progress = (scrollController.offset / max).clamp(0.0, 1.0);
+              progress = (_activeController.offset / max).clamp(0.0, 1.0);
             }
-          } catch (_) {
-            // Position not ready yet — keep progress at 0
-          }
+          } catch (_) {}
         }
 
         return SizedBox(
@@ -36,20 +40,11 @@ class ScrollProgressBar extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerLeft,
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 80),
+              duration: const Duration(milliseconds: 50),
               width: MediaQuery.of(context).size.width * progress,
               height: 2,
               decoration: BoxDecoration(
-                color: color,
-                boxShadow: progress > 0
-                    ? [
-                        BoxShadow(
-                          color: color.withValues(alpha: 0.45),
-                          blurRadius: 8,
-                          spreadRadius: 1,
-                        ),
-                      ]
-                    : [],
+                color: activeColor,
               ),
             ),
           ),
@@ -58,3 +53,4 @@ class ScrollProgressBar extends StatelessWidget {
     );
   }
 }
+

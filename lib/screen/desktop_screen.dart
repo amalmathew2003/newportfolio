@@ -1,564 +1,561 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:my_portfolio/constants/app_colors.dart';
 import 'package:my_portfolio/service/downloadcv.dart';
-import 'package:my_portfolio/widgets/gradient_orb.dart';
+import 'package:my_portfolio/widgets/inspector_box.dart';
+import 'package:my_portfolio/widgets/gradient_button.dart';
+import 'package:my_portfolio/widgets/tech_generic_tag.dart';
 
 class DesktopScreen extends StatefulWidget {
   final VoidCallback? onContactTap;
-  const DesktopScreen({super.key, this.onContactTap});
+  final VoidCallback? onProjectsTap;
+
+  const DesktopScreen({super.key, this.onContactTap, this.onProjectsTap});
 
   @override
   State<DesktopScreen> createState() => _DesktopScreenState();
 }
 
-class _DesktopScreenState extends State<DesktopScreen>
-    with TickerProviderStateMixin {
-  Offset _mousePos = Offset.zero;
-  late AnimationController _lineController;
+class _DesktopScreenState extends State<DesktopScreen> {
+  int _rebuildCounter = 1;
+  bool _isDiffFlashing = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _lineController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..forward();
+  void _triggerHotReload() {
+    final reducedMotion = MediaQuery.of(context).accessibleNavigation;
+    if (reducedMotion) {
+      setState(() {
+        _rebuildCounter++;
+      });
+      return;
+    }
+
+    setState(() {
+      _isDiffFlashing = true;
+    });
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) {
+        setState(() {
+          _isDiffFlashing = false;
+          _rebuildCounter++;
+        });
+      }
+    });
   }
 
-  @override
-  void dispose() {
-    _lineController.dispose();
-    super.dispose();
-  }
+  void _showProfileImageLightbox(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withValues(alpha: 0.85),
+      builder: (dialogContext) {
+        final size = MediaQuery.of(dialogContext).size;
+        final isSmall = size.width < 500;
 
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isMobile = size.width < 900;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = AppColors.accent(context);
-
-    return MouseRegion(
-      onHover: (event) {
-        if (!isMobile) {
-          setState(() {
-            _mousePos = Offset(
-              (event.localPosition.dx - size.width / 2) / (size.width / 2),
-              (event.localPosition.dy - size.height / 2) / (size.height / 2),
-            );
-          });
-        }
-      },
-      child: Container(
-        height: size.height,
-        width: double.infinity,
-        color: AppColors.background(context),
-        child: Stack(
-          children: [
-            // === AMBIENT ORBS ===
-            Positioned.fill(
-              child: IgnorePointer(
-                child: Stack(
-                  children: [
-                    GradientOrb(
-                      size: isMobile ? 350 : 600,
-                      alignment: Alignment.topRight,
-                      opacity: isDark ? 0.06 : 0.05,
-                      duration: const Duration(seconds: 10),
-                    ),
-                    GradientOrb(
-                      size: isMobile ? 250 : 400,
-                      alignment: Alignment.bottomLeft,
-                      opacity: isDark ? 0.04 : 0.035,
-                      duration: const Duration(seconds: 14),
-                    ),
-                  ],
-                ),
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 24,
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: isSmall ? 320 : 420),
+            child: InspectorBox(
+              widgetTag: 'ProfileAvatar(AmalMathew)',
+              dimensionTag: '1080×1080',
+              signalAccent: SignalAccent.cyan,
+              padding: const EdgeInsets.only(
+                top: 36,
+                left: 16,
+                right: 16,
+                bottom: 16,
               ),
-            ),
-
-            // === EDITORIAL BACKDROP TEXT ===
-            Positioned.fill(
-              child: Padding(
-                padding: EdgeInsets.only(top: size.height * 0.18),
-                child: Opacity(
-                  opacity: isDark ? 0.025 : 0.055,
-                  child: Text(
-                    'AMAL',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.libreBodoni(
-                      fontSize: isMobile ? 80 : size.width * 0.18,
-                      fontWeight: FontWeight.w900,
-                      color: isDark ? Colors.white : Colors.black,
-                      letterSpacing: -4,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // === LEFT CONTENT ===
-            Positioned(
-              left: isMobile ? 24 : 100,
-              top: size.height * 0.22,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Section marker
-                  FadeInLeft(
-                    duration: const Duration(milliseconds: 900),
-                    child: Row(
-                      children: [
-                        AnimatedBuilder(
-                          animation: _lineController,
-                          builder: (_, __) => Container(
-                            width: _lineController.value * 30,
-                            height: 1,
-                            color: accentColor.withValues(alpha: 0.5),
+                  // Top Title Bar
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: AppColors.cyan,
+                              shape: BoxShape.circle,
+                            ),
                           ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Amal Mathew • Profile',
+                            style: GoogleFonts.ibmPlexMono(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.cyan,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.close,
+                          color: AppColors.dim,
+                          size: 20,
                         ),
-                        const SizedBox(width: 10),
-                        Text(
-                          '*01 — PORTFOLIO',
-                          style: GoogleFonts.jetBrainsMono(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: accentColor.withValues(alpha: 0.5),
-                            letterSpacing: 3,
-                          ),
+                        onPressed: () => Navigator.of(dialogContext).pop(),
+                        tooltip: 'Close',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Large Circular Avatar Popup (Instagram Style)
+                  Container(
+                    width: isSmall ? 240 : 320,
+                    height: isSmall ? 240 : 320,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.cyan, width: 2.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.cyan.withValues(alpha: 0.25),
+                          blurRadius: 24,
+                          spreadRadius: 2,
                         ),
                       ],
                     ),
-                  ),
-
-                  const SizedBox(height: 36),
-
-                  // Subtitle
-                  FadeInLeft(
-                    duration: const Duration(milliseconds: 1000),
-                    delay: const Duration(milliseconds: 100),
-                    child: Text(
-                      'FLUTTER DEVELOPER',
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 6,
-                        color: isDark ? Colors.white.withValues(alpha: 0.30) : Colors.black.withValues(alpha: 0.30),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/images/portfolio1.png',
+                        fit: BoxFit.cover,
+                        alignment: const Alignment(-0.35, -0.25),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
 
-                  // Main Heading
-                  FadeInLeft(
-                    duration: const Duration(milliseconds: 1100),
-                    delay: const Duration(milliseconds: 200),
-                    child: _ShimmerHeader(
-                      text: 'AMAL\nMATHEW',
-                      style: GoogleFonts.libreBodoni(
-                        fontSize: isMobile ? 52 : 118,
-                        fontWeight: FontWeight.w900,
-                        height: 0.88,
-                        color: isDark ? Colors.white : Colors.black,
-                        letterSpacing: -3,
-                      ),
+                  Text(
+                    'Amal Mathew',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryText(context),
                     ),
                   ),
-
-                  const SizedBox(height: 52),
-
-                  // CTA Buttons
-                  FadeInLeft(
-                    duration: const Duration(milliseconds: 1200),
-                    delay: const Duration(milliseconds: 400),
-                    child: Row(
-                      children: [
-                        _PremiumButton(
-                          text: 'DOWNLOAD CV',
-                          isPrimary: true,
-                          accentColor: accentColor,
-                          onTap: () => downloadCV(context),
-                        ),
-                        const SizedBox(width: 16),
-                        _PremiumButton(
-                          text: 'GET IN TOUCH',
-                          isPrimary: false,
-                          accentColor: accentColor,
-                          onTap: widget.onContactTap ?? () {},
-                        ),
-                      ],
+                  const SizedBox(height: 4),
+                  Text(
+                    'Flutter Developer • Thrissur, Kerala',
+                    style: GoogleFonts.ibmPlexMono(
+                      fontSize: 12,
+                      color: AppColors.cyan,
                     ),
                   ),
                 ],
               ),
-            ),
-
-            // === PROFILE IMAGE (PARALLAX) ===
-            Positioned(
-              right: isMobile ? 0 : size.width * 0.04,
-              top: size.height * 0.12,
-              child: Transform(
-                transform: Matrix4.identity()
-                  ..translate(_mousePos.dx * 18, _mousePos.dy * 18),
-                child: FadeIn(
-                  duration: const Duration(milliseconds: 1600),
-                  delay: const Duration(milliseconds: 300),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Outer glow ring
-                      if (!isMobile)
-                        Container(
-                          width: size.width * 0.47,
-                          height: size.height * 0.73,
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: accentColor.withValues(alpha: isDark ? 0.06 : 0.04),
-                                blurRadius: 120,
-                                spreadRadius: 40,
-                              ),
-                            ],
-                          ),
-                        ),
-                      Container(
-                        width: size.width * (isMobile ? 0.9 : 0.46),
-                        height: size.height * 0.72,
-                        decoration: BoxDecoration(
-                          image: const DecorationImage(
-                            image: AssetImage('assets/images/portfolio2.png'),
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // === RIGHT META INFO (DESKTOP) ===
-            if (!isMobile)
-              Positioned(
-                right: 44,
-                bottom: 72,
-                child: FadeInRight(
-                  duration: const Duration(milliseconds: 1100),
-                  delay: const Duration(milliseconds: 600),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _MetaItem('STATUS', 'AVAILABLE FOR HIRE', accentColor, isDark),
-                      const SizedBox(height: 28),
-                      _MetaItem('ROLE', 'FLUTTER DEVELOPER', accentColor, isDark),
-                      const SizedBox(height: 28),
-                      _MetaItem('BASE', 'KERALA, INDIA', accentColor, isDark),
-                    ],
-                  ),
-                ),
-              ),
-
-            // === BOTTOM SCROLL INDICATOR ===
-            Positioned(
-              bottom: 30,
-              left: isMobile ? 24 : 100,
-              child: FadeInUp(
-                duration: const Duration(milliseconds: 1000),
-                delay: const Duration(milliseconds: 1000),
-                child: _ScrollIndicator(isDark: isDark),
-              ),
-            ),
-
-            // === NOISE OVERLAY ===
-            Positioned.fill(
-              child: IgnorePointer(
-                child: Opacity(
-                  opacity: 0.025,
-                  child: CustomPaint(
-                    painter: _NoisePainter(
-                      color: isDark ? Colors.white : Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Meta Item ────────────────────────────────────────────────────────────────
-
-class _MetaItem extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color accentColor;
-  final bool isDark;
-  const _MetaItem(this.label, this.value, this.accentColor, this.isDark);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.jetBrainsMono(
-            fontSize: 8,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 2.5,
-            color: accentColor.withValues(alpha: 0.4),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
-            color: isDark ? Colors.white.withValues(alpha: 0.70) : Colors.black.withValues(alpha: 0.70),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ─── Premium Button ───────────────────────────────────────────────────────────
-
-class _PremiumButton extends StatefulWidget {
-  final String text;
-  final bool isPrimary;
-  final Color accentColor;
-  final VoidCallback onTap;
-
-  const _PremiumButton({
-    required this.text,
-    required this.isPrimary,
-    required this.accentColor,
-    required this.onTap,
-  });
-
-  @override
-  State<_PremiumButton> createState() => _PremiumButtonState();
-}
-
-class _PremiumButtonState extends State<_PremiumButton> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
-        cursor: SystemMouseCursors.click,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 280),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-          transform: _isHovered
-              ? (Matrix4.identity()..translate(0, -2.0, 0))
-              : Matrix4.identity(),
-          decoration: BoxDecoration(
-            color: widget.isPrimary
-                ? (_isHovered
-                    ? widget.accentColor.withValues(alpha: 0.9)
-                    : widget.accentColor)
-                : Colors.transparent,
-            border: Border.all(
-              color: widget.isPrimary
-                  ? widget.accentColor
-                  : (_isHovered
-                      ? widget.accentColor
-                      : (isDark
-                          ? Colors.white.withValues(alpha: 0.15)
-                          : Colors.black.withValues(alpha: 0.15))),
-              width: 1.5,
-            ),
-            boxShadow: _isHovered && widget.isPrimary
-                ? [
-                    BoxShadow(
-                      color: widget.accentColor.withValues(alpha: 0.25),
-                      blurRadius: 24,
-                      offset: const Offset(0, 8),
-                    ),
-                  ]
-                : [],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                widget.text,
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 2.5,
-                  color: widget.isPrimary
-                      ? (isDark ? Colors.black : Colors.white)
-                      : (_isHovered
-                          ? widget.accentColor
-                          : (isDark ? Colors.white.withValues(alpha: 0.54) : Colors.black.withValues(alpha: 0.54))),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Icon(
-                widget.isPrimary
-                    ? Icons.download_rounded
-                    : Icons.arrow_outward_rounded,
-                size: 14,
-                color: widget.isPrimary
-                    ? (isDark ? Colors.black : Colors.white)
-                    : (_isHovered
-                        ? widget.accentColor
-                        : (isDark ? Colors.white.withValues(alpha: 0.38) : Colors.black.withValues(alpha: 0.38))),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Shimmer Header ───────────────────────────────────────────────────────────
-
-class _ShimmerHeader extends StatefulWidget {
-  final String text;
-  final TextStyle style;
-
-  const _ShimmerHeader({required this.text, required this.style});
-
-  @override
-  _ShimmerHeaderState createState() => _ShimmerHeaderState();
-}
-
-class _ShimmerHeaderState extends State<_ShimmerHeader>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 4),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return ShaderMask(
-          shaderCallback: (bounds) {
-            return LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDark
-                  ? [
-                      Colors.white,
-                      Colors.white.withValues(alpha: 0.55),
-                      Colors.white,
-                    ]
-                  : [
-                      Colors.black,
-                      Colors.black.withValues(alpha: 0.45),
-                      Colors.black,
-                    ],
-              stops: [
-                (_controller.value - 0.35).clamp(0.0, 1.0),
-                _controller.value.clamp(0.0, 1.0),
-                (_controller.value + 0.35).clamp(0.0, 1.0),
-              ],
-            ).createShader(bounds);
-          },
-          child: Text(
-            widget.text,
-            style: widget.style.copyWith(
-              color: Colors.white,
             ),
           ),
         );
       },
     );
   }
-}
-
-// ─── Scroll Indicator ─────────────────────────────────────────────────────────
-
-class _ScrollIndicator extends StatefulWidget {
-  final bool isDark;
-  const _ScrollIndicator({required this.isDark});
-
-  @override
-  State<_ScrollIndicator> createState() => _ScrollIndicatorState();
-}
-
-class _ScrollIndicatorState extends State<_ScrollIndicator>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _anim;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
-    _anim = Tween<double>(begin: 0, end: 8).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.isDark ? Colors.white.withValues(alpha: 0.30) : Colors.black.withValues(alpha: 0.30);
-    return AnimatedBuilder(
-      animation: _anim,
-      builder: (_, __) => Transform.translate(
-        offset: Offset(0, _anim.value),
-        child: Row(
-          children: [
-            Container(
-              width: 1,
-              height: 30,
-              color: color,
+    final size = MediaQuery.of(context).size;
+    final isMobile = size.width < 900;
+
+    return Container(
+      width: double.infinity,
+      color: AppColors.background(context),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 16 : 48,
+        vertical: isMobile ? 24 : 48,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: InspectorBox(
+            widgetTag: 'Hero',
+            dimensionTag: '${size.width.toInt()}×${size.height.toInt()}',
+            signalAccent: SignalAccent.pink,
+            padding: EdgeInsets.all(isMobile ? 20 : 36),
+            child: isMobile
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeroText(context, isMobile: true),
+                      const SizedBox(height: 36),
+                      Center(child: _buildPhoneMockup(context)),
+                    ],
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 6,
+                        child: _buildHeroText(context, isMobile: false),
+                      ),
+                      const SizedBox(width: 48),
+                      Expanded(flex: 5, child: _buildPhoneMockup(context)),
+                    ],
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroText(BuildContext context, {required bool isMobile}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 12),
+        // Code metadata role tag
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: AppColors.cyan.withValues(alpha: 0.1),
+            border: Border.all(color: AppColors.cyan.withValues(alpha: 0.3)),
+            borderRadius: BorderRadius.circular(2),
+          ),
+          child: Text(
+            'const Role = FlutterDeveloper & MobileArchitect;',
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: isMobile ? 11 : 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.cyan,
             ),
-            const SizedBox(width: 12),
-            Text(
-              'SCROLL',
-              style: GoogleFonts.jetBrainsMono(
-                fontSize: 8,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 3,
-                color: color,
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // Main Name Headline
+        Text(
+          'Amal Mathew',
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: isMobile ? 38 : 64,
+            fontWeight: FontWeight.w700,
+            color: AppColors.primaryText(context),
+            letterSpacing: -1.5,
+            height: 1.05,
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        // Subtitle / Bio
+        Text(
+          'Building high-performance, cross-platform mobile & web applications with Dart, Flutter, and clean software architecture.',
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: isMobile ? 15 : 18,
+            height: 1.5,
+            color: AppColors.dim,
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Generic type stack tag
+        const TechGenericTag(
+          baseName: 'Stack',
+          typeArguments: [
+            'Flutter',
+            'Dart',
+            'Firebase',
+            'REST',
+            'Provider',
+            'Hive',
+          ],
+          fontSize: 13,
+        ),
+
+        const SizedBox(height: 32),
+
+        // Action Buttons
+        Wrap(
+          spacing: 16,
+          runSpacing: 12,
+          children: [
+            DevToolsButton(
+              text: 'VIEW WORK',
+              onPressed: () {
+                if (widget.onProjectsTap != null) {
+                  widget.onProjectsTap!();
+                }
+              },
+              icon: Icons.code,
+            ),
+            DevToolsButton(
+              text: 'DOWNLOAD CV',
+              isSecondary: true,
+              onPressed: () => downloadCV(context),
+              icon: Icons.download_outlined,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPhoneMockup(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Center(
+      child: Container(
+        width: 280,
+        height: 480,
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.ink : AppColors.paper,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.pink, width: 1.5),
+        ),
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                // Phone Top Notch Bar
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceCard(context),
+                    border: Border(
+                      bottom: BorderSide(color: AppColors.line(context)),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: AppColors.pink,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'HotReloadDemo()',
+                            style: GoogleFonts.ibmPlexMono(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.pink,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'v3.22.0',
+                        style: GoogleFonts.ibmPlexMono(
+                          fontSize: 9,
+                          color: AppColors.dim,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Phone Screen Content
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Developer Profile App Header Card
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceCard(context),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: AppColors.line(context)),
+                          ),
+                          child: Row(
+                            children: [
+                              MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      _showProfileImageLightbox(context),
+                                  child: Tooltip(
+                                    message: 'Click to enlarge profile picture',
+                                    child: Container(
+                                      width: 44,
+                                      height: 44,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: AppColors.cyan,
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          'assets/images/portfolio1.png',
+                                          fit: BoxFit.cover,
+                                          alignment: const Alignment(
+                                            -0.35,
+                                            -0.25,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Amal Mathew',
+                                      style: GoogleFonts.spaceGrotesk(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primaryText(context),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Flutter Developer',
+                                      style: GoogleFonts.ibmPlexMono(
+                                        fontSize: 10,
+                                        color: AppColors.cyan,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        // Counter Display Card
+                        Column(
+                          children: [
+                            Text(
+                              'Widget Rebuilds',
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 13,
+                                color: AppColors.dim,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '$_rebuildCounter',
+                              style: GoogleFonts.ibmPlexMono(
+                                fontSize: 52,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.cyan,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.cyan.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(2),
+                                border: Border.all(
+                                  color: AppColors.cyan.withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: Text(
+                                'final counter = useState($_rebuildCounter);',
+                                style: GoogleFonts.ibmPlexMono(
+                                  fontSize: 10,
+                                  color: AppColors.cyan,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const Spacer(),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Phone Bottom Bar / Hint
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  color: AppColors.surfaceCard(context),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Click FAB for cyan diff flash',
+                        style: GoogleFonts.ibmPlexMono(
+                          fontSize: 9,
+                          color: AppColors.dim,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            // Diff Flash Overlay (~200ms cyan flash on hot reload)
+            if (_isDiffFlashing)
+              Positioned.fill(
+                child: Container(
+                  color: AppColors.cyan.withValues(alpha: 0.4),
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.ink,
+                        borderRadius: BorderRadius.circular(2),
+                        border: Border.all(color: AppColors.cyan),
+                      ),
+                      child: Text(
+                        '⚡ HOT RELOAD DIFF',
+                        style: GoogleFonts.ibmPlexMono(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.cyan,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+            // Pink Floating Action Button (FAB)
+            Positioned(
+              bottom: 40,
+              right: 16,
+              child: FloatingActionButton.small(
+                onPressed: _triggerHotReload,
+                backgroundColor: AppColors.pink,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(
+                  Icons.flash_on,
+                  color: Colors.white,
+                  size: 18,
+                ),
               ),
             ),
           ],
@@ -566,25 +563,4 @@ class _ScrollIndicatorState extends State<_ScrollIndicator>
       ),
     );
   }
-}
-
-// ─── Noise Painter ────────────────────────────────────────────────────────────
-
-class _NoisePainter extends CustomPainter {
-  final Color color;
-  _NoisePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final random = Random(42);
-    final paint = Paint()..color = color.withValues(alpha: 0.12);
-    for (int i = 0; i < 2000; i++) {
-      final x = random.nextDouble() * size.width;
-      final y = random.nextDouble() * size.height;
-      canvas.drawCircle(Offset(x, y), 0.5, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
