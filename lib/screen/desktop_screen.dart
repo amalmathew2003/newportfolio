@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:my_portfolio/constants/app_colors.dart';
 import 'package:my_portfolio/service/downloadcv.dart';
 import 'package:my_portfolio/widgets/inspector_box.dart';
@@ -16,9 +17,26 @@ class DesktopScreen extends StatefulWidget {
   State<DesktopScreen> createState() => _DesktopScreenState();
 }
 
-class _DesktopScreenState extends State<DesktopScreen> {
+class _DesktopScreenState extends State<DesktopScreen>
+    with SingleTickerProviderStateMixin {
   int _rebuildCounter = 1;
   bool _isDiffFlashing = false;
+  late AnimationController _fabAnimController;
+
+  @override
+  void initState() {
+    super.initState();
+    _fabAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _fabAnimController.dispose();
+    super.dispose();
+  }
 
   void _triggerHotReload() {
     final reducedMotion = MediaQuery.of(context).accessibleNavigation;
@@ -47,115 +65,96 @@ class _DesktopScreenState extends State<DesktopScreen> {
     showDialog(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withValues(alpha: 0.85),
+      barrierColor: Colors.black.withValues(alpha: 0.88),
       builder: (dialogContext) {
         final size = MediaQuery.of(dialogContext).size;
         final isSmall = size.width < 500;
+        final avatarSize = isSmall ? 250.0 : 310.0;
 
         return Dialog(
           backgroundColor: Colors.transparent,
+          elevation: 0,
           insetPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
+            horizontal: 20,
             vertical: 24,
           ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: isSmall ? 320 : 420),
-            child: InspectorBox(
-              widgetTag: 'ProfileAvatar(AmalMathew)',
-              dimensionTag: '1080×1080',
-              signalAccent: SignalAccent.cyan,
-              padding: const EdgeInsets.only(
-                top: 36,
-                left: 16,
-                right: 16,
-                bottom: 16,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Top Title Bar
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: AppColors.cyan,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Amal Mathew • Profile',
-                            style: GoogleFonts.ibmPlexMono(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.cyan,
-                            ),
-                          ),
-                        ],
-                      ),
-                      IconButton(
-                        icon: const Icon(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Top Close Button Bar
+              SizedBox(
+                width: avatarSize,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    InkWell(
+                      onTap: () => Navigator.of(dialogContext).pop(),
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.line(context)),
+                        ),
+                        child: const Icon(
                           Icons.close,
-                          color: AppColors.dim,
+                          color: Colors.white,
                           size: 20,
                         ),
-                        onPressed: () => Navigator.of(dialogContext).pop(),
-                        tooltip: 'Close',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Large Circular Avatar Popup (Instagram Style)
-                  Container(
-                    width: isSmall ? 240 : 320,
-                    height: isSmall ? 240 : 320,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.cyan, width: 2.5),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.cyan.withValues(alpha: 0.25),
-                          blurRadius: 24,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/portfolio1.png',
-                        fit: BoxFit.cover,
-                        alignment: const Alignment(-0.35, -0.25),
                       ),
                     ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  Text(
-                    'Amal Mathew',
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryText(context),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Flutter Developer • Thrissur, Kerala',
-                    style: GoogleFonts.ibmPlexMono(
-                      fontSize: 12,
-                      color: AppColors.cyan,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              const SizedBox(height: 10),
+
+              // Floating Circular Profile Avatar (Instagram Lightbox style)
+              Container(
+                width: avatarSize,
+                height: avatarSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.cyan, width: 3.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.cyan.withValues(alpha: 0.4),
+                      blurRadius: 32,
+                      spreadRadius: 4,
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/portfolio1.png',
+                    fit: BoxFit.cover,
+                    alignment: const Alignment(-0.35, -0.25),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Clean text info below image
+              Text(
+                'Amal Mathew',
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Flutter Developer • Thrissur, Kerala',
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.cyan,
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -371,72 +370,73 @@ class _DesktopScreenState extends State<DesktopScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Developer Profile App Header Card
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceCard(context),
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: AppColors.line(context)),
-                          ),
-                          child: Row(
-                            children: [
-                              MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: GestureDetector(
-                                  onTap: () =>
-                                      _showProfileImageLightbox(context),
-                                  child: Tooltip(
-                                    message: 'Click to enlarge profile picture',
-                                    child: Container(
-                                      width: 44,
-                                      height: 44,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: AppColors.cyan,
-                                          width: 1.5,
-                                        ),
+                        // Developer Profile App Header Card (Entire Box Clickable)
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () => _showProfileImageLightbox(context),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceCard(context),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: AppColors.line(context),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppColors.cyan,
+                                        width: 1.5,
                                       ),
-                                      child: ClipOval(
-                                        child: Image.asset(
-                                          'assets/images/portfolio1.png',
-                                          fit: BoxFit.cover,
-                                          alignment: const Alignment(
-                                            -0.35,
-                                            -0.25,
-                                          ),
+                                    ),
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                        'assets/images/portfolio1.png',
+                                        fit: BoxFit.cover,
+                                        alignment: const Alignment(
+                                          -0.35,
+                                          -0.25,
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Amal Mathew',
-                                      style: GoogleFonts.spaceGrotesk(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.primaryText(context),
-                                      ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Amal Mathew',
+                                          style: GoogleFonts.spaceGrotesk(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColors.primaryText(
+                                              context,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'Flutter Developer',
+                                          style: GoogleFonts.ibmPlexMono(
+                                            fontSize: 10,
+                                            color: AppColors.cyan,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      'Flutter Developer',
-                                      style: GoogleFonts.ibmPlexMono(
-                                        fontSize: 10,
-                                        color: AppColors.cyan,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
 
@@ -540,22 +540,94 @@ class _DesktopScreenState extends State<DesktopScreen> {
                 ),
               ),
 
-            // Pink Floating Action Button (FAB)
+            // Pink Floating Action Button (FAB) with Lottie Animated Pulse & Tap Hint
             Positioned(
-              bottom: 40,
-              right: 16,
-              child: FloatingActionButton.small(
-                onPressed: _triggerHotReload,
-                backgroundColor: AppColors.pink,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(
-                  Icons.flash_on,
-                  color: Colors.white,
-                  size: 18,
-                ),
+              bottom: 30,
+              right: 8,
+              child: Stack(
+                alignment: Alignment.center,
+                clipBehavior: Clip.none,
+                children: [
+                  // 1. Vector Lottie Tap Ripple Animation
+                  IgnorePointer(
+                    child: SizedBox(
+                      width: 80,
+                      height: 80,
+                      child: Lottie.asset(
+                        'assets/lottie/tap_animation.json',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+
+                  // 2. Bouncing "TAP ME ⚡" Tooltip Pill Tag
+                  Positioned(
+                    right: 52,
+                    child: AnimatedBuilder(
+                      animation: _fabAnimController,
+                      builder: (context, child) {
+                        final offsetX = -5.0 * _fabAnimController.value;
+                        return Transform.translate(
+                          offset: Offset(offsetX, 0),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.pink,
+                              borderRadius: BorderRadius.circular(4),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.pink.withValues(alpha: 0.5),
+                                  blurRadius: 10,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'TAP ME',
+                                  style: GoogleFonts.ibmPlexMono(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                const SizedBox(width: 3),
+                                const Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 9,
+                                  color: Colors.white,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  // 3. Interactive Floating Action Button
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: FloatingActionButton.small(
+                      onPressed: _triggerHotReload,
+                      backgroundColor: AppColors.pink,
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(
+                        Icons.flash_on,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
