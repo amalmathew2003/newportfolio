@@ -4,6 +4,24 @@ import 'package:my_portfolio/constants/app_colors.dart';
 import 'package:my_portfolio/widgets/inspector_box.dart';
 import 'package:my_portfolio/widgets/tech_generic_tag.dart';
 
+// Auto-calculates total experience from career start date
+String _calcExperience() {
+  // Internship: 6 months
+  // Professional: ~1.3 years, started around June 2025
+  final internshipMonths = 6;
+  final professionalStart = DateTime(2025, 6, 1);
+  final now = DateTime.now();
+  final professionalMonths =
+      (now.year - professionalStart.year) * 12 +
+      (now.month - professionalStart.month);
+  final totalMonths = internshipMonths + professionalMonths;
+  final years = totalMonths ~/ 12;
+  final months = totalMonths % 12;
+  if (years == 0) return '${months}m Experience';
+  if (months == 0) return '${years}y Experience';
+  return '${years}y ${months}m Experience';
+}
+
 class AboutMe extends StatefulWidget {
   const AboutMe({super.key});
 
@@ -52,7 +70,7 @@ class _AboutMeState extends State<AboutMe> {
 
                 // Main Title
                 Text(
-                  'Cross-Platform Developer & Technical Architect',
+                  'Flutter Developer & Mobile Engineer',
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: isMobile ? 26 : 38,
                     fontWeight: FontWeight.w700,
@@ -65,7 +83,7 @@ class _AboutMeState extends State<AboutMe> {
 
                 // Detailed Bio Paragraphs
                 Text(
-                  'I am a passionate software developer specializing in building cross-platform mobile and web applications with Flutter & Dart. My focus lies in architecting modular codebase structures, implementing state management, and delivering smooth 60fps user experiences.',
+                  'A Flutter developer with a 6-month internship and over a year of professional experience building cross-platform mobile apps. I specialise in clean architecture, state management, and shipping smooth, production-ready experiences on both Android and iOS.',
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: isMobile ? 14 : 16,
                     height: 1.6,
@@ -74,7 +92,7 @@ class _AboutMeState extends State<AboutMe> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Driven by technical curiosity, I continuously integrate emerging AI tools (like Groq, Gemini API, and audio intelligence) into mobile workflows to solve real-world productivity challenges.',
+                  'I enjoy integrating AI capabilities — Groq, Gemini API, speech-to-text, and real-time sensor data — into mobile workflows to solve meaningful, real-world problems.',
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: isMobile ? 14 : 16,
                     height: 1.6,
@@ -183,14 +201,29 @@ class _AboutMeState extends State<AboutMe> {
   Widget _buildHighlightsList(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-
       children: [
         _buildInfoRow(
           context,
-          title: 'Cross-Platform Mobile Development',
-          subtitle: 'Flutter & Dart Ecosystem',
-          date: '3+ Years Practice',
-          description: 'Proficient in building production-ready apps with Provider, Riverpod, Bloc, REST APIs, and Hive/SQLite local caching.',
+          title: 'Professional Experience',
+          subtitle: 'Flutter Developer — Full-Time',
+          date: '1y 3m',
+          description: 'Building and shipping production-ready Flutter apps with Provider, Bloc, REST APIs, and Hive/SQLite caching. Responsible for feature development, code reviews, and app-store releases.',
+        ),
+        const SizedBox(height: 16),
+        _buildInfoRow(
+          context,
+          title: 'Internship',
+          subtitle: 'Flutter Intern',
+          date: '6 Months',
+          description: 'Hands-on internship building real-world Flutter applications, learning state management patterns, REST API integration, and delivering features under production timelines.',
+        ),
+        const SizedBox(height: 16),
+        _buildInfoRow(
+          context,
+          title: 'Total Experience (Auto-Calculated)',
+          subtitle: 'Internship + Professional',
+          date: _calcExperience(),
+          description: 'Combined experience across internship (6 months) and professional role. The duration badge above updates automatically as time progresses — no manual edits needed.',
         ),
         const SizedBox(height: 16),
         _buildInfoRow(
@@ -198,7 +231,7 @@ class _AboutMeState extends State<AboutMe> {
           title: 'AI & Sensor Integrations',
           subtitle: 'Hardware & Machine Learning',
           date: 'Production Projects',
-          description: 'Experienced with speech-to-text audio processing, motion detection sensors, background services, and real-time mapping APIs.',
+          description: 'Integrated speech-to-text audio processing, motion detection sensors, background services, and real-time mapping APIs into Flutter apps.',
         ),
       ],
     );
