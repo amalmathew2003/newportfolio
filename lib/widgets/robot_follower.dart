@@ -9,53 +9,54 @@ const _sectionInfo = {
   'Dev': (
     icon: '🧑‍💻',
     title: 'Dev Avatar',
-    desc: 'Interactive dev character.\nEye-tracking active!',
+    desc: 'Move mouse around!\nThe avatar eyes follow you.',
   ),
   'App': (
     icon: '🚀',
-    title: 'Hello World',
-    desc: "I'm Amal — Flutter Developer\nbuilding high-performance apps.",
+    title: 'Hello!',
+    desc: "I'm Amal — Flutter dev\nbuilding beautiful apps.",
   ),
   'About': (
     icon: '👤',
     title: 'About Me',
-    desc: 'BCA graduate · 6-month intern\n+ 1 yr 3 mos Flutter experience.',
+    desc: 'BCA grad · 6m intern\n+ 1y 3m Flutter experience.',
   ),
   'Skills': (
     icon: '⚡',
-    title: 'Tech Stack',
-    desc: 'Flutter · Dart · Firebase\nREST APIs · State Management.',
+    title: 'Skills',
+    desc: 'Flutter · Dart · Firebase\nREST APIs · Clean Code.',
   ),
   'Work': (
     icon: '💼',
     title: 'Experience',
-    desc: 'Internship & full-time roles\nshipping production apps.',
+    desc: 'Internship + full-time\nshipping production apps.',
   ),
   'Projects': (
     icon: '📦',
-    title: 'Featured Apps',
-    desc: 'Production applications featuring\nAI, maps, sensors & audio.',
+    title: 'Projects',
+    desc: 'Real apps with AI, maps,\nsensors & speech!',
   ),
   'Contact': (
     icon: '📬',
-    title: 'Get In Touch',
-    desc: "Open for opportunities!\nLet's connect & collaborate.",
+    title: 'Contact',
+    desc: "Let's build something\namazing together!",
   ),
   'Project': (
     icon: '🔍',
     title: 'Project Detail',
-    desc: 'Detailed view & screenshots.\nExplore specs and links!',
+    desc: 'Exploring this project.\nSwipe through screenshots!',
   ),
 };
 
 // ─────────────────────────── Overlay widget ──────────────────────────────────
 
-/// Global section-aware robot guide with high-fidelity physics & animations.
+/// Global section-aware robot guide with intro placement & smooth 2D glide.
 class RobotFollowerOverlay extends StatefulWidget {
   final Widget child;
   final List<GlobalKey> sectionKeys;
   final List<String> sectionNames;
   final bool showOnRight;
+  final bool autoStart;
 
   const RobotFollowerOverlay({
     super.key,
@@ -63,6 +64,7 @@ class RobotFollowerOverlay extends StatefulWidget {
     required this.sectionKeys,
     required this.sectionNames,
     this.showOnRight = false,
+    this.autoStart = false,
   });
 
   @override
@@ -71,94 +73,156 @@ class RobotFollowerOverlay extends StatefulWidget {
 
 class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
     with TickerProviderStateMixin {
-  // ── Cursor position (for eye tracking & head tilt) ──────────────────────────
+  // ── Cursor position (for eye tracking) ─────────────────────────────────────
   Offset _cursor = const Offset(400, 400);
 
-  // ── Bot Y & physics lerp with tilt ──────────────────────────────────────────
-  double _botY = 400.0;
-  double _botTargetY = 400.0;
-  double _velocityY = 0.0;
-  double _botTilt = 0.0; // Dynamic tilt angle while moving
+  // ── 2D Bot position & target physics ────────────────────────────────────────
+  double _botX = 400.0;
+  double _botTargetX = 400.0;
+  double _botY = 280.0;
+  double _botTargetY = 280.0;
+  double _botVelocity = 0.0;
 
-  // ── Section speech bubble ──────────────────────────────────────────────────
+  // ── Motion trail ────────────────────────────────────────────────────────────
+  final List<double> _trail = [];
+
+  // ── Intro state & Section guide state ──────────────────────────────────────
+  late bool _hasStartedGuide;
   String _detectedSection = '';
-  bool _bubbleVisible = false;
-  String _bubbleSection = '';
+  bool _bubbleVisible = true;
+  String _bubbleSection = 'Dev';
+  bool _isFirstLayout = true;
+
+  // ── Animation Controllers ──────────────────────────────────────────────────
   late AnimationController _bubbleCtrl;
   late Animation<double> _bubbleAnim;
 
-  // ── Idle & Animation Controllers ───────────────────────────────────────────
-  late AnimationController _idleCtrl;
-  late AnimationController _antennaCtrl;
-  late AnimationController _armCtrl;
-  late AnimationController _pulseCtrl;
+  // Single Master Ticker for 60fps smooth rendering
+  late AnimationController _animCtrl;
 
+  // Sparkle burst controller
+  late AnimationController _sparkleCtrl;
+
+  // Blink state
   bool _isBlinking = false;
 
   @override
   void initState() {
     super.initState();
 
+    final isProjectDetails = widget.sectionNames.contains('Project');
+    _hasStartedGuide = widget.autoStart || isProjectDetails;
+    if (_hasStartedGuide && isProjectDetails) {
+      _bubbleSection = 'Project';
+      _detectedSection = 'Project';
+    }
+
     _bubbleCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 380),
+      duration: const Duration(milliseconds: 350),
     );
     _bubbleAnim =
-        CurvedAnimation(parent: _bubbleCtrl, curve: Curves.elasticOut);
+        CurvedAnimation(parent: _bubbleCtrl, curve: Curves.easeOutBack);
+    _bubbleCtrl.forward();
 
-    _idleCtrl = AnimationController(
+    _animCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2400),
+      duration: const Duration(seconds: 12),
     )..repeat();
-    _idleCtrl.addListener(_onIdleTick);
 
-    _antennaCtrl = AnimationController(
+    _sparkleCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..repeat(reverse: true);
-    _antennaCtrl.addListener(() => setState(() {}));
+      duration: const Duration(milliseconds: 700),
+    );
 
-    _armCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 650),
-    )..repeat(reverse: true);
-    _armCtrl.addListener(() => setState(() {}));
-
-    _pulseCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1600),
-    )..repeat();
-    _pulseCtrl.addListener(() => setState(() {}));
-
+    _animCtrl.addListener(_onTick);
     _scheduleBlink();
   }
 
-  void _onIdleTick() {
-    // Spring physics for bot Y movement and dynamic body tilt
-    final dy = _botTargetY - _botY;
-    _velocityY = _velocityY * 0.82 + dy * 0.08;
-    
-    setState(() {
-      _botY += _velocityY;
-      // Tilt bot slightly into direction of movement (max 0.15 rad ~ 8.5 deg)
-      _botTilt = (_velocityY * 0.025).clamp(-0.15, 0.15);
-    });
+  void _onTick() {
+    if (!mounted) return;
+    final screenW = MediaQuery.of(context).size.width;
+    const botW = 74.0;
+
+    // Side position (outside section box)
+    final sideX = widget.showOnRight ? screenW - botW - 8 : 8.0;
+
+    // Inside Dev section position (centered near Dev card inside section)
+    final insideX = (screenW / 2) + (widget.showOnRight ? -200.0 : 200.0);
+
+    // Initial setup on first frame layout
+    if (_isFirstLayout) {
+      _isFirstLayout = false;
+      _locateDevSectionCenter();
+      _botX = _hasStartedGuide ? sideX : insideX;
+      _botTargetX = _hasStartedGuide ? sideX : insideX;
+    } else {
+      _botTargetX = _hasStartedGuide ? sideX : insideX;
+    }
+
+    final prevY = _botY;
+    final prevX = _botX;
+
+    final diffY = _botTargetY - _botY;
+    final diffX = _botTargetX - _botX;
+
+    if (diffY.abs() > 0.05 || diffX.abs() > 0.05) {
+      setState(() {
+        _botY += diffY * 0.08;
+        _botX += diffX * 0.08;
+        _botVelocity = _botY - prevY;
+
+        if (_botVelocity.abs() > 0.2 || (_botX - prevX).abs() > 0.2) {
+          _trail.add(_botY);
+          if (_trail.length > 6) _trail.removeAt(0);
+        } else if (_trail.isNotEmpty) {
+          _trail.removeAt(0);
+        }
+      });
+    } else if (_botVelocity != 0.0 || _trail.isNotEmpty) {
+      setState(() {
+        _botVelocity = 0.0;
+        if (_trail.isNotEmpty) _trail.removeAt(0);
+      });
+    }
+  }
+
+  void _locateDevSectionCenter() {
+    if (widget.sectionKeys.isNotEmpty) {
+      final box = widget.sectionKeys.first.currentContext
+          ?.findRenderObject() as RenderBox?;
+      if (box != null) {
+        final sTop = box.localToGlobal(Offset.zero).dy;
+        _botTargetY = sTop + box.size.height / 2;
+        _botY = _botTargetY;
+      }
+    }
   }
 
   void _scheduleBlink() async {
     await Future.delayed(
-        Duration(milliseconds: 1800 + math.Random().nextInt(2800)));
+        Duration(milliseconds: 2200 + math.Random().nextInt(2500)));
     if (!mounted) return;
     setState(() => _isBlinking = true);
-    await Future.delayed(const Duration(milliseconds: 120));
+    await Future.delayed(const Duration(milliseconds: 110));
     if (!mounted) return;
     setState(() => _isBlinking = false);
     _scheduleBlink();
   }
 
+  void _startGuide() {
+    setState(() {
+      _hasStartedGuide = true;
+    });
+    _sparkleCtrl.forward(from: 0);
+    _detectSection(_cursor.dy);
+  }
+
   void _onMouseMove(PointerEvent e) {
-    setState(() => _cursor = e.position);
-    _detectSection(e.position.dy);
+    _cursor = e.position;
+    if (_hasStartedGuide) {
+      _detectSection(e.position.dy);
+    }
   }
 
   void _detectSection(double cursorY) {
@@ -193,6 +257,7 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
     if (_sectionInfo.containsKey(section)) {
       setState(() => _bubbleSection = section);
       _bubbleCtrl.forward(from: 0);
+      _sparkleCtrl.forward(from: 0);
       setState(() => _bubbleVisible = true);
     } else {
       _bubbleCtrl.reverse().then((_) {
@@ -204,10 +269,8 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
   @override
   void dispose() {
     _bubbleCtrl.dispose();
-    _idleCtrl.dispose();
-    _antennaCtrl.dispose();
-    _armCtrl.dispose();
-    _pulseCtrl.dispose();
+    _animCtrl.dispose();
+    _sparkleCtrl.dispose();
     super.dispose();
   }
 
@@ -216,25 +279,40 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
     final screenW = MediaQuery.of(context).size.width;
     final isMobile = screenW < 700;
 
-    const botW = 84.0;
-    const botH = 175.0;
-    final botX = widget.showOnRight ? screenW - botW - 10 : 10.0;
+    const botW = 74.0;
+    const botH = 160.0;
 
     // Eye direction tracking
     final contentCX = screenW / 2;
-    final eyeRelX = (contentCX - botX - botW / 2).clamp(-40.0, 40.0);
-    final eyeNX = (eyeRelX / 40.0) * 4.5;
-    final eyeRelY = (_cursor.dy - _botY).clamp(-40.0, 40.0);
-    final eyeNY = (eyeRelY / 40.0) * 3.0;
-
-    // Levitation floating oscillation
-    final bob = math.sin(_idleCtrl.value * math.pi * 2) * 6.0;
-    final antennaWave = math.sin(_antennaCtrl.value * math.pi) * 8.0;
-    final armWave = _armCtrl.value;
+    final eyeRelX = (contentCX - _botX - botW / 2).clamp(-40.0, 40.0);
+    final eyeNX = (eyeRelX / 40.0) * 4.0;
+    final eyeRelY = (_cursor.dy - _botY).clamp(-30.0, 30.0);
+    final eyeNY = (eyeRelY / 30.0) * 2.5;
 
     final showBot = !isMobile;
-    final info = _sectionInfo[_bubbleSection];
-    final bubbleOnRight = !widget.showOnRight;
+    final bubbleOnRight = _botX < (screenW / 2);
+
+    // Intro vs Normal section info
+    final String bubbleIcon;
+    final String bubbleTitle;
+    final String bubbleDesc;
+    final String? actionLabel;
+    final VoidCallback? onActionTap;
+
+    if (!_hasStartedGuide) {
+      bubbleIcon = '🤖';
+      bubbleTitle = 'PERSONAL ASSISTANT';
+      bubbleDesc = "Hi! I'm your AI Guide.\nTap below to start the tour!";
+      actionLabel = 'START GUIDE ➔';
+      onActionTap = _startGuide;
+    } else {
+      final info = _sectionInfo[_bubbleSection];
+      bubbleIcon = info?.icon ?? '🤖';
+      bubbleTitle = info?.title ?? '';
+      bubbleDesc = info?.desc ?? '';
+      actionLabel = null;
+      onActionTap = null;
+    }
 
     return MouseRegion(
       onHover: _onMouseMove,
@@ -244,54 +322,100 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
           children: [
             widget.child,
 
-            // ── Full-body robot ───────────────────────────────────────────
-            if (showBot)
-              Positioned(
-                left: botX,
-                top: _botY + bob - botH / 2,
-                width: botW,
-                height: botH,
-                child: IgnorePointer(
-                  child: Transform.rotate(
-                    angle: _botTilt,
-                    origin: const Offset(botW / 2, botH / 2),
-                    child: CustomPaint(
-                      painter: _RobotBodyPainter(
-                        eyeNX: eyeNX,
-                        eyeNY: eyeNY,
-                        isBlinking: _isBlinking,
-                        antennaWave: antennaWave,
-                        armWave: armWave,
-                        t: _idleCtrl.value,
-                        pulseT: _pulseCtrl.value,
-                        bubbleVisible: _bubbleVisible,
-                        faceRight: !widget.showOnRight,
+            // ── Motion trail ──────────────────────────────────────────────
+            if (showBot && _hasStartedGuide)
+              for (int i = 0; i < _trail.length; i++)
+                Positioned(
+                  left: _botX,
+                  top: _trail[i] - botH / 2,
+                  width: botW,
+                  height: botH,
+                  child: IgnorePointer(
+                    child: Opacity(
+                      opacity: (i + 1) / (_trail.length + 1) * 0.16,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(40),
+                          gradient: RadialGradient(
+                            colors: [
+                              AppColors.cyan.withValues(alpha: 0.55),
+                              AppColors.cyan.withValues(alpha: 0.0),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-            // ── Speech bubble with tech accents ───────────────────────────
-            if (showBot && _bubbleVisible && info != null)
+            // ── Full-body robot ───────────────────────────────────────────
+            if (showBot)
               Positioned(
-                left: bubbleOnRight ? botX + botW + 8 : null,
-                right: bubbleOnRight ? null : screenW - botX + 8,
-                top: _botY + bob - 62,
+                left: _botX,
+                top: _botY - botH / 2,
+                width: botW,
+                height: botH,
                 child: IgnorePointer(
                   child: AnimatedBuilder(
-                    animation: _bubbleAnim,
-                    builder: (context, _) => Transform.scale(
-                      scale: _bubbleAnim.value.clamp(0.0, 1.2),
-                      alignment: bubbleOnRight
-                          ? Alignment.centerLeft
-                          : Alignment.centerRight,
-                      child: _SpeechBubble(
-                        icon: info.icon,
-                        title: info.title,
-                        desc: info.desc,
-                        tailOnLeft: bubbleOnRight,
-                      ),
+                    animation: _animCtrl,
+                    builder: (context, _) {
+                      final t = _animCtrl.value;
+                      final bob = math.sin(t * math.pi * 4) * 4.5;
+                      final antennaWave = math.sin(t * math.pi * 8) * 7.0;
+                      final armWave = 0.5 + 0.5 * math.sin(t * math.pi * 6);
+                      final mouthTalk = _bubbleVisible
+                          ? (0.5 + 0.5 * math.sin(t * math.pi * 14))
+                          : 0.0;
+                      final lean = (_botVelocity * 0.06).clamp(-0.16, 0.16);
+
+                      return Transform.translate(
+                        offset: Offset(0, bob),
+                        child: RepaintBoundary(
+                          child: CustomPaint(
+                            painter: _RobotBodyPainter(
+                              eyeNX: eyeNX,
+                              eyeNY: eyeNY,
+                              isBlinking: _isBlinking,
+                              antennaWave: antennaWave,
+                              armWave: armWave,
+                              t: t,
+                              bubbleVisible: _bubbleVisible,
+                              faceRight: bubbleOnRight,
+                              mouthTalk: mouthTalk,
+                              lean: lean,
+                              orbitT: (t * 2) % 1.0,
+                              sparkleT: _sparkleCtrl.value,
+                              hueT: t,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+            // ── Speech bubble ─────────────────────────────────────────────
+            if (showBot && _bubbleVisible)
+              Positioned(
+                left: bubbleOnRight ? _botX + botW + 6 : null,
+                right: bubbleOnRight ? null : screenW - _botX + 6,
+                top: _botY - 60,
+                child: AnimatedBuilder(
+                  animation: _bubbleAnim,
+                  builder: (context, _) => Transform.scale(
+                    scale: _bubbleAnim.value.clamp(0.0, 1.2),
+                    alignment: bubbleOnRight
+                        ? Alignment.centerLeft
+                        : Alignment.centerRight,
+                    child: _SpeechBubble(
+                      icon: bubbleIcon,
+                      title: bubbleTitle,
+                      desc: bubbleDesc,
+                      actionLabel: actionLabel,
+                      onActionTap: onActionTap,
+                      tailOnLeft: bubbleOnRight,
                     ),
                   ),
                 ),
@@ -303,97 +427,144 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
   }
 }
 
-// ─────────────────────────── Tech Speech Bubble ─────────────────────────────
+// ─────────────────────────── Speech bubble ───────────────────────────────────
 
-class _SpeechBubble extends StatelessWidget {
+class _SpeechBubble extends StatefulWidget {
   final String icon, title, desc;
+  final String? actionLabel;
+  final VoidCallback? onActionTap;
   final bool tailOnLeft;
 
   const _SpeechBubble({
     required this.icon,
     required this.title,
     required this.desc,
+    this.actionLabel,
+    this.onActionTap,
     required this.tailOnLeft,
   });
 
   @override
+  State<_SpeechBubble> createState() => _SpeechBubbleState();
+}
+
+class _SpeechBubbleState extends State<_SpeechBubble>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _shimmerCtrl = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 2),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _shimmerCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 184,
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF06101E).withValues(alpha: 0.96),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.cyan.withValues(alpha: 0.6),
-          width: 1.4,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.cyan.withValues(alpha: 0.28),
-            blurRadius: 20,
-            spreadRadius: 1,
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.6),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Header with pulse status dot
-          Row(
-            children: [
-              Text(icon, style: const TextStyle(fontSize: 15)),
-              const SizedBox(width: 7),
-              Expanded(
-                child: Text(
-                  title.toUpperCase(),
-                  style: GoogleFonts.ibmPlexMono(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.cyan,
-                    letterSpacing: 0.8,
-                  ),
-                ),
-              ),
-              Container(
-                width: 6,
-                height: 6,
-                decoration: const BoxDecoration(
-                  color: AppColors.cyan,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.cyan,
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
+    return AnimatedBuilder(
+      animation: _shimmerCtrl,
+      builder: (context, _) {
+        final glow = 0.18 + 0.12 * math.sin(_shimmerCtrl.value * math.pi * 2);
+        return Container(
+          width: 180,
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF071120).withValues(alpha: 0.97),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: AppColors.cyan.withValues(alpha: 0.6),
+              width: 1.3,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cyan.withValues(alpha: glow),
+                blurRadius: 20,
+                spreadRadius: 1,
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          Container(
-            height: 1,
-            color: AppColors.cyan.withValues(alpha: 0.2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.85, end: 1.0),
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.elasticOut,
+                    builder: (context, scale, child) =>
+                        Transform.scale(scale: scale, child: child),
+                    child: Text(widget.icon,
+                        style: const TextStyle(fontSize: 14)),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      widget.title,
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.cyan,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 7),
+              Text(
+                widget.desc,
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 11,
+                  height: 1.5,
+                  color: Colors.white.withValues(alpha: 0.85),
+                ),
+              ),
+              if (widget.actionLabel != null && widget.onActionTap != null) ...[
+                const SizedBox(height: 10),
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: widget.onActionTap,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 7),
+                      decoration: BoxDecoration(
+                        color: AppColors.cyan.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: AppColors.cyan,
+                          width: 1.2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.cyan.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          widget.actionLabel!,
+                          style: GoogleFonts.ibmPlexMono(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.cyan,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            desc,
-            style: GoogleFonts.spaceGrotesk(
-              fontSize: 11.5,
-              height: 1.5,
-              fontWeight: FontWeight.w500,
-              color: Colors.white.withValues(alpha: 0.88),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -401,8 +572,13 @@ class _SpeechBubble extends StatelessWidget {
 // ─────────────────────────── Full-body robot painter ─────────────────────────
 
 class _RobotBodyPainter extends CustomPainter {
-  final double eyeNX, eyeNY, antennaWave, armWave, t, pulseT;
+  final double eyeNX, eyeNY, antennaWave, armWave, t;
   final bool isBlinking, bubbleVisible, faceRight;
+  final double mouthTalk;
+  final double lean;
+  final double orbitT;
+  final double sparkleT;
+  final double hueT;
 
   const _RobotBodyPainter({
     required this.eyeNX,
@@ -411,77 +587,105 @@ class _RobotBodyPainter extends CustomPainter {
     required this.antennaWave,
     required this.armWave,
     required this.t,
-    required this.pulseT,
     required this.bubbleVisible,
     required this.faceRight,
+    this.mouthTalk = 0.0,
+    this.lean = 0.0,
+    this.orbitT = 0.0,
+    this.sparkleT = 0.0,
+    this.hueT = 0.0,
   });
 
   static const _cyan = Color(0xFF00F5D4);
   static const _pink = Color(0xFFFF2D78);
   static const _yellow = Color(0xFFFFD166);
-  static const _dark = Color(0xFF050E1A);
-  static const _bodyColor = Color(0xFF0C1D2E);
-  static const _bodyHL = Color(0xFF162B44);
-  static const _jointColor = Color(0xFF1B2E46);
-  static const _footColor = Color(0xFF091624);
+  static const _dark = Color(0xFF07111F);
+  static const _bodyColor = Color(0xFF0D1E30);
+  static const _bodyHL = Color(0xFF152840);
+  static const _jointColor = Color(0xFF162035);
+  static const _footColor = Color(0xFF0A1827);
+
+  Color _driftColor(double hue) {
+    final hsl = HSLColor.fromColor(_cyan).withHue(180 + hue * 180);
+    return hsl.toColor();
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
+    final ambient = _driftColor(math.sin(hueT * math.pi * 2) * 0.5 + 0.5);
 
-    const antennaTipY = 6.0;
-    const headCY = 54.0;
-    const headR = 28.0;
+    const antennaTipY = 4.0;
+    const headCY = 50.0;
+    const headR = 26.0;
     const neckTop = headCY + headR - 4;
     const neckBot = neckTop + 14;
     const torsoTop = neckBot - 2;
-    const torsoBot = torsoTop + 50;
+    const torsoBot = torsoTop + 46;
     const legTop = torsoBot - 2;
-    const legBot = legTop + 38;
+    const legBot = legTop + 36;
     const footY = legBot;
 
     final glowPulse = 0.5 + 0.5 * math.sin(t * math.pi * 2);
-    final ledPulseFast = 0.5 + 0.5 * math.sin(t * math.pi * 6);
+    final ballPulse = 0.5 + 0.5 * math.sin(t * math.pi * 4);
 
-    // ── 1. Thruster Jet Flames & Ground Aura ─────────────────────────────
-    final flameScale = 0.7 + 0.3 * math.sin(t * math.pi * 8);
-    for (final side in [-1.0, 1.0]) {
-      final lx = cx + side * 13;
-      // Energy Jet Plasma cone under feet
-      final jetPath = Path()
-        ..moveTo(lx - 5, footY + 5)
-        ..lineTo(lx + 5, footY + 5)
-        ..lineTo(lx, footY + 22 + flameScale * 8)
-        ..close();
+    canvas.save();
+    canvas.translate(cx, footY);
+    canvas.rotate(lean);
+    canvas.translate(-cx, -footY);
 
-      canvas.drawPath(
-        jetPath,
-        Paint()
-          ..shader = LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              _cyan.withValues(alpha: 0.9),
-              _pink.withValues(alpha: 0.6),
-              Colors.transparent,
-            ],
-          ).createShader(jetPath.getBounds())
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    // Outer glow
+    canvas.drawCircle(
+      Offset(cx, headCY),
+      headR + 8 + glowPulse * 4,
+      Paint()
+        ..color = ambient.withValues(alpha: 0.1 + glowPulse * 0.05)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 14),
+    );
+
+    // Orbiting motes
+    for (int i = 0; i < 3; i++) {
+      final phase = orbitT * math.pi * 2 + i * (math.pi * 2 / 3);
+      final radius = headR + 14 + i * 3;
+      final mx = cx + math.cos(phase) * radius;
+      final my = headCY + math.sin(phase) * radius * 0.55;
+      final moteColor = [_cyan, _pink, _yellow][i % 3];
+      canvas.drawCircle(
+        Offset(mx, my),
+        2.2,
+        Paint()..color = moteColor.withValues(alpha: 0.75),
       );
     }
 
-    // Outer aura glow
-    canvas.drawCircle(
-      Offset(cx, headCY + 20),
-      56 + glowPulse * 6,
-      Paint()
-        ..color = _cyan.withValues(alpha: 0.08 + glowPulse * 0.04)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 22),
-    );
+    // Sparkle burst
+    if (sparkleT > 0 && sparkleT < 1) {
+      final burstAlpha = (1 - sparkleT).clamp(0.0, 1.0);
+      final burstRadius = headR + sparkleT * 46;
+      canvas.drawCircle(
+        Offset(cx, headCY),
+        burstRadius,
+        Paint()
+          ..color = _cyan.withValues(alpha: burstAlpha * 0.5)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
+      const sparkCount = 8;
+      for (int i = 0; i < sparkCount; i++) {
+        final ang = (i / sparkCount) * math.pi * 2;
+        final dist = headR + 6 + sparkleT * 40;
+        final sx = cx + math.cos(ang) * dist;
+        final sy = headCY + math.sin(ang) * dist;
+        canvas.drawCircle(
+          Offset(sx, sy),
+          2.0 * burstAlpha + 0.4,
+          Paint()..color = _yellow.withValues(alpha: burstAlpha),
+        );
+      }
+    }
 
-    // ── 2. Legs & Knee Joints ─────────────────────────────────────────────
+    // Legs
     for (final side in [-1.0, 1.0]) {
-      final lx = cx + side * 13;
+      final lx = cx + side * 11;
       final legRect = Rect.fromLTWH(lx - 8, legTop, 16, legBot - legTop);
       canvas.drawRRect(
         RRect.fromRectAndRadius(legRect, const Radius.circular(6)),
@@ -489,134 +693,79 @@ class _RobotBodyPainter extends CustomPainter {
           ..shader = LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [_bodyHL, _dark],
+            colors: [_bodyColor, _dark],
           ).createShader(legRect),
       );
-      // Leg seam line
-      canvas.drawLine(
-        Offset(lx, legTop + 4),
-        Offset(lx, legBot - 4),
-        Paint()
-          ..color = _cyan.withValues(alpha: 0.2)
-          ..strokeWidth = 1,
-      );
-      // Knee joint ring
       canvas.drawCircle(
-        Offset(lx, legTop + (legBot - legTop) * 0.44),
-        5.5,
+        Offset(lx, legTop + (legBot - legTop) * 0.42),
+        5,
         Paint()..color = _jointColor,
       );
       canvas.drawCircle(
-        Offset(lx, legTop + (legBot - legTop) * 0.44),
-        5.5,
+        Offset(lx, legTop + (legBot - legTop) * 0.42),
+        5,
         Paint()
-          ..color = _cyan.withValues(alpha: 0.4)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.2,
-      );
-      // Feet
-      final footRect = Rect.fromCenter(
-        center: Offset(lx + side * 3, footY + 4),
-        width: 22,
-        height: 11,
-      );
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(footRect, const Radius.circular(5)),
-        Paint()..color = _footColor,
-      );
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(footRect, const Radius.circular(5)),
-        Paint()
-          ..color = _cyan.withValues(alpha: 0.35)
+          ..color = _cyan.withValues(alpha: 0.3)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1,
       );
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(lx + side * 3, footY + 5),
+          width: 20,
+          height: 10,
+        ),
+        Paint()..color = _footColor,
+      );
     }
 
-    // ── 3. Torso & Equalizer Panel ────────────────────────────────────────
-    final torsoRect = Rect.fromLTWH(cx - 24, torsoTop, 48, torsoBot - torsoTop);
+    // Torso
+    final torsoRect = Rect.fromLTWH(cx - 22, torsoTop, 44, torsoBot - torsoTop);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(torsoRect, const Radius.circular(10)),
+      RRect.fromRectAndRadius(torsoRect, const Radius.circular(9)),
       Paint()
         ..shader = LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [_bodyHL, _bodyColor, _dark],
+          colors: [_bodyHL, _bodyColor],
         ).createShader(torsoRect),
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(torsoRect, const Radius.circular(10)),
+      RRect.fromRectAndRadius(torsoRect, const Radius.circular(9)),
       Paint()
-        ..color = _cyan.withValues(alpha: 0.35)
+        ..color = ambient.withValues(alpha: 0.3)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.3,
+        ..strokeWidth = 1.2,
     );
-
-    // Chest Sci-Fi Panel
-    final chestRect = Rect.fromLTWH(cx - 15, torsoTop + 9, 30, 22);
+    final chestRect = Rect.fromLTWH(cx - 13, torsoTop + 8, 26, 18);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(chestRect, const Radius.circular(5)),
+      RRect.fromRectAndRadius(chestRect, const Radius.circular(4)),
       Paint()..color = _dark,
     );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(chestRect, const Radius.circular(5)),
-      Paint()
-        ..color = _cyan.withValues(alpha: 0.3)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 0.9,
-    );
-
-    // Dynamic 5-bar Audio Spectrum Analyzer / Equalizer inside chest
-    for (int bar = 0; bar < 5; bar++) {
-      final barH = 4 + 11 * (0.5 + 0.5 * math.sin(t * math.pi * 5 + bar * 1.3));
-      final bx = cx - 11 + bar * 5.2;
-      final by = torsoTop + 26;
-      canvas.drawLine(
-        Offset(bx, by),
-        Offset(bx, by - barH),
-        Paint()
-          ..color = bar.isEven ? _cyan : _pink
-          ..strokeWidth = 2.4
-          ..strokeCap = StrokeCap.round,
-      );
-    }
-
-    // Status LEDs
     for (int d = 0; d < 3; d++) {
-      final ledA = 0.4 + 0.6 * math.sin(t * math.pi * 4 + d * 1.5);
+      final ledPulse = 0.4 + 0.6 * math.sin(t * math.pi * 4 + d * 1.2);
       canvas.drawCircle(
-        Offset(cx - 9 + d * 9.0, torsoTop + 38),
+        Offset(cx - 8 + d * 8.0, torsoTop + 17),
         2.5,
-        Paint()
-          ..color = [_cyan, _yellow, _pink][d].withValues(alpha: ledA)
-          ..maskFilter = MaskFilter.blur(BlurStyle.normal, ledA * 2),
+        Paint()..color = [_cyan, _pink, _yellow][d].withValues(alpha: ledPulse),
       );
     }
 
-    // ── 4. Arms & Gestures ────────────────────────────────────────────────
-    final inwardSide = faceRight ? 1.0 : -1.0;
-
+    // Arms
+    final rightSide = faceRight ? 1.0 : -1.0;
     for (final side in [-1.0, 1.0]) {
-      final isInwardArm = (side == inwardSide) && bubbleVisible;
-      final ax = cx + side * 24;
+      final isInwardArm = (side == rightSide) && bubbleVisible;
+      final ax = cx + side * 22;
 
       canvas.save();
-
       if (isInwardArm) {
-        // Raise & wave arm towards bubble
-        final waveAngle = -1.0 + armWave * 0.3;
+        final raiseAngle = -0.9 + armWave * 0.25;
         canvas.translate(ax, torsoTop + 6);
-        canvas.rotate(waveAngle);
-        canvas.translate(-ax, -(torsoTop + 6));
-      } else {
-        // Subtle natural body counter-balance sway
-        final swayAngle = math.sin(t * math.pi * 2) * 0.08 * side;
-        canvas.translate(ax, torsoTop + 6);
-        canvas.rotate(swayAngle);
+        canvas.rotate(raiseAngle);
         canvas.translate(-ax, -(torsoTop + 6));
       }
 
-      final armRect = Rect.fromLTWH(ax - 7, torsoTop + 5, 14, 38);
+      final armRect = Rect.fromLTWH(ax - 7, torsoTop + 4, 14, 36);
       canvas.drawRRect(
         RRect.fromRectAndRadius(armRect, const Radius.circular(6)),
         Paint()
@@ -626,248 +775,181 @@ class _RobotBodyPainter extends CustomPainter {
             colors: [_bodyHL, _bodyColor],
           ).createShader(armRect),
       );
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(armRect, const Radius.circular(6)),
-        Paint()
-          ..color = _cyan.withValues(alpha: 0.25)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.9,
-      );
-
-      // Hand / Claw
-      final handCY = torsoTop + 5 + 38 + 7;
       canvas.drawCircle(
-        Offset(ax, handCY),
+        Offset(ax, torsoTop + 4 + 36 + 7),
         7,
         Paint()..color = _jointColor,
       );
-      canvas.drawCircle(
-        Offset(ax, handCY),
-        7,
-        Paint()
-          ..color = _cyan.withValues(alpha: 0.4)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.2,
-      );
-      // Glowing hand core
-      canvas.drawCircle(
-        Offset(ax, handCY),
-        2.5,
-        Paint()..color = _cyan.withValues(alpha: 0.6 + ledPulseFast * 0.4),
-      );
-
       canvas.restore();
     }
 
-    // ── 5. Neck ───────────────────────────────────────────────────────────
+    // Neck
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(cx - 9, neckTop, 18, neckBot - neckTop),
+        Rect.fromLTWH(cx - 8, neckTop, 16, neckBot - neckTop),
         const Radius.circular(4),
       ),
       Paint()..color = _bodyColor,
     );
-    canvas.drawLine(
-      Offset(cx - 7, neckTop + 6),
-      Offset(cx + 7, neckTop + 6),
-      Paint()
-        ..color = _cyan.withValues(alpha: 0.3)
-        ..strokeWidth = 1.2,
+
+    // Head
+    final headRect = Rect.fromCircle(
+      center: Offset(cx, headCY),
+      radius: headR,
     );
-
-    // ── 6. Head & Helmet Visor ────────────────────────────────────────────
-    final headCenter = Offset(cx, headCY);
-    final headRect = Rect.fromCircle(center: headCenter, radius: headR);
-
-    // Head base sphere with radial shader
     canvas.drawCircle(
-      headCenter,
+      Offset(cx, headCY),
       headR,
       Paint()
         ..shader = RadialGradient(
           center: const Alignment(-0.35, -0.45),
           radius: 1.0,
-          colors: [_bodyHL, _bodyColor, _dark],
+          colors: [_bodyHL, _bodyColor],
         ).createShader(headRect),
     );
-
-    // Outer glowing rim
     canvas.drawCircle(
-      headCenter,
+      Offset(cx, headCY),
       headR,
       Paint()
-        ..color = _cyan.withValues(alpha: 0.6)
+        ..color = ambient.withValues(alpha: 0.6)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.6,
+        ..strokeWidth = 1.5,
     );
 
-    // Visor Glass
-    final visorRect = Rect.fromLTWH(cx - 20, headCY - 12, 40, 24);
+    // Visor
+    final visorRect = Rect.fromLTWH(cx - 18, headCY - 11, 36, 22);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(visorRect, const Radius.circular(10)),
+      RRect.fromRectAndRadius(visorRect, const Radius.circular(9)),
       Paint()
         ..shader = LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            const Color(0xFF0E2843),
-            const Color(0xFF05111E),
+            const Color(0xFF0D2137),
+            const Color(0xFF06111E),
           ],
         ).createShader(visorRect),
     );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(visorRect, const Radius.circular(10)),
-      Paint()
-        ..color = _cyan.withValues(alpha: 0.45)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.2,
-    );
 
-    // Visor subtle scanlines
-    for (double sy = visorRect.top + 3; sy < visorRect.bottom - 2; sy += 4) {
-      canvas.drawLine(
-        Offset(visorRect.left + 3, sy),
-        Offset(visorRect.right - 3, sy),
-        Paint()
-          ..color = _cyan.withValues(alpha: 0.08)
-          ..strokeWidth = 1,
-      );
-    }
-
-    // ── 7. Eyes & Expressive Eye Tracking ─────────────────────────────────
+    // Eyes
     if (!isBlinking) {
       for (final side in [-1.0, 1.0]) {
-        final ex = cx + side * 8.0;
-        const ey = headCY - 1;
-
-        // Eye socket glow
-        canvas.drawCircle(Offset(ex, ey), 6.5, Paint()..color = _dark);
-
-        final irisCenter = Offset(ex + eyeNX * 0.55, ey + eyeNY * 0.55);
-
-        // Cyan/Pink Dual Iris Shader
+        final ex = cx + side * 7;
+        const ey = headCY;
+        canvas.drawCircle(Offset(ex, ey), 6, Paint()..color = _dark);
+        final irisCenter = Offset(ex + eyeNX * 0.5, ey + eyeNY * 0.5);
         canvas.drawCircle(
           irisCenter,
-          4.5,
+          4,
           Paint()
             ..shader = RadialGradient(
-              colors: [_cyan, const Color(0xFF007A6B)],
-            ).createShader(Rect.fromCircle(center: irisCenter, radius: 4.5)),
+              colors: [_cyan, const Color(0xFF008A76)],
+            ).createShader(
+              Rect.fromCircle(center: irisCenter, radius: 4),
+            ),
         );
-
-        // Pupil
         canvas.drawCircle(
           Offset(ex + eyeNX, ey + eyeNY),
-          2.2,
+          2.0,
           Paint()..color = Colors.black,
         );
-
-        // Glint / Catchlight
         canvas.drawCircle(
-          Offset(ex + eyeNX - 1.4, ey + eyeNY - 1.4),
-          1.1,
+          Offset(ex + eyeNX - 1.2, ey + eyeNY - 1.2),
+          0.9,
           Paint()..color = Colors.white,
-        );
-
-        // Eye ring pulse
-        canvas.drawCircle(
-          Offset(ex, ey),
-          6.5,
-          Paint()
-            ..color = _cyan.withValues(alpha: 0.2 + glowPulse * 0.15)
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1,
         );
       }
     } else {
-      // Expression blink lines (curved happy blink)
       for (final side in [-1.0, 1.0]) {
-        final blinkPath = Path()
-          ..moveTo(cx + side * 14, headCY - 1)
-          ..quadraticBezierTo(
-              cx + side * 8, headCY - 4, cx + side * 2, headCY - 1);
-        canvas.drawPath(
-          blinkPath,
+        canvas.drawLine(
+          Offset(cx + side * 13, headCY),
+          Offset(cx + side * 2, headCY),
           Paint()
-            ..color = _cyan
-            ..strokeWidth = 2.4
-            ..style = PaintingStyle.stroke
+            ..color = _cyan.withValues(alpha: 0.8)
+            ..strokeWidth = 2.2
             ..strokeCap = StrokeCap.round,
         );
       }
     }
 
-    // Smiling LED Mouth
-    final mouthPath = Path()
-      ..moveTo(cx - 7, headCY + 11)
-      ..quadraticBezierTo(cx, headCY + 15, cx + 7, headCY + 11);
-    canvas.drawPath(
-      mouthPath,
-      Paint()
-        ..color = _cyan.withValues(alpha: 0.75)
-        ..strokeWidth = 1.6
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round,
-    );
-
-    // Ear Bolts / Side Sensors
-    for (final side in [-1.0, 1.0]) {
-      final ex = cx + side * headR;
-      canvas.drawCircle(Offset(ex, headCY), 5.5, Paint()..color = _jointColor);
-      canvas.drawCircle(
-        Offset(ex, headCY),
-        5.5,
+    // Mouth
+    final mouthOpen = 3 + mouthTalk * 5;
+    if (bubbleVisible) {
+      final mouthRect = Rect.fromCenter(
+        center: Offset(cx, headCY + 12),
+        width: 12,
+        height: mouthOpen,
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(mouthRect, const Radius.circular(3)),
+        Paint()..color = _dark,
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(mouthRect, const Radius.circular(3)),
         Paint()
-          ..color = _cyan.withValues(alpha: 0.4)
+          ..color = _cyan.withValues(alpha: 0.7)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1,
       );
-      canvas.drawCircle(
-        Offset(ex, headCY),
-        2.5,
-        Paint()..color = _pink.withValues(alpha: 0.6 + ledPulseFast * 0.4),
+    } else {
+      final mouthPath = Path()
+        ..moveTo(cx - 6, headCY + 11)
+        ..quadraticBezierTo(cx, headCY + 14, cx + 6, headCY + 11);
+      canvas.drawPath(
+        mouthPath,
+        Paint()
+          ..color = _cyan.withValues(alpha: 0.6)
+          ..strokeWidth = 1.5
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round,
       );
     }
 
-    // ── 8. Antenna & RF Broadcast Signal Waves ─────────────────────────────
-    final antennaBase = Offset(cx, headCY - headR + 2);
-    final antennaTip = Offset(cx + antennaWave * 0.5, antennaTipY + 4);
+    // Ear Bolts
+    for (final side in [-1.0, 1.0]) {
+      final ex = cx + side * headR;
+      canvas.drawCircle(Offset(ex, headCY), 5, Paint()..color = _jointColor);
+      canvas.drawCircle(
+        Offset(ex, headCY),
+        2.5,
+        Paint()..color = _cyan.withValues(alpha: 0.5 + ballPulse * 0.4),
+      );
+    }
 
+    // Antenna
+    final antennaBase = Offset(cx, headCY - headR + 2);
+    final antennaTip = Offset(cx + antennaWave * 0.4, antennaTipY + 4);
     canvas.drawLine(
       antennaBase,
       antennaTip,
       Paint()
-        ..color = _cyan.withValues(alpha: 0.75)
-        ..strokeWidth = 2.2
+        ..color = _cyan.withValues(alpha: 0.65)
+        ..strokeWidth = 2
         ..strokeCap = StrokeCap.round,
     );
-
-    // Expanding Radio Signal Waves radiating from antenna tip
-    final ringRadius = (pulseT * 18.0) % 18.0;
-    final ringAlpha = (1.0 - (ringRadius / 18.0)).clamp(0.0, 1.0);
     canvas.drawCircle(
       antennaTip,
-      ringRadius,
+      5 + ballPulse * 2,
       Paint()
-        ..color = _cyan.withValues(alpha: ringAlpha * 0.5)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.2,
+        ..color = _pink.withValues(alpha: 0.3)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
     );
+    canvas.drawCircle(antennaTip, 3, Paint()..color = _pink);
 
-    // Tip Light Glow
-    canvas.drawCircle(
-      antennaTip,
-      6 + ledPulseFast * 2,
+    // Thruster glow
+    final thrusterBoost = (lean.abs() * 4).clamp(0.0, 0.25);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(cx, footY + 10),
+        width: 40 + thrusterBoost * 20,
+        height: 8 + thrusterBoost * 6,
+      ),
       Paint()
-        ..color = _pink.withValues(alpha: 0.45)
+        ..color = ambient.withValues(alpha: 0.15 + glowPulse * 0.1 + thrusterBoost)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
     );
-    canvas.drawCircle(antennaTip, 3.5, Paint()..color = _pink);
-    canvas.drawCircle(
-      antennaTip,
-      1.8,
-      Paint()..color = Colors.white.withValues(alpha: 0.9),
-    );
+
+    canvas.restore();
   }
 
   @override
