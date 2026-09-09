@@ -5,6 +5,7 @@ import 'package:my_portfolio/constants/app_colors.dart';
 import 'package:my_portfolio/widgets/inspector_box.dart';
 import 'package:my_portfolio/widgets/tech_generic_tag.dart';
 import 'package:my_portfolio/widgets/gradient_button.dart';
+import 'package:my_portfolio/widgets/robot_follower.dart';
 
 class ProjectDetailsScreen extends StatelessWidget {
   final String title;
@@ -14,8 +15,9 @@ class ProjectDetailsScreen extends StatelessWidget {
   final String githubUrl;
   final String? videoUrl;
   final List<String> techStack;
+  final _bodyKey = GlobalKey();
 
-  const ProjectDetailsScreen({
+  ProjectDetailsScreen({
     super.key,
     required this.title,
     required this.category,
@@ -72,15 +74,20 @@ class ProjectDetailsScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 16 : 48,
-            vertical: isMobile ? 24 : 48,
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1000),
+      body: RobotFollowerOverlay(
+        sectionKeys: [_bodyKey],
+        sectionNames: const ['Project'],
+        showOnRight: true,
+        child: SingleChildScrollView(
+          child: Padding(
+            key: _bodyKey,
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 16 : 48,
+              vertical: isMobile ? 24 : 48,
+            ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1000),
               child: InspectorBox(
                 widgetTag: 'ProjectDetail($cleanTitle)',
                 dimensionTag: category,
@@ -166,8 +173,9 @@ class ProjectDetailsScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildScreenshotsGallery(BuildContext context, bool isMobile) {
     return Column(
