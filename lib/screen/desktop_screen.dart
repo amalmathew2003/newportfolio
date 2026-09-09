@@ -5,6 +5,7 @@ import 'package:my_portfolio/constants/app_colors.dart';
 import 'package:my_portfolio/service/downloadcv.dart';
 import 'package:my_portfolio/widgets/inspector_box.dart';
 import 'package:my_portfolio/widgets/gradient_button.dart';
+import 'package:my_portfolio/widgets/mouse_follow_avatar.dart';
 import 'package:my_portfolio/widgets/tech_generic_tag.dart';
 
 class DesktopScreen extends StatefulWidget {
@@ -198,7 +199,10 @@ class _DesktopScreenState extends State<DesktopScreen>
                         child: _buildHeroText(context, isMobile: false),
                       ),
                       const SizedBox(width: 48),
-                      Expanded(flex: 5, child: _buildPhoneMockup(context)),
+                      Expanded(
+                        flex: 5,
+                        child: Center(child: MouseFollowAvatar(size: 300)),
+                      ),
                     ],
                   ),
           ),
