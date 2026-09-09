@@ -11,6 +11,7 @@ import 'package:my_portfolio/screen/projects_screen.dart';
 import 'package:my_portfolio/screen/contactme.dart';
 import 'package:my_portfolio/widgets/breadcrumb_nav.dart';
 import 'package:my_portfolio/widgets/scroll_progress_bar.dart';
+import 'package:my_portfolio/widgets/robot_follower.dart';
 
 class PortfolioScrollablePage extends StatefulWidget {
   const PortfolioScrollablePage({super.key});
@@ -86,70 +87,76 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage> {
 
     return Scaffold(
       backgroundColor: AppColors.background(context),
-      body: Stack(
-        children: [
-          // Scrollable Sections Body
-          SingleChildScrollView(
-            controller: _scrollController,
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                const SizedBox(height: 56), // Spacing for sticky breadcrumb header
-                KeyedSubtree(
-                  key: _sectionKeys[0],
-                  child: const AvatarSection(),
-                ),
-                KeyedSubtree(
-                  key: _sectionKeys[1],
-                  child: DesktopScreen(
-                    onProjectsTap: () => _scrollToSection(5),
-                    onContactTap: () => _scrollToSection(6),
+      // RobotFollowerOverlay wraps the whole page so the bot + bubble
+      // appear over all content. Section detection is cursor-Y based.
+      body: RobotFollowerOverlay(
+        sectionKeys: _sectionKeys,
+        sectionNames: _sections,
+        child: Stack(
+          children: [
+            // Scrollable Sections Body
+            SingleChildScrollView(
+              controller: _scrollController,
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  const SizedBox(height: 56),
+                  KeyedSubtree(
+                    key: _sectionKeys[0],
+                    child: const AvatarSection(),
                   ),
-                ),
-                KeyedSubtree(
-                  key: _sectionKeys[2],
-                  child: const AboutMe(),
-                ),
-                KeyedSubtree(
-                  key: _sectionKeys[3],
-                  child: const SkillsScreen(),
-                ),
-                KeyedSubtree(
-                  key: _sectionKeys[4],
-                  child: const ExperienceScreen(),
-                ),
-                KeyedSubtree(
-                  key: _sectionKeys[5],
-                  child: const ProjectsScreen(),
-                ),
-                KeyedSubtree(
-                  key: _sectionKeys[6],
-                  child: const ContactMe(),
-                ),
-              ],
+                  KeyedSubtree(
+                    key: _sectionKeys[1],
+                    child: DesktopScreen(
+                      onProjectsTap: () => _scrollToSection(5),
+                      onContactTap: () => _scrollToSection(6),
+                    ),
+                  ),
+                  KeyedSubtree(
+                    key: _sectionKeys[2],
+                    child: const AboutMe(),
+                  ),
+                  KeyedSubtree(
+                    key: _sectionKeys[3],
+                    child: const SkillsScreen(),
+                  ),
+                  KeyedSubtree(
+                    key: _sectionKeys[4],
+                    child: const ExperienceScreen(),
+                  ),
+                  KeyedSubtree(
+                    key: _sectionKeys[5],
+                    child: const ProjectsScreen(),
+                  ),
+                  KeyedSubtree(
+                    key: _sectionKeys[6],
+                    child: const ContactMe(),
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          // Top Sticky Breadcrumb Bar
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                BreadcrumbNav(
-                  activeIndex: _activeSection,
-                  sections: _sections,
-                  onSectionTap: _scrollToSection,
-                  onThemeToggle: themeService.toggleTheme,
-                  isDark: themeService.isDarkMode,
-                ),
-                ScrollProgressBar(controller: _scrollController),
-              ],
+            // Top Sticky Breadcrumb Bar
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  BreadcrumbNav(
+                    activeIndex: _activeSection,
+                    sections: _sections,
+                    onSectionTap: _scrollToSection,
+                    onThemeToggle: themeService.toggleTheme,
+                    isDark: themeService.isDarkMode,
+                  ),
+                  ScrollProgressBar(controller: _scrollController),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
