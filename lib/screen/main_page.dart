@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:my_portfolio/constants/app_colors.dart';
 import 'package:my_portfolio/service/theme_service.dart';
 import 'package:my_portfolio/screen/desktop_screen.dart';
+import 'package:my_portfolio/screen/avatar_section.dart';
 import 'package:my_portfolio/screen/aboutme.dart';
 import 'package:my_portfolio/screen/skills_screen.dart';
 import 'package:my_portfolio/screen/experience_screen.dart';
@@ -24,6 +25,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage> {
   int _activeSection = 0;
 
   final List<String> _sections = [
+    'Dev',
     'App',
     'About',
     'Skills',
@@ -32,7 +34,7 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage> {
     'Contact',
   ];
 
-  final List<GlobalKey> _sectionKeys = List.generate(6, (_) => GlobalKey());
+  final List<GlobalKey> _sectionKeys = List.generate(7, (_) => GlobalKey());
 
   @override
   void initState() {
@@ -95,29 +97,33 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage> {
                 const SizedBox(height: 56), // Spacing for sticky breadcrumb header
                 KeyedSubtree(
                   key: _sectionKeys[0],
-                  child: DesktopScreen(
-                    onProjectsTap: () => _scrollToSection(4),
-                    onContactTap: () => _scrollToSection(5),
-                  ),
+                  child: const AvatarSection(),
                 ),
                 KeyedSubtree(
                   key: _sectionKeys[1],
-                  child: const AboutMe(),
+                  child: DesktopScreen(
+                    onProjectsTap: () => _scrollToSection(5),
+                    onContactTap: () => _scrollToSection(6),
+                  ),
                 ),
                 KeyedSubtree(
                   key: _sectionKeys[2],
-                  child: const SkillsScreen(),
+                  child: const AboutMe(),
                 ),
                 KeyedSubtree(
                   key: _sectionKeys[3],
-                  child: const ExperienceScreen(),
+                  child: const SkillsScreen(),
                 ),
                 KeyedSubtree(
                   key: _sectionKeys[4],
-                  child: const ProjectsScreen(),
+                  child: const ExperienceScreen(),
                 ),
                 KeyedSubtree(
                   key: _sectionKeys[5],
+                  child: const ProjectsScreen(),
+                ),
+                KeyedSubtree(
+                  key: _sectionKeys[6],
                   child: const ContactMe(),
                 ),
               ],
