@@ -27,63 +27,120 @@ const List<ProjectData> portfolioProjects = [
   ProjectData(
     index: "01",
     title: "Voice Notes",
-    category: "AI • Productivity",
-    githubUrl: "https://github.com/amalmathew2003/note-app",
+    category: "AI • Voice Note App",
+    githubUrl: "https://github.com/amalmathew2003/note-app/blob/main/README.md",
     thumbnailUrls: [
-      "assets/images/VN1bg.png",
-      "assets/images/VN2bg.png",
-      "assets/images/VN3bg.png",
+      "assets/images/voice_notes_dashboard.png",
+      "assets/images/voice_notes_input.png",
+      "assets/images/voice_notes_editor.png",
+      "assets/images/voice_notes_translation.png",
+      "assets/images/voice_notes_splash.png",
     ],
     galleryUrls: [
-      "assets/images/vn1full.png",
-      "assets/images/VN1bg.png",
-      "assets/images/VN2bg.png",
-      "assets/images/VN3bg.png",
+      "assets/images/voice_notes_dashboard.png",
+      "assets/images/voice_notes_input.png",
+      "assets/images/voice_notes_editor.png",
+      "assets/images/voice_notes_translation.png",
+      "assets/images/voice_notes_splash.png",
     ],
     videoUrl: "assets/video/VN.mp4",
-    techStack: ["Flutter", "Dart", "Firebase", "Audio", "UI/UX"],
+    techStack: [
+      "Flutter",
+      "Hive",
+      "GroqAI",
+      "speech_to_text",
+      "flutter_tts",
+      "translator",
+      "flutter_local_notifications",
+      "google_fonts",
+    ],
     description:
-        "The Smart Voice Note App is a Flutter-Firebase based mobile application developed to provide users with a simple, reliable, and efficient way to record, store, and manage voice notes. The primary goal of the application is to help users capture ideas, reminders, meetings, and personal notes instantly through audio, without the need for typing. The app emphasizes usability, performance, and clean architecture while maintaining a modern and intuitive user interface.\n\n"
-        "In today's fast-paced environment, users often need a quick way to save thoughts or information. This application addresses that requirement by offering a seamless one-tap recording experience combined with organized storage and smooth playback functionality. The app is designed to work offline, ensuring that users can access their recordings anytime without depending on network connectivity.\n\n"
+        "Voice Notes is a cross-platform Flutter workspace built to capture thoughts by speech instead of typing. Speak an idea and it's transcribed live with speech_to_text, then handed to Groq's openai/gpt-oss-20b model to generate a clean, structured, bulleted note automatically.\n\n"
+        "Notes can be translated on demand into English, Malayalam, Kannada, Hindi, Tamil, or Telugu, and read back aloud with flutter_tts — complete with a route observer that halts playback the moment you navigate away. Everything is organized with categories, custom folders, pinning, favorites, and per-note colors across a searchable masonry grid, backed by a fast offline Hive database.\n\n"
         "Key Features:\n"
-        "* One-tap high-quality audio recording\n"
-        "* Automatic organization with date and time labels\n"
-        "* View a list of recorded notes with timestamps\n"
-        "* Play, pause, and control audio playback\n"
-        "* Delete recordings when no longer needed\n"
-        "The application follows a clean and minimal UI approach, making it accessible for users of all age groups. From recording to playback, every interaction is designed to be intuitive and responsive.",
+        "* Real-time voice-to-text note capture\n"
+        "* AI note generation and summarization via Groq\n"
+        "* Six-language on-demand translation\n"
+        "* Text-to-speech playback with smart auto-stop\n"
+        "* Folders, categories, pinning, favorites & color themes\n"
+        "* Soft-delete Trash with restore/permanent-delete\n"
+        "* Timezone-aware scheduled reminders with custom sounds",
   ),
   ProjectData(
     index: "02",
     title: "Travel Tracker",
-    category: "Mobile App • Flutter",
-    githubUrl: "https://github.com/amalmathew2003/travelapp",
+    category: "GPS • Fitness Tracking",
+    githubUrl: "https://github.com/amalmathew2003/travelapp/blob/main/README.md",
     thumbnailUrls: [
-      "assets/images/travalappfull.png",
-      "assets/images/travalapp.png",
-      "assets/images/travalapp2.png",
+      "assets/images/travel_tracker_dashboard.png",
+      "assets/images/travel_tracker_map.png",
+      "assets/images/travel_tracker_history.png",
+      "assets/images/travel_tracker_achievements.png",
+      "assets/images/travel_tracker_analytics.png",
+      "assets/images/travel_tracker_splash.png",
     ],
     galleryUrls: [
-      "assets/images/travalappfull.png",
-      "assets/images/travalapp.png",
-      "assets/images/travalapp2.png",
+      "assets/images/travel_tracker_dashboard.png",
+      "assets/images/travel_tracker_map.png",
+      "assets/images/travel_tracker_history.png",
+      "assets/images/travel_tracker_achievements.png",
+      "assets/images/travel_tracker_analytics.png",
+      "assets/images/travel_tracker_splash.png",
     ],
     videoUrl: "assets/video/travalApp.mp4",
-    techStack: ["Flutter", "Dart", "Google Maps", "Provider", "REST API"],
+    techStack: [
+      "Flutter",
+      "Geolocator",
+      "flutter_map",
+      "Hive",
+      "flutter_background_service",
+      "fl_chart",
+      "confetti",
+      "audioplayers",
+    ],
     description:
-        "The Travel Tracker App is a Flutter-based mobile application developed to help users track and record their travel activities in real time. The app allows users to monitor their location movements during a journey and maintain a record of travel routes and trips. It focuses on accurately capturing travel data while providing a simple and intuitive interface for viewing tracked information.\n\n"
-        "This project emphasizes real-time location tracking, background execution, and efficient data handling. The app is designed to work continuously during travel and reliably store tracking information for later reference. Through this project, I gained hands-on experience in location services, background task handling, permission management, and building Flutter applications that operate smoothly while tracking movement over extended periods.\n\n",
+        "Travel Tracker is a real-time fitness and travel tracking app for Walking, Running, Cycling, and Driving. It records distance, elapsed time, current/max speed, and estimated calorie burn using geolocator's GPS stream, while flutter_map renders the route live on OpenStreetMap/CartoDB/Esri tiles.\n\n"
+        "Map tiles only load during active tracking or preview — a lazy-rendering approach that keeps battery and data usage low. A persistent foreground service (flutter_background_service) keeps recording the route even when the app is minimized or the screen is locked, and completed trips are saved to a local Hive database.\n\n"
+        "Key Features:\n"
+        "* Real-time GPS distance, speed & calorie tracking\n"
+        "* Lazy map tile rendering to save battery and data\n"
+        "* Background location tracking with persistent notification\n"
+        "* Animated distance analytics via fl_chart\n"
+        "* Gamified milestone badges (1–100km) with confetti & sound\n"
+        "* On-device trip history with CSV/JSON export",
   ),
   ProjectData(
     index: "03",
-    title: "Motion Detection",
-    category: "Mobile App • Flutter",
-    githubUrl: "https://github.com/amalmathew2003/MotionDetectionApp",
-    thumbnailUrls: ["assets/images/motion.png", "assets/images/motion2.png"],
-    galleryUrls: ["assets/images/motion.png", "assets/images/motion2.png"],
-    techStack: ["Flutter", "Dart", "Sensors Plus", "Audio Players"],
+    title: "Motion Guard",
+    category: "Security • Anti-Theft Utility",
+    githubUrl: "https://github.com/amalmathew2003/MotionDetectionApp/blob/main/README.md",
+    thumbnailUrls: [
+      "assets/images/motion_guard_dashboard.png",
+      "assets/images/motion_guard_live_sensor.png",
+      "assets/images/motion_guard_detection_history.png",
+      "assets/images/motion_guard_settings.png",
+    ],
+    galleryUrls: [
+      "assets/images/motion_guard_dashboard.png",
+      "assets/images/motion_guard_live_sensor.png",
+      "assets/images/motion_guard_detection_history.png",
+      "assets/images/motion_guard_settings.png",
+    ],
+    techStack: [
+      "Flutter",
+      "sensors_plus",
+      "flutter_background_service",
+      "flutter_local_notifications",
+      "audioplayers",
+      "permission_handler",
+    ],
     description:
-        "The Motion Detection App is a Flutter-based mobile application designed to detect physical movement of the device using built-in sensors such as the accelerometer, gyroscope, and proximity sensor. The application continuously monitors sensor data to identify any significant movement or orientation changes of the phone. When motion is detected, the app immediately triggers an alarm sound, making it suitable for device security, theft prevention, and motion-based alert use cases. The app is capable of running in the background, ensuring continuous monitoring even when the application is not actively in use.\n\n"
-        "This project emphasizes real-time sensor data processing, background execution, and efficient system resource management. Motion detection is implemented using the sensors_plus package for accelerometer and gyroscope data, proximity_sensor for near-device detection, and audioplayers for triggering alarm sounds. Through this project, I gained hands-on experience in working with mobile sensors, managing background services, handling permissions, and building reliable Flutter applications that respond instantly to real-world physical interactions.",
+        "Motion Guard turns any smartphone into a physical anti-theft security system. It runs a background isolate that continuously reads the accelerometer via sensors_plus and computes a real-time motion magnitude vector, checked against a user-configurable sensitivity threshold on every sample.\n\n"
+        "Cross that threshold and an alarm fires instantly — whether the app is foregrounded, minimized, or the screen is off — powered by a persistent flutter_background_service isolate. A pulsing status orb reflects live state (standby/armed/alarm) alongside live X/Y/Z sensor bars.\n\n"
+        "Key Features:\n"
+        "* Background accelerometer monitoring via an isolate-based service\n"
+        "* Live status orb with X/Y/Z sensor visualization\n"
+        "* 50-event breach history log with magnitude & timestamp\n"
+        "* Adjustable sensitivity (2.0–7.0) with selectable alarm tones",
   ),
 ];

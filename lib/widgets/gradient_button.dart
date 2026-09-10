@@ -1,32 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:my_portfolio/constants/app_colors.dart';
 
-class GradientButton extends StatefulWidget {
+/// Sharp DevTools Inspector Button
+/// - 2px radius corners
+/// - Solid mist/charcoal primary OR outline secondary with cyan hover shift
+/// - Uses IBM Plex Mono / Space Grotesk
+/// - NO arrow glyphs (→)
+class DevToolsButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
-  final List<Color> gradientColors;
-  final double borderRadius;
+  final bool isSecondary;
   final EdgeInsets padding;
   final IconData? icon;
 
-  const GradientButton({
+  const DevToolsButton({
     super.key,
     required this.text,
     required this.onPressed,
-    this.gradientColors = const [Color(0xFF667eea), Color(0xFF764ba2)],
-    this.borderRadius = 30,
-    this.padding = const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+    this.isSecondary = false,
+    this.padding = const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
     this.icon,
   });
 
   @override
-  State<GradientButton> createState() => _GradientButtonState();
+  State<DevToolsButton> createState() => _DevToolsButtonState();
 }
 
-class _GradientButtonState extends State<GradientButton> {
+class _DevToolsButtonState extends State<DevToolsButton> {
   bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Primary colors
+    final primaryBg = isDark ? AppColors.mist : AppColors.charcoal;
+    final primaryFg = isDark ? AppColors.ink : AppColors.paperSurface;
+
+    // Secondary colors
+    final secondaryBg = _isHovered
+        ? AppColors.cyan.withValues(alpha: 0.12)
+        : Colors.transparent;
+    final secondaryBorder = _isHovered
+        ? AppColors.cyan
+        : AppColors.line(context);
+    final secondaryFg = _isHovered
+        ? AppColors.cyan
+        : AppColors.primaryText(context);
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -34,42 +56,33 @@ class _GradientButtonState extends State<GradientButton> {
       child: GestureDetector(
         onTap: widget.onPressed,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-          transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
+          duration: const Duration(milliseconds: 150),
           padding: widget.padding,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-            gradient: LinearGradient(
-              colors: widget.gradientColors,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: widget.gradientColors.first.withValues(
-                  alpha: _isHovered ? 0.6 : 0.3,
-                ),
-                blurRadius: _isHovered ? 25 : 15,
-                spreadRadius: _isHovered ? 2 : 0,
-                offset: const Offset(0, 5),
-              ),
-            ],
+            color: widget.isSecondary ? secondaryBg : primaryBg,
+            borderRadius: BorderRadius.circular(2.0),
+            border: widget.isSecondary
+                ? Border.all(color: secondaryBorder, width: 1.5)
+                : null,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               if (widget.icon != null) ...[
-                Icon(widget.icon, color: Colors.white, size: 20),
-                const SizedBox(width: 10),
+                Icon(
+                  widget.icon,
+                  color: widget.isSecondary ? secondaryFg : primaryFg,
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
               ],
               Text(
                 widget.text,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 13,
+                  color: widget.isSecondary ? secondaryFg : primaryFg,
                   fontWeight: FontWeight.w600,
-                  letterSpacing: 1.2,
+                  letterSpacing: 0.5,
                 ),
               ),
             ],
@@ -79,6 +92,37 @@ class _GradientButtonState extends State<GradientButton> {
     );
   }
 }
+
+/// Backward compatibility alias
+class GradientButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final List<Color>? gradientColors;
+  final double borderRadius;
+  final EdgeInsets padding;
+  final IconData? icon;
+
+  const GradientButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.gradientColors,
+    this.borderRadius = 2.0,
+    this.padding = const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+    this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DevToolsButton(
+      text: text,
+      onPressed: onPressed,
+      padding: padding,
+      icon: icon,
+    );
+  }
+}
+
 
 class GlowingIconButton extends StatefulWidget {
   final IconData icon;
@@ -91,8 +135,8 @@ class GlowingIconButton extends StatefulWidget {
     super.key,
     required this.icon,
     required this.onPressed,
-    this.color = const Color(0xFF00d4ff),
-    this.size = 50,
+    this.color = AppColors.cyan,
+    this.size = 40,
     this.tooltip,
   });
 
@@ -114,28 +158,23 @@ class _GlowingIconButtonState extends State<GlowingIconButton> {
         child: Tooltip(
           message: widget.tooltip ?? '',
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 150),
             width: widget.size,
             height: widget.size,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: widget.color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(2.0),
+              color: _isHovered
+                  ? widget.color.withValues(alpha: 0.15)
+                  : AppColors.surfaceCard(context),
               border: Border.all(
-                color: widget.color.withValues(alpha: _isHovered ? 1.0 : 0.5),
-                width: 2,
+                color: _isHovered ? widget.color : AppColors.line(context),
+                width: 1.5,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: widget.color.withValues(alpha: _isHovered ? 0.5 : 0.2),
-                  blurRadius: _isHovered ? 20 : 10,
-                  spreadRadius: _isHovered ? 2 : 0,
-                ),
-              ],
             ),
             child: Icon(
               widget.icon,
-              color: widget.color,
-              size: widget.size * 0.5,
+              color: _isHovered ? widget.color : AppColors.primaryText(context),
+              size: widget.size * 0.45,
             ),
           ),
         ),
@@ -143,3 +182,4 @@ class _GlowingIconButtonState extends State<GlowingIconButton> {
     );
   }
 }
+

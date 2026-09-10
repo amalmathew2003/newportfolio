@@ -1,243 +1,197 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:visibility_detector/visibility_detector.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:my_portfolio/constants/app_colors.dart';
+import 'package:my_portfolio/widgets/inspector_box.dart';
 
-class SkillDetail {
-  final String title;
-  final String category;
+class SkillChipData {
+  final String prefix;
+  final String name;
 
-  SkillDetail({
-    required this.title,
-    required this.category,
-  });
+  const SkillChipData(this.prefix, this.name);
 }
 
-class SkillsScreen extends StatefulWidget {
+class SkillsScreen extends StatelessWidget {
   const SkillsScreen({super.key});
 
-  @override
-  State<SkillsScreen> createState() => _SkillsScreenState();
-}
+  static const List<SkillChipData> skills = [
+    // Languages & SDK
+    SkillChipData('lang', 'Dart'),
+    SkillChipData('lang', 'Flutter'),
+    SkillChipData('lang', 'C'),
+    SkillChipData('lang', 'HTML/CSS'),
+    
+    // State Management
+    SkillChipData('state', 'Provider'),
+    SkillChipData('state', 'Bloc'),
+    SkillChipData('state', 'Riverpod'),
+    SkillChipData('state', 'GetX'),
 
-class _SkillsScreenState extends State<SkillsScreen> {
-  final Map<String, List<SkillDetail>> categorizedSkills = {
-    "CORE PLATFORMS": [
-      SkillDetail(title: "FLUTTER", category: "MOBILE / WEB SDK"),
-      SkillDetail(title: "DART", category: "PRIMARY LANGUAGE"),
-      SkillDetail(title: "ANDROID", category: "NATIVE STACK"),
-      SkillDetail(title: "iOS", category: "NATIVE STACK"),
-      SkillDetail(title: "WEB", category: "RESPONSIVE DESKTOP"),
-    ],
-    "STATE MANAGEMENT": [
-      SkillDetail(title: "PROVIDER", category: "CORE PATTERN"),
-      SkillDetail(title: "BLoC", category: "ENTERPRISE PATTERN"),
-      SkillDetail(title: "GETX", category: "FAST-TRACK PATTERN"),
-      SkillDetail(title: "RIVERPOD", category: "MODERN PATTERN"),
-    ],
-    "BACKEND & INFRA": [
-      SkillDetail(title: "FIREBASE", category: "BaaS ECOSYSTEM"),
-      SkillDetail(title: "SUPABASE", category: "POSTGRES ECOSYSTEM"),
-      SkillDetail(title: "REST API", category: "CLIENT-SERVER SYNC"),
-    ],
-    "DESIGN & TOOLS": [
-      SkillDetail(title: "FIGMA", category: "PROTOTYPING"),
-      SkillDetail(title: "UI/UX", category: "USER CENTRIC DESIGN"),
-      SkillDetail(title: "GIT", category: "VERSION CONTROL"),
-    ],
-  };
+    // Backend & APIs
+    SkillChipData('backend', 'Firebase'),
+    SkillChipData('backend', 'REST API'),
+    SkillChipData('backend', 'Supabase'),
 
-  bool _visible = false;
+    // Local Storage & Database
+    SkillChipData('db', 'Hive'),
+    SkillChipData('db', 'SQLite'),
+    SkillChipData('db', 'SharedPref'),
+
+    // Packages & Integrations
+    SkillChipData('pkg', 'Dio'),
+    SkillChipData('pkg', 'http'),
+    SkillChipData('pkg', 'GoogleMaps'),
+    SkillChipData('pkg', 'PaymentGateway'),
+    SkillChipData('pkg', 'SensorsPlus'),
+
+    // Dev Tools & Architecture
+    SkillChipData('tool', 'Git/GitHub'),
+    SkillChipData('tool', 'Clean Architecture'),
+    SkillChipData('tool', 'Figma'),
+  ];
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.primaryRed : AppColors.woodBrown;
 
-    return VisibilityDetector(
-      key: const Key('skills-section'),
-      onVisibilityChanged: (info) {
-        if (info.visibleFraction > 0.1 && !_visible) {
-          setState(() => _visible = true);
-        }
-      },
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 24 : 100,
-          vertical: isMobile ? 80 : 150,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Section Header
-            if (_visible)
-              FadeInUp(
-                duration: const Duration(milliseconds: 800),
-                child: Row(
-                  children: [
-                    Container(width: 30, height: 2, color: accentColor),
-                    const SizedBox(width: 15),
-                    Text(
-                      'CORE COMPETENCIES',
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 4,
-                        color: isDark ? Colors.white38 : Colors.black38,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-            const SizedBox(height: 30),
-
-            // Big title
-            if (_visible)
-              FadeInUp(
-                duration: const Duration(milliseconds: 1000),
-                delay: const Duration(milliseconds: 200),
-                child: Text(
-                  "TECHNICAL\nSTACK",
-                  style: GoogleFonts.libreBodoni(
-                    fontSize: isMobile ? 40 : 80,
-                    fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : Colors.black87,
-                    height: 0.9,
-                    letterSpacing: -4,
+    return Container(
+      width: double.infinity,
+      color: AppColors.background(context),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 16 : 48,
+        vertical: isMobile ? 32 : 64,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: InspectorBox(
+            widgetTag: 'Skills',
+            dimensionTag: 'items: ${skills.length}',
+            signalAccent: SignalAccent.pink,
+            padding: EdgeInsets.all(isMobile ? 20 : 36),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header in IBM Plex Mono
+                Text(
+                  'Map<Prefix, Skill> techStack = {',
+                  style: GoogleFonts.ibmPlexMono(
+                    fontSize: isMobile ? 13 : 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.pink,
                   ),
                 ),
-              ),
 
-            const SizedBox(height: 80),
+                const SizedBox(height: 16),
 
-            if (_visible)
-              ...categorizedSkills.entries.map((entry) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 60),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            entry.key,
-                            style: GoogleFonts.inter(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 3,
-                              color: accentColor.withValues(alpha: 0.8),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            child: Container(
-                              height: 1,
-                              color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 30),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: isMobile ? 1 : 4,
-                          crossAxisSpacing: 1,
-                          mainAxisSpacing: 1,
-                          childAspectRatio: isMobile ? 3 : 1.8,
-                        ),
-                        itemCount: entry.value.length,
-                        itemBuilder: (context, index) {
-                          return _SkillCard(
-                            skill: entry.value[index],
-                            accentColor: accentColor,
-                            isDark: isDark,
-                          );
-                        },
-                      ),
-                    ],
+                Text(
+                  'Technical Skills & Package Ecosystem',
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: isMobile ? 24 : 36,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryText(context),
+                    letterSpacing: -0.5,
                   ),
-                );
-              }),
-          ],
+                ),
+
+                const SizedBox(height: 12),
+
+                Text(
+                  'Categorized Flutter packages, state libraries, database engines, and developer tools.',
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: isMobile ? 14 : 16,
+                    color: AppColors.dim,
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                // Animated Skill Chips Wrap
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: skills.map((s) => AnimatedSkillChip(skill: s)).toList(),
+                ),
+
+                const SizedBox(height: 32),
+
+                Text(
+                  '}; // end techStack',
+                  style: GoogleFonts.ibmPlexMono(
+                    fontSize: 14,
+                    color: AppColors.pink,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-class _SkillCard extends StatefulWidget {
-  final SkillDetail skill;
-  final Color accentColor;
-  final bool isDark;
+class AnimatedSkillChip extends StatefulWidget {
+  final SkillChipData skill;
 
-  const _SkillCard({
-    required this.skill,
-    required this.accentColor,
-    required this.isDark,
-  });
+  const AnimatedSkillChip({super.key, required this.skill});
 
   @override
-  State<_SkillCard> createState() => _SkillCardState();
+  State<AnimatedSkillChip> createState() => _AnimatedSkillChipState();
 }
 
-class _SkillCardState extends State<_SkillCard> {
+class _AnimatedSkillChipState extends State<AnimatedSkillChip> {
   bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
+    final prefixColor = widget.skill.prefix == 'pkg'
+        ? AppColors.cyan
+        : widget.skill.prefix == 'lang'
+            ? AppColors.pink
+            : widget.skill.prefix == 'state'
+                ? AppColors.pink
+                : widget.skill.prefix == 'backend'
+                    ? AppColors.cyan
+                    : AppColors.dim;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.all(24),
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: _isHovered 
-            ? widget.accentColor.withValues(alpha: 0.08) 
-            : Colors.transparent,
+          color: _isHovered
+              ? prefixColor.withValues(alpha: 0.14)
+              : AppColors.background(context),
           border: Border.all(
-            color: widget.isDark 
-              ? Colors.white.withValues(alpha: 0.05) 
-              : Colors.black.withValues(alpha: 0.05),
+            color: _isHovered ? prefixColor : AppColors.line(context),
+            width: 1,
           ),
+          borderRadius: BorderRadius.circular(2),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const SizedBox.shrink(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.skill.title,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    color: widget.isDark ? Colors.white70 : Colors.black87,
-                    letterSpacing: 1,
-                  ),
+        child: RichText(
+          text: TextSpan(
+            style: GoogleFonts.ibmPlexMono(fontSize: 12),
+            children: [
+              TextSpan(
+                text: '${widget.skill.prefix}:',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: prefixColor,
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  widget.skill.category.toUpperCase(),
-                  style: GoogleFonts.jetBrainsMono(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w500,
-                    color: widget.accentColor.withValues(alpha: 0.6),
-                    letterSpacing: 1,
-                  ),
+              ),
+              TextSpan(
+                text: widget.skill.name,
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primaryText(context),
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
