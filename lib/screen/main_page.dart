@@ -87,14 +87,9 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage> {
 
     return Scaffold(
       backgroundColor: AppColors.background(context),
-      // RobotFollowerOverlay wraps the whole page so the bot + bubble
-      // appear over all content. Section detection is cursor-Y based.
-      body: RobotFollowerOverlay(
-        sectionKeys: _sectionKeys,
-        sectionNames: _sections,
-        child: Stack(
-          children: [
-            // Scrollable Sections Body
+      body: Stack(
+        children: [
+          // Scrollable Sections Body
             SingleChildScrollView(
               controller: _scrollController,
               physics: const BouncingScrollPhysics(),
@@ -136,28 +131,10 @@ class _PortfolioScrollablePageState extends State<PortfolioScrollablePage> {
               ),
             ),
 
-            // Top Sticky Breadcrumb Bar
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  BreadcrumbNav(
-                    activeIndex: _activeSection,
-                    sections: _sections,
-                    onSectionTap: _scrollToSection,
-                    onThemeToggle: themeService.toggleTheme,
-                    isDark: themeService.isDarkMode,
-                  ),
-                  ScrollProgressBar(controller: _scrollController),
-                ],
-              ),
-            ),
+            // Top sticky status bar (Breadcrumb/ProgressBar) removed.
           ],
         ),
-      ),
+      
     );
   }
 }

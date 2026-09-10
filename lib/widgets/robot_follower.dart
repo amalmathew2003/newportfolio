@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -160,6 +161,10 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
     _scheduleBlink();
   }
 
+  bool _isRenderBoxReady(RenderBox? box) {
+    return box != null && box.attached && box.hasSize && !box.debugNeedsLayout;
+  }
+
   void _onPhysicsTick() {
     if (!mounted) return;
     final screenW = MediaQuery.of(context).size.width;
@@ -169,16 +174,27 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
     final insideX = (screenW / 2) + (widget.showOnRight ? -200.0 : 200.0);
 
     if (_isFirstLayout) {
-      _isFirstLayout = false;
       _locateDevSectionCenter();
-      final initX = _hasStartedGuide ? sideX : insideX;
-      _botTargetX = initX;
-      _botPosNotifier.value = Offset(initX, _botTargetY);
-      _lastElapsed = _clock.elapsed;
-      return;
+      final box = widget.sectionKeys.isNotEmpty
+          ? widget.sectionKeys.first.currentContext?.findRenderObject() as RenderBox?
+          : null;
+      if (_isRenderBoxReady(box)) {
+        _isFirstLayout = false;
+        final initX = _hasStartedGuide ? sideX : insideX;
+        _botTargetX = initX;
+        _botPosNotifier.value = Offset(initX, _botTargetY);
+        _lastElapsed = _clock.elapsed;
+        return;
+      }
     } else {
       _botTargetX = _hasStartedGuide ? sideX : insideX;
     }
+
+    // ── Continuously re-detect active section & update target Y every tick ───
+    // Re-evaluates section RenderBoxes on every frame tick so the bot smoothly
+    // follows scrolling, expanding panels (e.g. HotReloadDemo), and dynamic content
+    // without needing mouse pointer movement.
+    _detectSection(_cursor.dy);
 
     // ── Real, frame-rate independent dt for a buttery-smooth critically
     // damped spring — gives the bot a light, elastic, "alive" glide instead
@@ -199,15 +215,17 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
     _botVelocityX += accX * dt;
     _botVelocityY += accY * dt;
 
-    final newX = currPos.dx + _botVelocityX * dt;
-    final newY = currPos.dy + _botVelocityY * dt;
+    var newX = currPos.dx + _botVelocityX * dt;
+    var newY = currPos.dy + _botVelocityY * dt;
 
-    if ((_botTargetX - newX).abs() < 0.02 &&
-        (_botTargetY - newY).abs() < 0.02 &&
-        _botVelocityX.abs() < 0.5 &&
-        _botVelocityY.abs() < 0.5) {
+    if ((_botTargetX - newX).abs() < 0.5 &&
+        (_botTargetY - newY).abs() < 0.5 &&
+        _botVelocityX.abs() < 1.0 &&
+        _botVelocityY.abs() < 1.0) {
       _botVelocityX = 0;
       _botVelocityY = 0;
+      newX = _botTargetX;
+      newY = _botTargetY;
     }
 
     // Track a short afterimage trail while moving with real speed.
@@ -226,8 +244,8 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
     if (widget.sectionKeys.isNotEmpty) {
       final box = widget.sectionKeys.first.currentContext
           ?.findRenderObject() as RenderBox?;
-      if (box != null) {
-        final sTop = box.localToGlobal(Offset.zero).dy;
+      if (_isRenderBoxReady(box)) {
+        final sTop = box!.localToGlobal(Offset.zero).dy;
         _botTargetY = sTop + box.size.height / 2;
       }
     }
@@ -251,6 +269,8 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
     _sparkleCtrl.forward(from: 0);
     _greetCtrl.forward(from: 0);
     _detectSection(_cursor.dy);
+    _updateBubble(
+        _detectedSection.isNotEmpty ? _detectedSection : (widget.sectionNames.isNotEmpty ? widget.sectionNames.first : 'Dev'));
   }
 
   void _onMouseMove(PointerEvent e) {
@@ -261,30 +281,29 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
   }
 
   void _detectSection(double cursorY) {
-    final viewportH = MediaQuery.of(context).size.height;
-    String found = '';
-    double foundCenterY = _botTargetY;
+    if (widget.sectionKeys.isEmpty) return;
 
-    for (int i = 0; i < widget.sectionKeys.length; i++) {
-      final box = widget.sectionKeys[i].currentContext
-          ?.findRenderObject() as RenderBox?;
-      if (box == null) continue;
-      final sTop = box.localToGlobal(Offset.zero).dy;
-      final sBottom = sTop + box.size.height;
-      if (cursorY >= sTop && cursorY <= sBottom) {
-        found = widget.sectionNames[i];
-        final visTop = sTop.clamp(56.0, viewportH - 10);
-        final visBot = sBottom.clamp(56.0, viewportH - 10);
-        foundCenterY = (visTop + visBot) / 2;
+    // The user requested that the bot "don't move still stant the dev section".
+    // This means the bot should permanently lock to the Dev section (index 0)
+    // and naturally scroll off the screen when the user scrolls down,
+    // rather than following them or jumping between sections.
+    final devBox = widget.sectionKeys[0].currentContext?.findRenderObject() as RenderBox?;
+    if (!_isRenderBoxReady(devBox)) return;
+
+    final sTop = devBox!.localToGlobal(Offset.zero).dy;
+    
+    // Anchor purely to the Dev section's top + 100px.
+    // No clamping to viewport! This ensures it scrolls completely off the top of the screen naturally.
+    final anchorY = sTop + 100.0;
+
+    if (_detectedSection != 'Dev') {
+      _detectedSection = 'Dev';
+      _botTargetY = anchorY;
+      _updateBubble('Dev');
+    } else {
+      if ((_botTargetY - anchorY).abs() > 2.0) {
+        _botTargetY = anchorY;
       }
-    }
-
-    if (found != _detectedSection) {
-      _detectedSection = found;
-      _botTargetY = foundCenterY;
-      _updateBubble(found);
-    } else if (found.isNotEmpty) {
-      _botTargetY = foundCenterY;
     }
   }
 
@@ -348,9 +367,19 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
       onHover: _onMouseMove,
       child: Listener(
         onPointerMove: _onMouseMove,
-        child: Stack(
-          children: [
-            widget.child,
+        // NotificationListener ensures scroll events (trackpad, keyboard,
+        // programmatic) also re-run section detection without needing a
+        // pointer-move event.
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (notification) {
+            if (_hasStartedGuide) {
+              _detectSection(_cursor.dy);
+            }
+            return false; // let the notification bubble up
+          },
+          child: Stack(
+            children: [
+              widget.child,
 
             // ── Dark Cyber Bot (ValueNotifier driven: Zero setState rebuilds!) ──
             if (showBot)
@@ -457,8 +486,10 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
                           left: bubbleOnRight ? pos.dx + botW + 6 : null,
                           right: bubbleOnRight ? null : screenW - pos.dx + 6,
                           top: pos.dy - 64,
-                          child: AnimatedBuilder(
-                            animation: _bubbleAnim,
+                          child: IgnorePointer(
+                            ignoring: actionLabel == null,
+                            child: AnimatedBuilder(
+                              animation: _bubbleAnim,
                             builder: (context, _) {
                               final slide = (1 - _bubbleAnim.value.clamp(0.0, 1.0)) *
                                   (bubbleOnRight ? -14 : 14);
@@ -485,11 +516,13 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
                             },
                           ),
                         ),
-                    ],
+                      ),
+                  ],
                   );
                 },
               ),
           ],
+        ),
         ),
       ),
     );
@@ -1236,4 +1269,92 @@ class _DarkRobotBodyPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_DarkRobotBodyPainter old) => true;
+}
+
+// ─────────────────────────── Stationary Inline Bot ───────────────────────────
+class StationaryBot extends StatefulWidget {
+  final double cursorX;
+  final double cursorY;
+  final double size;
+  const StationaryBot({super.key, required this.cursorX, required this.cursorY, this.size = 90});
+
+  @override
+  State<StationaryBot> createState() => _StationaryBotState();
+}
+
+class _StationaryBotState extends State<StationaryBot> with TickerProviderStateMixin {
+  late AnimationController _animCtrl;
+  bool _isBlinking = false;
+  late Timer _blinkTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _animCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000))..repeat();
+    _scheduleBlink();
+  }
+
+  void _scheduleBlink() {
+    final delay = 2000 + math.Random().nextInt(4000);
+    _blinkTimer = Timer(Duration(milliseconds: delay), () {
+      if (!mounted) return;
+      setState(() => _isBlinking = true);
+      Future.delayed(const Duration(milliseconds: 150), () {
+        if (!mounted) return;
+        setState(() => _isBlinking = false);
+        _scheduleBlink();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _animCtrl.dispose();
+    _blinkTimer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: widget.size,
+      height: widget.size,
+      child: AnimatedBuilder(
+        animation: _animCtrl,
+        builder: (context, _) {
+          final t = _animCtrl.value;
+          final bob = math.sin(t * math.pi * 4) * 4.5;
+          final antennaWave = math.sin(t * math.pi * 8) * 7.0;
+          final armWave = 0.5 + 0.5 * math.sin(t * math.pi * 6);
+          
+          final screenW = MediaQuery.of(context).size.width;
+          final eyeRelX = ((screenW / 2) - widget.cursorX).clamp(-40.0, 40.0);
+          final eyeNX = (eyeRelX / 40.0) * 4.0;
+          final eyeRelY = (widget.cursorY - 200).clamp(-30.0, 30.0);
+          final eyeNY = (eyeRelY / 30.0) * 2.5;
+
+          return Transform.translate(
+            offset: Offset(0, bob),
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: SizedBox(
+                width: 120,
+                height: 120,
+                child: CustomPaint(
+                  painter: _DarkRobotBodyPainter(
+                    eyeNX: eyeNX, eyeNY: eyeNY,
+                    isBlinking: _isBlinking,
+                    antennaWave: antennaWave, armWave: armWave,
+                    t: t, bubbleVisible: false, faceRight: false,
+                    mouthTalk: 0, lean: 0, orbitT: (t * 2) % 1.0,
+                    sparkleT: 0, hueT: t, speed: 0, greetWave: 0,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }

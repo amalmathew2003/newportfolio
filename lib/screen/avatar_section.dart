@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:my_portfolio/constants/app_colors.dart';
 import 'package:my_portfolio/widgets/inspector_box.dart';
 import 'package:my_portfolio/widgets/mouse_follow_avatar.dart';
+import 'package:my_portfolio/widgets/robot_follower.dart';
 
 class AvatarSection extends StatefulWidget {
   const AvatarSection({super.key});
@@ -19,6 +21,9 @@ class _AvatarSectionState extends State<AvatarSection>
   final List<_Sparkle> _sparkles = [];
   final GlobalKey _sectionKey = GlobalKey();
   late final AnimationController _sparkleLoopCtrl;
+
+  double _cursorX = 0;
+  double _cursorY = 0;
 
   // ── Waving ─────────────────────────────────────────────────────────────────
   bool _isWaving = false;
@@ -73,10 +78,14 @@ class _AvatarSectionState extends State<AvatarSection>
     _sparkleLoopCtrl.addListener(_updateSparkles);
 
     // Typewriter
-    _typeTimer =
-        Timer.periodic(const Duration(milliseconds: 38), _tickTypewriter);
-    _cursorTimer =
-        Timer.periodic(const Duration(milliseconds: 530), _tickCursor);
+    _typeTimer = Timer.periodic(
+      const Duration(milliseconds: 38),
+      _tickTypewriter,
+    );
+    _cursorTimer = Timer.periodic(
+      const Duration(milliseconds: 530),
+      _tickCursor,
+    );
 
     // Skill bars
     _barCtrl = AnimationController(
@@ -95,20 +104,25 @@ class _AvatarSectionState extends State<AvatarSection>
   }
 
   void _onMouseMove(PointerEvent e) {
-    final box =
-        _sectionKey.currentContext?.findRenderObject() as RenderBox?;
+    setState(() {
+      _cursorX = e.position.dx;
+      _cursorY = e.position.dy;
+    });
+
+    final box = _sectionKey.currentContext?.findRenderObject() as RenderBox?;
     if (box == null) return;
     final local = box.globalToLocal(e.position);
     final now = DateTime.now().millisecondsSinceEpoch;
-    if (_sparkles.isEmpty ||
-        (local - _sparkles.last.localPos).distance > 10) {
+    if (_sparkles.isEmpty || (local - _sparkles.last.localPos).distance > 10) {
       setState(() {
-        _sparkles.add(_Sparkle(
-          localPos: local,
-          createdAt: now,
-          isCyan: math.Random().nextBool(),
-          size: 2.0 + math.Random().nextDouble() * 3.0,
-        ));
+        _sparkles.add(
+          _Sparkle(
+            localPos: local,
+            createdAt: now,
+            isCyan: math.Random().nextBool(),
+            size: 2.0 + math.Random().nextDouble() * 3.0,
+          ),
+        );
       });
     }
   }
@@ -236,10 +250,7 @@ class _AvatarSectionState extends State<AvatarSection>
         const SizedBox(width: 52),
 
         // Right — interactive panel
-        Expanded(
-          flex: 5,
-          child: _buildRightPanel(context, isMobile: false),
-        ),
+        Expanded(flex: 5, child: _buildRightPanel(context, isMobile: false)),
       ],
     );
   }
@@ -265,8 +276,7 @@ class _AvatarSectionState extends State<AvatarSection>
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             color: AppColors.cyan.withValues(alpha: 0.1),
-            border:
-                Border.all(color: AppColors.cyan.withValues(alpha: 0.3)),
+            border: Border.all(color: AppColors.cyan.withValues(alpha: 0.3)),
             borderRadius: BorderRadius.circular(2),
           ),
           child: Text(
@@ -305,23 +315,48 @@ class _AvatarSectionState extends State<AvatarSection>
 
         const SizedBox(height: 24),
 
-        // ── Skill bars ─────────────────────────────────────────────
-        AnimatedBuilder(
-          animation: _barCtrl,
-          builder: (context, _) {
-            return Column(
-              children: [
-                for (final s in _skills) ...[
-                  _SkillBar(
-                    label: s.$1,
-                    value: s.$2 * _barCtrl.value,
-                    target: s.$2,
+        // ── Glassmorphic Skills Pill & 3D Gyroscope ───────────────────────────
+        ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              height: 56,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.cyan.withValues(alpha: 0.15),
+                    const Color(0xFF00F5D4).withValues(alpha: 0.05),
+                    Colors.purple.withValues(alpha: 0.08),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(
+                  color: AppColors.cyan.withValues(alpha: 0.4),
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.cyan.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    spreadRadius: -2,
                   ),
-                  const SizedBox(height: 8),
                 ],
-              ],
-            );
-          },
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const _GyroSkillIcon(),
+                  const SizedBox(width: 16),
+                  _RotatingSkillsText(skills: _skills),
+                  const SizedBox(width: 8),
+                ],
+              ),
+            ),
+          ),
         ),
 
         const SizedBox(height: 24),
@@ -336,8 +371,7 @@ class _AvatarSectionState extends State<AvatarSection>
                 label: _chipData[i].$1,
                 value: _chipData[i].$2,
                 isHovered: _hoveredChip == i,
-                onHover: (v) =>
-                    setState(() => _hoveredChip = v ? i : -1),
+                onHover: (v) => setState(() => _hoveredChip = v ? i : -1),
               ),
           ],
         ),
@@ -345,10 +379,7 @@ class _AvatarSectionState extends State<AvatarSection>
         const SizedBox(height: 24),
 
         // ── Terminal ───────────────────────────────────────────────
-        _TerminalBox(
-          text: _termBuffer.toString(),
-          showCursor: _showCursor,
-        ),
+        _TerminalBox(text: _termBuffer.toString(), showCursor: _showCursor),
 
         const SizedBox(height: 16),
 
@@ -397,17 +428,17 @@ class _WaveButtonState extends State<_WaveButton> {
         onTap: widget.onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           decoration: BoxDecoration(
             color: widget.isWaving
                 ? AppColors.cyan.withValues(alpha: 0.2)
                 : _hovered
-                    ? AppColors.cyan.withValues(alpha: 0.15)
-                    : AppColors.cyan.withValues(alpha: 0.08),
+                ? AppColors.cyan.withValues(alpha: 0.15)
+                : AppColors.cyan.withValues(alpha: 0.08),
             border: Border.all(
               color: AppColors.cyan.withValues(
-                  alpha: widget.isWaving || _hovered ? 0.8 : 0.35),
+                alpha: widget.isWaving || _hovered ? 0.8 : 0.35,
+              ),
               width: widget.isWaving ? 1.5 : 1,
             ),
             borderRadius: BorderRadius.circular(4),
@@ -416,7 +447,7 @@ class _WaveButtonState extends State<_WaveButton> {
                     BoxShadow(
                       color: AppColors.cyan.withValues(alpha: 0.25),
                       blurRadius: 16,
-                    )
+                    ),
                   ]
                 : [],
           ),
@@ -463,15 +494,13 @@ class _HoverChip extends StatelessWidget {
       onExit: (_) => onHover(false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: isHovered
               ? AppColors.cyan.withValues(alpha: 0.14)
               : AppColors.cyan.withValues(alpha: 0.06),
           border: Border.all(
-            color: AppColors.cyan
-                .withValues(alpha: isHovered ? 0.55 : 0.2),
+            color: AppColors.cyan.withValues(alpha: isHovered ? 0.55 : 0.2),
           ),
           borderRadius: BorderRadius.circular(4),
           boxShadow: isHovered
@@ -479,7 +508,7 @@ class _HoverChip extends StatelessWidget {
                   BoxShadow(
                     color: AppColors.cyan.withValues(alpha: 0.18),
                     blurRadius: 12,
-                  )
+                  ),
                 ]
               : [],
         ),
@@ -516,8 +545,11 @@ class _SkillBar extends StatelessWidget {
   final double value; // current (animated)
   final double target; // final value (for text)
 
-  const _SkillBar(
-      {required this.label, required this.value, required this.target});
+  const _SkillBar({
+    required this.label,
+    required this.value,
+    required this.target,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -580,10 +612,10 @@ class _TerminalBox extends StatelessWidget {
   final bool showCursor;
   const _TerminalBox({required this.text, required this.showCursor});
 
-  @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
+      height: 280,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFF060F1A),
@@ -636,19 +668,17 @@ class _TerminalBox extends StatelessWidget {
   }
 
   Widget _dot(Color c) => Container(
-        width: 10,
-        height: 10,
-        decoration:
-            BoxDecoration(color: c, shape: BoxShape.circle),
-      );
+    width: 10,
+    height: 10,
+    decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+  );
 }
 
 // ─────────────────────────── Dot-grid background ─────────────────────────────
 
 class _DotGridPainterWidget extends StatefulWidget {
   @override
-  State<_DotGridPainterWidget> createState() =>
-      _DotGridPainterWidgetState();
+  State<_DotGridPainterWidget> createState() => _DotGridPainterWidgetState();
 }
 
 class _DotGridPainterWidgetState extends State<_DotGridPainterWidget>
@@ -672,9 +702,8 @@ class _DotGridPainterWidgetState extends State<_DotGridPainterWidget>
   }
 
   @override
-  Widget build(BuildContext context) => CustomPaint(
-        painter: _DotGridPainter(t: _ctrl.value),
-      );
+  Widget build(BuildContext context) =>
+      CustomPaint(painter: _DotGridPainter(t: _ctrl.value));
 }
 
 class _DotGridPainter extends CustomPainter {
@@ -699,8 +728,9 @@ class _DotGridPainter extends CustomPainter {
           Offset(x, y),
           dotR + wave * 0.5,
           Paint()
-            ..color =
-                const Color(0xFF00F5D4).withValues(alpha: alpha.clamp(0.0, 1.0)),
+            ..color = const Color(
+              0xFF00F5D4,
+            ).withValues(alpha: alpha.clamp(0.0, 1.0)),
         );
       }
     }
@@ -735,9 +765,7 @@ class _SparklePainter extends CustomPainter {
     for (final s in sparkles) {
       final age = (now - s.createdAt) / 700.0; // 0..1
       final alpha = (1.0 - age).clamp(0.0, 1.0);
-      final col = s.isCyan
-          ? const Color(0xFF00F5D4)
-          : const Color(0xFFFF2D78);
+      final col = s.isCyan ? const Color(0xFF00F5D4) : const Color(0xFFFF2D78);
 
       // Glow
       canvas.drawCircle(
@@ -758,4 +786,162 @@ class _SparklePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_SparklePainter old) => true;
+}
+
+class _RotatingSkillsText extends StatefulWidget {
+  final List<(String, double)> skills;
+  const _RotatingSkillsText({required this.skills});
+
+  @override
+  State<_RotatingSkillsText> createState() => _RotatingSkillsTextState();
+}
+
+class _RotatingSkillsTextState extends State<_RotatingSkillsText> {
+  int _idx = 0;
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 2500), (_) {
+      if (mounted) setState(() => _idx = (_idx + 1) % widget.skills.length);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 600),
+      switchInCurve: Curves.easeOutBack,
+      switchOutCurve: Curves.easeIn,
+      transitionBuilder: (child, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.4),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          ),
+        );
+      },
+      child: Text(
+        widget.skills[_idx].$1,
+        key: ValueKey<int>(_idx),
+        textAlign: TextAlign.left,
+        style: GoogleFonts.spaceGrotesk(
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          color: AppColors.cyan,
+          letterSpacing: -0.5,
+        ),
+      ),
+    );
+  }
+}
+
+class _GyroSkillIcon extends StatefulWidget {
+  const _GyroSkillIcon();
+
+  @override
+  State<_GyroSkillIcon> createState() => _GyroSkillIconState();
+}
+
+class _GyroSkillIconState extends State<_GyroSkillIcon>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 3000))
+      ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  Widget _buildRing(double angleX, double angleY, double angleZ, double size,
+      double width, Color color) {
+    return Transform(
+      alignment: Alignment.center,
+      transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.002) // Perspective for 3D effect
+        ..rotateX(angleX)
+        ..rotateY(angleY)
+        ..rotateZ(angleZ),
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: color, width: width),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, _) {
+        final t = _ctrl.value * math.pi * 2;
+        return Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.cyan.withValues(alpha: 0.1),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cyan.withValues(alpha: 0.25),
+                blurRadius: 12,
+              ),
+            ],
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Glowing Core
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: AppColors.cyan,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      blurRadius: 4,
+                    )
+                  ],
+                ),
+              ),
+              // Outer Ring (Z-axis primary)
+              _buildRing(t * 0.9, 0, -t, 32, 0.8,
+                  AppColors.dim.withValues(alpha: 0.4)),
+              // Middle Ring (X-Y axis tumble)
+              _buildRing(t, t * 1.5, 0, 24, 1.5,
+                  AppColors.cyan.withValues(alpha: 0.8)),
+              // Inner Ring (Y-Z axis tumble)
+              _buildRing(0, t * 1.2, t * 0.8, 16, 1.0,
+                  const Color(0xFF00F5D4).withValues(alpha: 0.6)),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
