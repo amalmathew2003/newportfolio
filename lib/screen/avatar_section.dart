@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:my_portfolio/constants/app_colors.dart';
 import 'package:my_portfolio/widgets/inspector_box.dart';
 import 'package:my_portfolio/widgets/mouse_follow_avatar.dart';
-import 'package:my_portfolio/widgets/robot_follower.dart';
 
 class AvatarSection extends StatefulWidget {
   const AvatarSection({super.key});

@@ -185,12 +185,16 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
     final insideX = (screenW / 2) + (widget.showOnRight ? -200.0 : 200.0);
 
     if (_isFirstLayout) {
-      _locateDevSectionCenter();
+      final isProjectPage = widget.sectionNames.contains('Project');
+      if (!isProjectPage) _locateDevSectionCenter();
       final box = widget.sectionKeys.isNotEmpty
           ? widget.sectionKeys.first.currentContext?.findRenderObject() as RenderBox?
           : null;
-      if (_isRenderBoxReady(box)) {
+      // On project pages, skip waiting for the section box — place right away.
+      if (isProjectPage || _isRenderBoxReady(box)) {
         _isFirstLayout = false;
+        final screenH = MediaQuery.of(context).size.height;
+        if (isProjectPage) _botTargetY = screenH * 0.38;
         final initX = _hasStartedGuide ? sideX : insideX;
         _botTargetX = initX;
         _botPosNotifier.value = Offset(initX, _botTargetY);
@@ -294,6 +298,9 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
   void _detectSection(double cursorY) {
     if (widget.sectionKeys.isEmpty) return;
 
+    // On the project details page, the bubble is locked to 'Project' — never override it.
+    if (widget.sectionNames.contains('Project')) return;
+
     // The user requested that the bot "don't move still stant the dev section".
     // This means the bot should permanently lock to the Dev section (index 0)
     // and naturally scroll off the screen when the user scrolls down,
@@ -360,7 +367,7 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
     final VoidCallback? onActionTap;
 
     if (!_hasStartedGuide) {
-      bubbleIcon = '🤖';
+      bubbleIcon = '\u{1F916}';
       bubbleTitle = 'PERSONAL ASSISTANT';
       bubbleDesc = "Hi! I'm your AI Guide.\nTap below to start the tour!";
       actionLabel = 'START GUIDE ➔';
@@ -368,12 +375,18 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
     } else {
       final info = _sectionInfo[_bubbleSection];
       bubbleIcon = info?.icon ?? '🤖';
-      bubbleTitle = (_bubbleSection == 'Project' && widget.dynamicTitle != null)
-          ? widget.dynamicTitle!
-          : info?.title ?? '';
-      bubbleDesc = (_bubbleSection == 'Project' && widget.dynamicDesc != null)
-          ? widget.dynamicDesc!
-          : info?.desc ?? '';
+      if (_bubbleSection == 'Project' && widget.dynamicTitle != null) {
+        bubbleTitle = widget.dynamicTitle!;
+        // Short note: first line of dynamicDesc, trimmed to 72 chars
+        final rawDesc = widget.dynamicDesc ?? '';
+        final firstLine = rawDesc.split('\n').first.trim();
+        bubbleDesc = firstLine.length > 72
+            ? '${firstLine.substring(0, 70)}…'
+            : firstLine;
+      } else {
+        bubbleTitle = info?.title ?? '';
+        bubbleDesc = info?.desc ?? '';
+      }
       actionLabel = null;
       onActionTap = null;
     }
@@ -394,7 +407,7 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
           },
           child: Stack(
             children: [
-              widget.child,
+              Positioned.fill(child: widget.child),
 
             // ── Dark Cyber Bot (ValueNotifier driven: Zero setState rebuilds!) ──
             if (showBot)

@@ -79,7 +79,7 @@ class ProjectDetailsScreen extends StatelessWidget {
         sectionNames: const ['Project'],
         showOnRight: true,
         dynamicTitle: title,
-        dynamicDesc: 'Exploring this $category!\nSwipe to see more.',
+        dynamicDesc: description.split('.').first.trim(),
         child: SingleChildScrollView(
           child: Padding(
             key: _bodyKey,
