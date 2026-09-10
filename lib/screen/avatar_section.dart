@@ -17,14 +17,6 @@ class AvatarSection extends StatefulWidget {
 
 class _AvatarSectionState extends State<AvatarSection>
     with TickerProviderStateMixin {
-  // ── Mouse sparkle trail ────────────────────────────────────────────────────
-  final List<_Sparkle> _sparkles = [];
-  final GlobalKey _sectionKey = GlobalKey();
-  late final AnimationController _sparkleLoopCtrl;
-
-  double _cursorX = 0;
-  double _cursorY = 0;
-
   // ── Waving ─────────────────────────────────────────────────────────────────
   bool _isWaving = false;
 
@@ -56,26 +48,18 @@ class _AvatarSectionState extends State<AvatarSection>
   bool _showCursor = true;
   late Timer _cursorTimer;
 
-  // ── Skill bars ─────────────────────────────────────────────────────────────
+  // ── Skills shown in the rotating pill ──────────────────────────────────────
   static const _skills = [
-    ('Flutter / Dart', 0.90),
-    ('Firebase & REST APIs', 0.80),
-    ('State Management', 0.85),
-    ('Clean Architecture', 0.78),
-    ('UI / UX Design', 0.72),
+    ('Flutter / Dart', Icons.flutter_dash_rounded),
+    ('Firebase & REST APIs', Icons.local_fire_department_rounded),
+    ('State Management', Icons.hub_rounded),
+    ('Clean Architecture', Icons.architecture_rounded),
+    ('UI / UX Design', Icons.brush_rounded),
   ];
-  late final AnimationController _barCtrl;
 
   @override
   void initState() {
     super.initState();
-
-    // Sparkle animation loop
-    _sparkleLoopCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 16),
-    )..repeat();
-    _sparkleLoopCtrl.addListener(_updateSparkles);
 
     // Typewriter
     _typeTimer = Timer.periodic(
@@ -86,45 +70,6 @@ class _AvatarSectionState extends State<AvatarSection>
       const Duration(milliseconds: 530),
       _tickCursor,
     );
-
-    // Skill bars
-    _barCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    )..forward();
-  }
-
-  void _updateSparkles() {
-    final now = DateTime.now().millisecondsSinceEpoch;
-    if (mounted) {
-      setState(() {
-        _sparkles.removeWhere((s) => now - s.createdAt > 700);
-      });
-    }
-  }
-
-  void _onMouseMove(PointerEvent e) {
-    setState(() {
-      _cursorX = e.position.dx;
-      _cursorY = e.position.dy;
-    });
-
-    final box = _sectionKey.currentContext?.findRenderObject() as RenderBox?;
-    if (box == null) return;
-    final local = box.globalToLocal(e.position);
-    final now = DateTime.now().millisecondsSinceEpoch;
-    if (_sparkles.isEmpty || (local - _sparkles.last.localPos).distance > 10) {
-      setState(() {
-        _sparkles.add(
-          _Sparkle(
-            localPos: local,
-            createdAt: now,
-            isCyan: math.Random().nextBool(),
-            size: 2.0 + math.Random().nextDouble() * 3.0,
-          ),
-        );
-      });
-    }
   }
 
   void _tickTypewriter(Timer _) {
@@ -165,10 +110,8 @@ class _AvatarSectionState extends State<AvatarSection>
 
   @override
   void dispose() {
-    _sparkleLoopCtrl.dispose();
     _typeTimer.cancel();
     _cursorTimer.cancel();
-    _barCtrl.dispose();
     super.dispose();
   }
 
@@ -177,32 +120,18 @@ class _AvatarSectionState extends State<AvatarSection>
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 900;
 
-    return MouseRegion(
-      onHover: _onMouseMove,
-      child: Listener(
-        onPointerMove: _onMouseMove,
-        child: Container(
-          key: _sectionKey,
-          width: double.infinity,
-          // Full-viewport-height feel
-          constraints: BoxConstraints(minHeight: size.height * 0.94),
-          color: AppColors.background(context),
-          child: Stack(
-            children: [
-              // ── Animated dot-grid background ───────────────────────────
-              Positioned.fill(child: _DotGridPainterWidget()),
+    return Container(
+      width: double.infinity,
+      // Full-viewport-height feel
+      constraints: BoxConstraints(minHeight: size.height * 0.94),
+      color: AppColors.background(context),
+      child: Stack(
+        children: [
+          // ── Animated dot-grid background ───────────────────────────
+          Positioned.fill(child: _DotGridPainterWidget()),
 
-              // ── Mouse sparkle trail ────────────────────────────────────
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: CustomPaint(
-                    painter: _SparklePainter(sparkles: _sparkles),
-                  ),
-                ),
-              ),
-
-              // ── Main content ───────────────────────────────────────────
-              Padding(
+          // ── Main content ───────────────────────────────────────────
+          Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: isMobile ? 16 : 48,
                   vertical: isMobile ? 32 : 56,
@@ -224,8 +153,6 @@ class _AvatarSectionState extends State<AvatarSection>
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 
@@ -315,49 +242,8 @@ class _AvatarSectionState extends State<AvatarSection>
 
         const SizedBox(height: 24),
 
-        // ── Glassmorphic Skills Pill & 3D Gyroscope ───────────────────────────
-        ClipRRect(
-          borderRadius: BorderRadius.circular(28),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              height: 56,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.cyan.withValues(alpha: 0.15),
-                    const Color(0xFF00F5D4).withValues(alpha: 0.05),
-                    Colors.purple.withValues(alpha: 0.08),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                border: Border.all(
-                  color: AppColors.cyan.withValues(alpha: 0.4),
-                  width: 1.5,
-                ),
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.cyan.withValues(alpha: 0.1),
-                    blurRadius: 10,
-                    spreadRadius: -2,
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const _GyroSkillIcon(),
-                  const SizedBox(width: 16),
-                  _RotatingSkillsText(skills: _skills),
-                  const SizedBox(width: 8),
-                ],
-              ),
-            ),
-          ),
-        ),
+        // ── Redesigned Skills Pill ──────────────────────────────────────
+        _SkillPill(skills: _skills),
 
         const SizedBox(height: 24),
 
@@ -402,6 +288,245 @@ class _AvatarSectionState extends State<AvatarSection>
     ('REST APIs', '1+ yr'),
     ('Apps Shipped', '10+'),
   ];
+}
+
+// ─────────────────────────── Redesigned Skills Pill ──────────────────────────
+
+/// A capsule with a slow-rotating conic gradient border, a glassy dark
+/// interior, and a per-skill icon that crossfades along with the label.
+/// No numbers, no progress bar — just a clean, high-polish rotating badge.
+class _SkillPill extends StatefulWidget {
+  final List<(String, IconData)> skills;
+  const _SkillPill({required this.skills});
+
+  @override
+  State<_SkillPill> createState() => _SkillPillState();
+}
+
+class _SkillPillState extends State<_SkillPill>
+    with TickerProviderStateMixin {
+  late final AnimationController _borderCtrl;
+  late final AnimationController _pulseCtrl;
+  int _idx = 0;
+  late final Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _borderCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 6),
+    )..repeat();
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+    _timer = Timer.periodic(const Duration(milliseconds: 2600), (_) {
+      if (mounted) setState(() => _idx = (_idx + 1) % widget.skills.length);
+    });
+  }
+
+  @override
+  void dispose() {
+    _borderCtrl.dispose();
+    _pulseCtrl.dispose();
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final skill = widget.skills[_idx];
+
+    return AnimatedBuilder(
+      animation: Listenable.merge([_borderCtrl, _pulseCtrl]),
+      builder: (context, _) {
+        final pulse = _pulseCtrl.value;
+        return Container(
+          padding: const EdgeInsets.all(1.6),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(32),
+            gradient: SweepGradient(
+              startAngle: 0,
+              endAngle: math.pi * 2,
+              transform: GradientRotation(_borderCtrl.value * math.pi * 2),
+              colors: const [
+                AppColors.cyan,
+                Color(0xFF9B6BFF),
+                AppColors.pink,
+                AppColors.cyan,
+              ],
+              stops: const [0.0, 0.4, 0.75, 1.0],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cyan.withValues(alpha: 0.16 + pulse * 0.12),
+                blurRadius: 24,
+                spreadRadius: -4,
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 14,
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      const Color(0xFF0A1626).withValues(alpha: 0.95),
+                      const Color(0xFF071120).withValues(alpha: 0.98),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Row(
+                  children: [
+                    _IconBadge(icon: skill.$2, pulse: pulse),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 450),
+                        switchInCurve: Curves.easeOutBack,
+                        switchOutCurve: Curves.easeIn,
+                        transitionBuilder: (child, anim) => FadeTransition(
+                          opacity: anim,
+                          child: SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(0, 0.35),
+                              end: Offset.zero,
+                            ).animate(anim),
+                            child: child,
+                          ),
+                        ),
+                        child: Column(
+                          key: ValueKey(_idx),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'CURRENTLY FOCUSED ON',
+                              style: GoogleFonts.ibmPlexMono(
+                                fontSize: 9,
+                                color: AppColors.cyan.withValues(alpha: 0.55),
+                                letterSpacing: 1.4,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            ShaderMask(
+                              shaderCallback: (r) => const LinearGradient(
+                                colors: [Colors.white, AppColors.cyan],
+                              ).createShader(r),
+                              child: Text(
+                                skill.$1,
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: -0.4,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Static dot rail — a quiet index indicator, no numbers.
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (int i = 0; i < widget.skills.length; i++)
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.symmetric(vertical: 1.5),
+                            width: i == _idx ? 5 : 3,
+                            height: i == _idx ? 5 : 3,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: i == _idx
+                                  ? AppColors.cyan
+                                  : Colors.white.withValues(alpha: 0.15),
+                              boxShadow: i == _idx
+                                  ? [
+                                      BoxShadow(
+                                        color: AppColors.cyan
+                                            .withValues(alpha: 0.7),
+                                        blurRadius: 5,
+                                      ),
+                                    ]
+                                  : [],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Rounded-square glowing icon badge — replaces the old 3D gyroscope with
+/// something that reads instantly and matches the panel/terminal language
+/// already used elsewhere in the section.
+class _IconBadge extends StatelessWidget {
+  final IconData icon;
+  final double pulse;
+  const _IconBadge({required this.icon, required this.pulse});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(13),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.cyan.withValues(alpha: 0.18 + pulse * 0.06),
+            AppColors.pink.withValues(alpha: 0.10 + pulse * 0.04),
+          ],
+        ),
+        border: Border.all(
+          color: AppColors.cyan.withValues(alpha: 0.4),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.cyan.withValues(alpha: 0.25 + pulse * 0.2),
+            blurRadius: 12,
+            spreadRadius: -1,
+          ),
+        ],
+      ),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 400),
+        transitionBuilder: (child, anim) => ScaleTransition(
+          scale: anim,
+          child: FadeTransition(opacity: anim, child: child),
+        ),
+        child: Icon(
+          icon,
+          key: ValueKey(icon),
+          color: AppColors.cyan,
+          size: 20,
+        ),
+      ),
+    );
+  }
 }
 
 // ─────────────────────────── Sub-widgets ─────────────────────────────────────
@@ -540,82 +665,16 @@ class _HoverChip extends StatelessWidget {
   }
 }
 
-class _SkillBar extends StatelessWidget {
-  final String label;
-  final double value; // current (animated)
-  final double target; // final value (for text)
-
-  const _SkillBar({
-    required this.label,
-    required this.value,
-    required this.target,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: GoogleFonts.ibmPlexMono(
-                fontSize: 11,
-                color: AppColors.dim,
-                letterSpacing: 0.3,
-              ),
-            ),
-            Text(
-              '${(target * 100).toInt()}%',
-              style: GoogleFonts.ibmPlexMono(
-                fontSize: 11,
-                color: AppColors.cyan,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 5),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(2),
-          child: Stack(
-            children: [
-              // Track
-              Container(
-                height: 5,
-                color: AppColors.cyan.withValues(alpha: 0.1),
-              ),
-              // Fill
-              FractionallySizedBox(
-                widthFactor: value,
-                child: Container(
-                  height: 5,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [AppColors.cyan, AppColors.pink],
-                    ),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _TerminalBox extends StatelessWidget {
   final String text;
   final bool showCursor;
   const _TerminalBox({required this.text, required this.showCursor});
 
+  @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 280,
+      constraints: const BoxConstraints(minHeight: 300),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFF060F1A),
@@ -786,162 +845,4 @@ class _SparklePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_SparklePainter old) => true;
-}
-
-class _RotatingSkillsText extends StatefulWidget {
-  final List<(String, double)> skills;
-  const _RotatingSkillsText({required this.skills});
-
-  @override
-  State<_RotatingSkillsText> createState() => _RotatingSkillsTextState();
-}
-
-class _RotatingSkillsTextState extends State<_RotatingSkillsText> {
-  int _idx = 0;
-  late Timer _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(const Duration(milliseconds: 2500), (_) {
-      if (mounted) setState(() => _idx = (_idx + 1) % widget.skills.length);
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 600),
-      switchInCurve: Curves.easeOutBack,
-      switchOutCurve: Curves.easeIn,
-      transitionBuilder: (child, animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, 0.4),
-              end: Offset.zero,
-            ).animate(animation),
-            child: child,
-          ),
-        );
-      },
-      child: Text(
-        widget.skills[_idx].$1,
-        key: ValueKey<int>(_idx),
-        textAlign: TextAlign.left,
-        style: GoogleFonts.spaceGrotesk(
-          fontSize: 22,
-          fontWeight: FontWeight.w700,
-          color: AppColors.cyan,
-          letterSpacing: -0.5,
-        ),
-      ),
-    );
-  }
-}
-
-class _GyroSkillIcon extends StatefulWidget {
-  const _GyroSkillIcon();
-
-  @override
-  State<_GyroSkillIcon> createState() => _GyroSkillIconState();
-}
-
-class _GyroSkillIconState extends State<_GyroSkillIcon>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 3000))
-      ..repeat();
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  Widget _buildRing(double angleX, double angleY, double angleZ, double size,
-      double width, Color color) {
-    return Transform(
-      alignment: Alignment.center,
-      transform: Matrix4.identity()
-        ..setEntry(3, 2, 0.002) // Perspective for 3D effect
-        ..rotateX(angleX)
-        ..rotateY(angleY)
-        ..rotateZ(angleZ),
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: color, width: width),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _ctrl,
-      builder: (context, _) {
-        final t = _ctrl.value * math.pi * 2;
-        return Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.cyan.withValues(alpha: 0.1),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.cyan.withValues(alpha: 0.25),
-                blurRadius: 12,
-              ),
-            ],
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Glowing Core
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: AppColors.cyan,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      blurRadius: 4,
-                    )
-                  ],
-                ),
-              ),
-              // Outer Ring (Z-axis primary)
-              _buildRing(t * 0.9, 0, -t, 32, 0.8,
-                  AppColors.dim.withValues(alpha: 0.4)),
-              // Middle Ring (X-Y axis tumble)
-              _buildRing(t, t * 1.5, 0, 24, 1.5,
-                  AppColors.cyan.withValues(alpha: 0.8)),
-              // Inner Ring (Y-Z axis tumble)
-              _buildRing(0, t * 1.2, t * 0.8, 16, 1.0,
-                  const Color(0xFF00F5D4).withValues(alpha: 0.6)),
-            ],
-          ),
-        );
-      },
-    );
-  }
 }
