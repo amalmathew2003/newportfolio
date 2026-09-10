@@ -9,9 +9,6 @@ import 'package:my_portfolio/screen/skills_screen.dart';
 import 'package:my_portfolio/screen/experience_screen.dart';
 import 'package:my_portfolio/screen/projects_screen.dart';
 import 'package:my_portfolio/screen/contactme.dart';
-import 'package:my_portfolio/widgets/breadcrumb_nav.dart';
-import 'package:my_portfolio/widgets/scroll_progress_bar.dart';
-import 'package:my_portfolio/widgets/robot_follower.dart';
 
 class PortfolioScrollablePage extends StatefulWidget {
   const PortfolioScrollablePage({super.key});

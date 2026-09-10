@@ -76,6 +76,8 @@ class RobotFollowerOverlay extends StatefulWidget {
   final List<String> sectionNames;
   final bool showOnRight;
   final bool autoStart;
+  final String? dynamicTitle;
+  final String? dynamicDesc;
 
   const RobotFollowerOverlay({
     super.key,
@@ -84,6 +86,8 @@ class RobotFollowerOverlay extends StatefulWidget {
     required this.sectionNames,
     this.showOnRight = false,
     this.autoStart = false,
+    this.dynamicTitle,
+    this.dynamicDesc,
   });
 
   @override
@@ -96,8 +100,7 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
   Offset _cursor = const Offset(400, 400);
 
   // ── Bot 2D Position driven via ValueNotifier (Zero-setState lag!) ─────────
-  late final ValueNotifier<Offset> _botPosNotifier =
-      ValueNotifier(const Offset(400, 280));
+  late final ValueNotifier<Offset> _botPosNotifier;
 
   double _botTargetX = 400.0;
   double _botTargetY = 280.0;
@@ -147,6 +150,14 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
   @override
   void initState() {
     super.initState();
+
+    // Spawn off-screen or far right if showOnRight is true to avoid center glitch
+    final initialPos = widget.showOnRight
+        ? const Offset(1200, 280)
+        : const Offset(400, 280);
+    _botPosNotifier = ValueNotifier(initialPos);
+    _botTargetX = initialPos.dx;
+    _botTargetY = initialPos.dy;
 
     final isProjectDetails = widget.sectionNames.contains('Project');
     _hasStartedGuide = widget.autoStart || isProjectDetails;
@@ -357,8 +368,12 @@ class _RobotFollowerOverlayState extends State<RobotFollowerOverlay>
     } else {
       final info = _sectionInfo[_bubbleSection];
       bubbleIcon = info?.icon ?? '🤖';
-      bubbleTitle = info?.title ?? '';
-      bubbleDesc = info?.desc ?? '';
+      bubbleTitle = (_bubbleSection == 'Project' && widget.dynamicTitle != null)
+          ? widget.dynamicTitle!
+          : info?.title ?? '';
+      bubbleDesc = (_bubbleSection == 'Project' && widget.dynamicDesc != null)
+          ? widget.dynamicDesc!
+          : info?.desc ?? '';
       actionLabel = null;
       onActionTap = null;
     }

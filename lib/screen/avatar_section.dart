@@ -282,11 +282,11 @@ class _AvatarSectionState extends State<AvatarSection>
   }
 
   static const _chipData = [
-    ('Flutter', '2+ yrs'),
-    ('Dart', '2+ yrs'),
-    ('Firebase', '1+ yr'),
-    ('REST APIs', '1+ yr'),
-    ('Apps Shipped', '10+'),
+    ('Flutter', '1.5+ yrs'),
+    ('Dart', '1.5+ yrs'),
+    ('Firebase', '1.5+ yr'),
+    ('REST APIs', '1.5+ yr'),
+    ('Apps Shipped', '5+'),
   ];
 }
 
@@ -798,51 +798,4 @@ class _DotGridPainter extends CustomPainter {
   @override
   bool shouldRepaint(_DotGridPainter old) => old.t != t;
 }
-
-// ─────────────────────────── Sparkle trail ───────────────────────────────────
-
-class _Sparkle {
-  final Offset localPos;
-  final int createdAt;
-  final bool isCyan;
-  final double size;
-  const _Sparkle({
-    required this.localPos,
-    required this.createdAt,
-    required this.isCyan,
-    required this.size,
-  });
-}
-
-class _SparklePainter extends CustomPainter {
-  final List<_Sparkle> sparkles;
-  const _SparklePainter({required this.sparkles});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final now = DateTime.now().millisecondsSinceEpoch;
-    for (final s in sparkles) {
-      final age = (now - s.createdAt) / 700.0; // 0..1
-      final alpha = (1.0 - age).clamp(0.0, 1.0);
-      final col = s.isCyan ? const Color(0xFF00F5D4) : const Color(0xFFFF2D78);
-
-      // Glow
-      canvas.drawCircle(
-        s.localPos,
-        s.size * 3 * (1 - age * 0.5),
-        Paint()
-          ..color = col.withValues(alpha: alpha * 0.25)
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
-      );
-      // Core
-      canvas.drawCircle(
-        s.localPos,
-        s.size * (1 - age * 0.6),
-        Paint()..color = col.withValues(alpha: alpha * 0.85),
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(_SparklePainter old) => true;
-}
+
